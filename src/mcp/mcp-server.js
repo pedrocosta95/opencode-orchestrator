@@ -15,6 +15,22 @@ import { memoryStore } from '../memory/fallback-store.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Legacy agent type mapping for backward compatibility
+const LEGACY_AGENT_MAPPING = {
+  analyst: 'code-analyzer',
+  coordinator: 'task-orchestrator', 
+  optimizer: 'perf-analyzer',
+  documenter: 'api-docs',
+  monitor: 'performance-benchmarker',
+  specialist: 'system-architect',
+  architect: 'system-architect',
+};
+
+// Resolve legacy agent types to current equivalents
+function resolveLegacyAgentType(legacyType) {
+  return LEGACY_AGENT_MAPPING[legacyType] || legacyType;
+}
+
 class ClaudeFlowMCPServer {
   constructor() {
     this.version = '2.0.0-alpha.59';
