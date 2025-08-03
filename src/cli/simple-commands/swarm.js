@@ -795,7 +795,6 @@ The swarm should be self-documenting - use memory_store to save all important in
         console.log('\n✓ Claude Code launched with swarm coordination prompt!');
         console.log('  The swarm coordinator will orchestrate all agent tasks');
         console.log('  Use MCP tools for coordination and memory sharing');
-        console.log(`  Prompt file saved at: ${promptFile}`);
         
         console.log('\n💡 Pro Tips:');
         console.log('─'.repeat(30));
