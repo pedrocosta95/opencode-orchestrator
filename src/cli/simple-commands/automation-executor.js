@@ -55,6 +55,9 @@ export class WorkflowExecutor {
    */
   async executeWorkflow(workflowData, variables = {}) {
     try {
+      // Store workflow for reference
+      this.currentWorkflow = workflowData;
+      
       console.log(`🚀 Starting workflow execution: ${this.executionId}`);
       console.log(`📋 Workflow: ${workflowData.name}`);
       console.log(`🎯 Strategy: MLE-STAR Machine Learning Engineering`);
