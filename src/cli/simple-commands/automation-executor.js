@@ -637,8 +637,14 @@ Execute your role in the MLE-STAR workflow with full coordination and hook integ
     }
     
     // Final summary
-    console.log(`\n📊 Final Workflow Summary:`);
-    this.displayTaskBoard(taskStatuses);
+    if (!concurrentDisplay) {
+      console.log(`\n📊 Final Workflow Summary:`);
+      this.displayTaskBoard(taskStatuses);
+    } else {
+      // Stop concurrent display
+      concurrentDisplay.stop();
+      console.log(); // Add some space after display
+    }
     
     return {
       success: failedTasks === 0,
