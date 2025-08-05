@@ -1221,8 +1221,25 @@ COORDINATION KEY POINTS:
           const agent = claudeInstance.agent;
           const taskPrompt = this.createTaskPrompt(task, agent, workflow);
           
+          // Check if we should chain from a previous task
+          let chainOptions = {};
+          if (this.enableChaining && this.options.outputFormat === 'stream-json' && task.depends?.length > 0) {
+            // Get the output stream from the last dependency
+            const lastDependency = task.depends[task.depends.length - 1];
+            const dependencyStream = this.taskOutputStreams.get(lastDependency);
+            if (dependencyStream) {
+              console.log(`    🔗 Enabling stream chaining from ${lastDependency} to ${task.id}`);
+              chainOptions.inputStream = dependencyStream;
+            }
+          }
+          
           // For now, spawn a new instance for each task
-          const taskClaudeProcess = await this.spawnClaudeInstance(agent, taskPrompt);
+          const taskClaudeProcess = await this.spawnClaudeInstance(agent, taskPrompt, chainOptions);
+          
+          // Store the output stream for potential chaining
+          if (this.enableChaining && this.options.outputFormat === 'stream-json' && taskClaudeProcess.stdout) {
+            this.taskOutputStreams.set(task.id, taskClaudeProcess.stdout);
+          }
           
           // Wait for completion
           // Use longer timeout for ML tasks
