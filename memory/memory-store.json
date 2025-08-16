@@ -521,6 +521,12 @@
       "value": "test value 2 in default",
       "namespace": "default",
       "timestamp": 1754403771773
+    },
+    {
+      "key": "tdd_test_plan",
+      "value": "Test strategy: Testing claude-flow basic functionality. Unit tests for core commands and utilities, integration tests for API endpoints and MCP tools, e2e tests for complete workflows. Mocking: External services, GitHub API, MCP servers. Coverage target: 95%.",
+      "namespace": "default",
+      "timestamp": 1755362446482
     }
   ]
 }
