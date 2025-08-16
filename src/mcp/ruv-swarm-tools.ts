@@ -11,6 +11,20 @@ import { execAsync } from '../utils/helpers.js';
 import { existsSync } from 'fs';
 import { join } from 'path';
 
+// Import error fixes for agent_metrics, swarm_monitor, neural_train
+let errorFixes: any;
+try {
+  errorFixes = require('./fixes/mcp-error-fixes.js');
+} catch (e) {
+  // Fallback if module not found
+  errorFixes = {
+    fixAgentMetrics: (d: any) => d,
+    fixSwarmMonitor: (d: any) => d,
+    fixNeuralTrain: (d: any) => d,
+    wrapRuvSwarmResponse: (n: string, d: any) => d,
+  };
+}
+
 export interface RuvSwarmToolContext extends MCPContext {
   workingDirectory?: string;
   swarmId?: string;
