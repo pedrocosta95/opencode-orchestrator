@@ -42,6 +42,27 @@ async function ensureInitialized() {
       return true;
     } catch (error) {
       console.error('[ReasoningBank] Backend initialization failed:', error);
+
+      // Check if this is the better-sqlite3 missing error (npx issue)
+      if (error.message?.includes('BetterSqlite3 is not a constructor') ||
+          error.message?.includes('better-sqlite3')) {
+        const isNpx = process.env.npm_config_user_agent?.includes('npx') ||
+                      process.cwd().includes('_npx');
+
+        if (isNpx) {
+          console.error('\n⚠️  NPX LIMITATION DETECTED\n');
+          console.error('ReasoningBank requires better-sqlite3, which is not available in npx temp directories.\n');
+          console.error('📚 Solutions:\n');
+          console.error('  1. LOCAL INSTALL (Recommended):');
+          console.error('     npm install && node_modules/.bin/claude-flow memory store "key" "value"\n');
+          console.error('  2. USE MCP TOOLS instead:');
+          console.error('     mcp__claude-flow__memory_usage({ action: "store", key: "test", value: "data" })\n');
+          console.error('  3. USE JSON FALLBACK:');
+          console.error('     npx claude-flow@alpha memory store "key" "value" --no-reasoningbank\n');
+          console.error('See: docs/MEMORY_COMMAND_FIX.md for details\n');
+        }
+      }
+
       throw new Error(`Failed to initialize ReasoningBank: ${error.message}`);
     }
   })();
