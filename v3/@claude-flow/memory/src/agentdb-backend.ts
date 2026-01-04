@@ -717,10 +717,23 @@ export class AgentDBBackend extends EventEmitter implements IMemoryBackend {
    * Delete entry from AgentDB
    */
   private async deleteFromAgentDB(id: string): Promise<void> {
-    if (!this.agentdb?.database) return;
+    if (!this.agentdb) return;
 
-    const db = this.agentdb.database;
-    await db.run('DELETE FROM memory_entries WHERE id = ?', [id]);
+    try {
+      // Try native delete method first
+      if (typeof this.agentdb.delete === 'function') {
+        await this.agentdb.delete(id);
+        return;
+      }
+
+      // Fallback to database
+      const db = this.agentdb.database;
+      if (!db || typeof db.run !== 'function') return;
+
+      await db.run('DELETE FROM memory_entries WHERE id = ?', [id]);
+    } catch {
+      // Delete failed - entry removed from in-memory
+    }
   }
 
   /**
