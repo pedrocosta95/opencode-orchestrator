@@ -436,7 +436,21 @@ describe('UnifiedSwarmCoordinator', () => {
       expect(report.messagesPerSecond).toBeGreaterThanOrEqual(0);
     });
 
-    it('should report healthy status', () => {
+    it('should report healthy status', async () => {
+      // Add at least one agent to be considered healthy
+      await coordinator.registerAgent({
+        name: 'health-agent',
+        type: 'worker',
+        status: 'idle',
+        capabilities: createTestCapabilities(),
+        metrics: createTestMetrics(),
+        workload: 0,
+        health: 1.0,
+        lastHeartbeat: new Date(),
+        topologyRole: 'worker',
+        connections: [],
+      });
+
       expect(coordinator.isHealthy()).toBe(true);
     });
   });
