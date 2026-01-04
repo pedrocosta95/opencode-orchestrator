@@ -5,7 +5,7 @@
  * Supports 15-agent V3 swarm topology testing
  */
 import { vi, type Mock } from 'vitest';
-import { createMock, type MockedInterface, InteractionRecorder } from './create-mock';
+import { createMock, type MockedInterface, InteractionRecorder } from './create-mock.js';
 
 /**
  * Agent types for V3 15-agent swarm
