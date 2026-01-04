@@ -662,6 +662,20 @@ export class MCPServer extends EventEmitter implements IMCPServer {
    * Register built-in tools
    */
   private async registerBuiltInTools(): Promise<void> {
+    const startTime = performance.now();
+
+    // Register all ADR-005 MCP-first tools
+    const { getAllTools } = await import('./tools/index.js');
+    const mcpTools = getAllTools();
+
+    const mcpResult = this.registerTools(mcpTools);
+
+    this.logger.info('MCP-first tools registered (ADR-005)', {
+      registered: mcpResult.registered,
+      failed: mcpResult.failed.length,
+      failedTools: mcpResult.failed,
+    });
+
     // System info tool
     this.registerTool({
       name: 'system/info',
@@ -719,8 +733,13 @@ export class MCPServer extends EventEmitter implements IMCPServer {
       category: 'system',
     });
 
+    const duration = performance.now() - startTime;
+
     this.logger.info('Built-in tools registered', {
-      count: 4,
+      mcpTools: mcpResult.registered,
+      systemTools: 4,
+      totalTools: mcpResult.registered + 4,
+      registrationTime: `${duration.toFixed(2)}ms`,
     });
   }
 
