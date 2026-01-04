@@ -37,8 +37,8 @@ async function quickTest() {
     console.log(`  Execution time: ${output.executionTimeMs.toFixed(3)}ms`);
     console.log(`  Runtime: ${output.runtime}`);
 
-    // Test 4: Quick benchmark
-    console.log('\n✓ Test 4: Quick benchmark');
+    // Test 3: Quick benchmark
+    console.log('\n✓ Test 3: Quick benchmark');
     const benchResult = await quickBenchmark(256);
     console.log(`  Flash: ${benchResult.flashAttention.averageTimeMs.toFixed(3)}ms`);
     console.log(`  Baseline: ${benchResult.baseline.averageTimeMs.toFixed(3)}ms`);
