@@ -1,0 +1,86 @@
+{
+  "name": "@claude-flow/hooks",
+  "version": "3.0.0-alpha.1",
+  "description": "V3 Hooks System - Event-driven lifecycle hooks with ReasoningBank learning integration",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "import": "./dist/registry/index.js"
+    },
+    "./executor": {
+      "types": "./dist/executor/index.d.ts",
+      "import": "./dist/executor/index.js"
+    },
+    "./daemons": {
+      "types": "./dist/daemons/index.d.ts",
+      "import": "./dist/daemons/index.js"
+    },
+    "./statusline": {
+      "types": "./dist/statusline/index.d.ts",
+      "import": "./dist/statusline/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/index.d.ts",
+      "import": "./dist/mcp/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "bin",
+    "scripts"
+  ],
+  "bin": {
+    "hooks-daemon": "./bin/hooks-daemon.js",
+    "statusline": "./bin/statusline.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@claude-flow/shared": "workspace:*",
+    "@claude-flow/neural": "workspace:*",
+    "better-sqlite3": "^11.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@claude-flow/shared": "workspace:*"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "claude-flow",
+    "hooks",
+    "daemons",
+    "statusline",
+    "reasoningbank",
+    "mcp",
+    "agents"
+  ],
+  "author": "Claude Flow Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/claude-flow.git",
+    "directory": "v3/@claude-flow/hooks"
+  }
+}

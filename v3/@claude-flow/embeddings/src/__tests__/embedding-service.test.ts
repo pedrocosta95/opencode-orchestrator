@@ -16,7 +16,7 @@ describe('EmbeddingService', () => {
     let service: MockEmbeddingService;
 
     beforeEach(() => {
-      service = new MockEmbeddingService({ dimensions: 128 });
+      service = new MockEmbeddingService({ provider: 'mock', dimensions: 128 });
     });
 
     it('should generate embeddings with correct dimensions', async () => {

@@ -190,6 +190,9 @@ export {
   RaftConsensus,
   ByzantineConsensus,
   GossipConsensus,
+} from './consensus/index.js';
+
+export type {
   RaftConfig,
   ByzantineConfig,
   GossipConfig,
@@ -241,13 +244,13 @@ export {
   getWorkerDispatchService,
   type WorkerTrigger,
   type WorkerStatus,
-  type WorkerPriority,
-  type TriggerConfig,
   type WorkerInstance,
   type WorkerResult,
-  type WorkerDispatchOptions,
+  type DispatchOptions,
   type TriggerDetectionResult,
-  type WorkerStats,
+  type WorkerConfig,
+  type WorkerMetrics,
+  type WorkerArtifact,
 } from './workers/worker-dispatch.js';
 
 // =============================================================================
@@ -258,13 +261,14 @@ export {
   AttentionCoordinator,
   createAttentionCoordinator,
   type AttentionType,
-  type AttentionConfig,
-  type AttentionResult,
-  type ExpertConfig,
-  type ExpertSelection,
-  type MoEResult,
-  type PositionalConfig,
-  type PositionalResult,
+  type AttentionCoordinatorConfig,
+  type CoordinationResult,
+  type ExpertRoutingResult,
+  type AgentOutput,
+  type Task as AttentionTask,
+  type SpecializedAgent,
+  type SwarmTopology,
+  type GraphContext,
 } from './attention-coordinator.js';
 
 // =============================================================================
@@ -285,7 +289,7 @@ export {
   type SpawnEphemeralOptions,
   type SpawnResult,
   type FederationMessage,
-  type ConsensusProposal,
+  type ConsensusProposal as FederationConsensusProposal,
   type FederationStats,
   type FederationEvent,
   type FederationEventType,

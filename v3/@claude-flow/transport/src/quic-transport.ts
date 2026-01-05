@@ -131,7 +131,7 @@ export class QUICClient extends EventEmitter implements IQUICClient {
     streamErrors: 0,
   };
 
-  private listeners: Set<TransportEventListener> = new Set();
+  private transportListeners: Set<TransportEventListener> = new Set();
 
   constructor(config: QUICClientConfig, logger?: ILogger) {
     super();
@@ -331,15 +331,15 @@ export class QUICClient extends EventEmitter implements IQUICClient {
   }
 
   addEventListener(listener: TransportEventListener): void {
-    this.listeners.add(listener);
+    this.transportListeners.add(listener);
   }
 
   removeEventListener(listener: TransportEventListener): void {
-    this.listeners.delete(listener);
+    this.transportListeners.delete(listener);
   }
 
   private emitEvent(event: TransportEvent): void {
-    for (const listener of this.listeners) {
+    for (const listener of this.transportListeners) {
       try {
         listener(event);
       } catch (error) {
@@ -387,7 +387,7 @@ export class QUICServer extends EventEmitter implements IQUICServer {
     streamErrors: 0,
   };
 
-  private listeners: Set<TransportEventListener> = new Set();
+  private transportListeners: Set<TransportEventListener> = new Set();
 
   constructor(config: QUICServerConfig, logger?: ILogger) {
     super();
@@ -495,11 +495,11 @@ export class QUICServer extends EventEmitter implements IQUICServer {
   }
 
   addEventListener(listener: TransportEventListener): void {
-    this.listeners.add(listener);
+    this.transportListeners.add(listener);
   }
 
   removeEventListener(listener: TransportEventListener): void {
-    this.listeners.delete(listener);
+    this.transportListeners.delete(listener);
   }
 }
 

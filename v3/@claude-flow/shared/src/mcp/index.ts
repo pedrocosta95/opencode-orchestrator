@@ -21,8 +21,8 @@
  * @version 3.0.0
  */
 
-// Core types
-export {
+// Core types - using 'export type' for TypeScript isolatedModules compatibility
+export type {
   // Protocol types
   JsonRpcVersion,
   RequestId,
@@ -84,55 +84,50 @@ export {
   // Logger
   LogLevel,
   ILogger,
-
-  // Error handling
-  ErrorCodes,
-  MCPServerError,
 } from './types.js';
 
-// Server
-export {
-  MCPServer,
-  IMCPServer,
-  createMCPServer,
-} from './server.js';
+// Import types for local use in quickStart function
+import type { MCPServerConfig, ILogger } from './types.js';
+
+// Error handling - values (not types)
+export { ErrorCodes, MCPServerError } from './types.js';
+
+// Server - class and interface exports
+import { MCPServer, createMCPServer } from './server.js';
+export { MCPServer, createMCPServer };
+export type { IMCPServer } from './server.js';
 
 // Tool Registry
-export {
-  ToolRegistry,
-  createToolRegistry,
-  defineTool,
-} from './tool-registry.js';
+export { ToolRegistry, createToolRegistry, defineTool } from './tool-registry.js';
 
-// Session Manager
-export {
-  SessionManager,
-  SessionConfig,
-  createSessionManager,
-} from './session-manager.js';
+// Session Manager - class and factory exports
+import { SessionManager, createSessionManager } from './session-manager.js';
+export { SessionManager, createSessionManager };
+export type { SessionConfig } from './session-manager.js';
 
 // Connection Pool
-export {
-  ConnectionPool,
-  createConnectionPool,
-} from './connection-pool.js';
+export { ConnectionPool, createConnectionPool } from './connection-pool.js';
 
-// Transport layer
+// Transport layer - values
 export {
   // Factory
   createTransport,
   createInProcessTransport,
   TransportManager,
   createTransportManager,
-  TransportConfig,
   DEFAULT_TRANSPORT_CONFIGS,
 
   // Specific transports
   StdioTransport,
-  StdioTransportConfig,
   HttpTransport,
-  HttpTransportConfig,
   WebSocketTransport,
+} from './transport/index.js';
+
+// Transport layer - types
+export type {
+  TransportConfig,
+  StdioTransportConfig,
+  HttpTransportConfig,
   WebSocketTransportConfig,
 } from './transport/index.js';
 

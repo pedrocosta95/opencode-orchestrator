@@ -542,15 +542,8 @@ export function assertDependencyInjected<T extends object>(
 
 /**
  * Custom Vitest matcher declarations
+ * Note: Main declarations in setup.ts - these extend CustomMatchers
  */
-declare module 'vitest' {
-  interface Assertion<T = unknown> {
-    toHaveBeenCalledWithPattern(pattern: Record<string, unknown>): T;
-    toHaveEventType(eventType: string): T;
-    toMeetV3PerformanceTargets(): T;
-    toBeValidTransition(from: string, allowedTransitions: Record<string, string[]>): T;
-  }
-}
 
 /**
  * Register custom Vitest matchers

@@ -233,7 +233,7 @@ export function configureTestEnvironment(config: TestEnvironmentConfig = {}): vo
     // Restore console
     for (const [method, original] of Object.entries(originalConsole)) {
       if (original) {
-        (console as Record<string, unknown>)[method] = original;
+        (console as unknown as Record<string, unknown>)[method] = original;
       }
     }
   });
@@ -450,7 +450,7 @@ export function createNetworkTestHelper(): NetworkTestHelper {
       if (!originalFetch) {
         originalFetch = global.fetch;
 
-        global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        global.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
           const url = typeof input === 'string' ? input : input.toString();
           const method = init?.method ?? 'GET';
 

@@ -17,16 +17,22 @@
 import {
   ITransport,
   TransportType,
+  TransportHealthStatus,
   ILogger,
 } from '../types.js';
 import { StdioTransport, StdioTransportConfig, createStdioTransport } from './stdio.js';
 import { HttpTransport, HttpTransportConfig, createHttpTransport } from './http.js';
 import { WebSocketTransport, WebSocketTransportConfig, createWebSocketTransport } from './websocket.js';
 
-// Re-export transport classes
-export { StdioTransport, StdioTransportConfig } from './stdio.js';
-export { HttpTransport, HttpTransportConfig } from './http.js';
-export { WebSocketTransport, WebSocketTransportConfig } from './websocket.js';
+// Re-export transport classes (values)
+export { StdioTransport } from './stdio.js';
+export { HttpTransport } from './http.js';
+export { WebSocketTransport } from './websocket.js';
+
+// Re-export transport config types
+export type { StdioTransportConfig } from './stdio.js';
+export type { HttpTransportConfig } from './http.js';
+export type { WebSocketTransportConfig } from './websocket.js';
 
 /**
  * Transport configuration union
@@ -105,11 +111,12 @@ class InProcessTransport implements ITransport {
     // No-op - notifications are handled directly
   }
 
-  async getHealthStatus() {
+  async getHealthStatus(): Promise<TransportHealthStatus> {
     return {
       healthy: true,
       metrics: {
-        transport: 'in-process',
+        latency: 0,
+        connections: 1,
       },
     };
   }

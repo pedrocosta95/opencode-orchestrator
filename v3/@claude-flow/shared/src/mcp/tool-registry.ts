@@ -359,7 +359,12 @@ export class ToolRegistry extends EventEmitter {
       };
     }
 
-    const execContext = { ...this.defaultContext, ...context };
+    // Build execution context with required sessionId
+    const execContext: ToolContext = {
+      sessionId: context?.sessionId || this.defaultContext?.sessionId || 'default-session',
+      ...this.defaultContext,
+      ...context,
+    };
     this.totalExecutions++;
     metadata.callCount++;
     metadata.lastCalled = new Date();

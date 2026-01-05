@@ -19,6 +19,7 @@ import {
   type MCPServerOptions,
   type MCPServerStatus,
 } from '../mcp-server.js';
+import { listMCPTools, callMCPTool, hasTool, getToolMetadata } from '../mcp-client.js';
 
 // MCP tools categories
 const TOOL_CATEGORIES = [
@@ -343,21 +344,20 @@ const toolsCommand: Command = {
   action: async (ctx: CommandContext): Promise<CommandResult> => {
     const category = ctx.flags.category as string;
 
-    // Try to get tools from running server, fall back to static list
+    // Use local tool registry
     let tools: Array<{ name: string; category: string; description: string; enabled: boolean }>;
 
-    try {
-      // Import tool registry
-      const { getAllTools, getToolsByCategory, getToolStats } = await import('../../../../mcp/tools/index.js');
-      const allTools = category ? getToolsByCategory(category) : getAllTools();
+    // Get tools from local registry
+    const registeredTools = listMCPTools(category);
 
-      tools = allTools.map(tool => ({
+    if (registeredTools.length > 0) {
+      tools = registeredTools.map(tool => ({
         name: tool.name,
         category: tool.category || 'uncategorized',
         description: tool.description,
         enabled: true
       }));
-    } catch {
+    } else {
       // Fallback to static tool list
       tools = [
         // Agent tools
@@ -422,7 +422,7 @@ const toolsCommand: Command = {
         columns: [
           { key: 'name', header: 'Tool', width: 25 },
           { key: 'description', header: 'Description', width: 35 },
-          { key: 'enabled', header: 'Status', width: 10, format: (v: boolean) => v ? output.success('Enabled') : output.dim('Disabled') }
+          { key: 'enabled', header: 'Status', width: 10, format: (v: unknown) => (v as boolean) ? output.success('Enabled') : output.dim('Disabled') }
         ],
         data: catTools,
         border: false
@@ -528,17 +528,14 @@ const execCommand: Command = {
     }
 
     try {
-      // Try to execute through running server or directly
-      const { getToolByName } = await import('../../../../mcp/tools/index.js');
-      const toolDef = getToolByName(tool);
-
-      if (!toolDef) {
+      // Execute through local MCP tool registry
+      if (!hasTool(tool)) {
         output.printError(`Tool not found: ${tool}`);
         return { success: false, exitCode: 1 };
       }
 
       const startTime = performance.now();
-      const result = await toolDef.handler(params, {
+      const result = await callMCPTool(tool, params, {
         sessionId: `cli-${Date.now().toString(36)}`,
         requestId: `exec-${Date.now()}`,
       });

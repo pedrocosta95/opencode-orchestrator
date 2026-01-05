@@ -615,7 +615,7 @@ export function createSwarmConfig(
   base: keyof typeof swarmConfigs = 'v3Default',
   overrides?: Partial<SwarmConfig>
 ): SwarmConfig {
-  return mergeDeep(swarmConfigs[base], overrides ?? {}) as SwarmConfig;
+  return mergeDeep(swarmConfigs[base] as SwarmConfig & Record<string, unknown>, (overrides ?? {}) as Partial<SwarmConfig & Record<string, unknown>>);
 }
 
 /**
@@ -718,24 +718,25 @@ export function createSwarmTaskBatch(
 /**
  * Deep merge utility
  */
-function mergeDeep(
-  target: Record<string, unknown>,
-  source: Record<string, unknown>
-): Record<string, unknown> {
-  const output = { ...target };
+function mergeDeep<T extends Record<string, unknown>>(
+  target: T,
+  source: Partial<T>
+): T {
+  const output = { ...target } as Record<string, unknown>;
 
   for (const key of Object.keys(source)) {
-    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+    const sourceValue = source[key as keyof T];
+    if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
       output[key] = mergeDeep(
-        (target[key] as Record<string, unknown>) ?? {},
-        source[key] as Record<string, unknown>
+        (target[key as keyof T] as Record<string, unknown>) ?? {},
+        sourceValue as Record<string, unknown>
       );
     } else {
-      output[key] = source[key];
+      output[key] = sourceValue;
     }
   }
 
-  return output;
+  return output as T;
 }
 
 /**

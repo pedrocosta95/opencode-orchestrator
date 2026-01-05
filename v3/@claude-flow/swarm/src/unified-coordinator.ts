@@ -1598,7 +1598,6 @@ export class UnifiedSwarmCoordinator extends EventEmitter implements IUnifiedSwa
       lastHeartbeat: new Date(),
       topologyRole: options.type === 'queen' ? 'queen' : 'worker',
       connections: [],
-      metadata: options.metadata,
     };
 
     // Determine domain and agent number
@@ -1629,7 +1628,7 @@ export class UnifiedSwarmCoordinator extends EventEmitter implements IUnifiedSwa
 
     const duration = performance.now() - startTime;
 
-    this.emitEvent('agent.spawned', {
+    this.emitEvent('agent.joined', {
       agentId,
       type: options.type,
       domain,
@@ -1698,7 +1697,7 @@ export class UnifiedSwarmCoordinator extends EventEmitter implements IUnifiedSwa
     // Unregister the agent
     await this.unregisterAgent(agentId);
 
-    this.emitEvent('agent.terminated', {
+    this.emitEvent('agent.left', {
       agentId,
       reason: options?.reason || 'manual termination',
       tasksReassigned,

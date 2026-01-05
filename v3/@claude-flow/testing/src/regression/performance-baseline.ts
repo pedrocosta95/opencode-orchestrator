@@ -250,14 +250,15 @@ export class PerformanceBaseline {
    * Benchmark event bus operations
    */
   private async benchmarkEventBus(): Promise<number> {
-    const { EventBus } = await import('@claude-flow/shared');
+    const { EventBus, createAgentSpawnedEvent } = await import('@claude-flow/shared');
     const eventBus = new EventBus();
 
     const iterations = 1000;
     const start = performance.now();
 
     for (let i = 0; i < iterations; i++) {
-      await eventBus.publish('test:benchmark', { iteration: i });
+      const event = createAgentSpawnedEvent(`bench-${i}`, 'worker', 'default', ['test']);
+      await eventBus.emit(event);
     }
 
     const elapsed = performance.now() - start;
@@ -293,13 +294,15 @@ export class PerformanceBaseline {
     const eventBus = new EventBus();
 
     let count = 0;
-    eventBus.subscribe('throughput:test', () => count++);
+    eventBus.subscribe('agent:spawned', () => { count++; });
 
+    const { createAgentSpawnedEvent } = await import('@claude-flow/shared');
     const duration = 1000; // 1 second
     const start = Date.now();
 
     while (Date.now() - start < duration) {
-      await eventBus.publish('throughput:test', { timestamp: Date.now() });
+      const event = createAgentSpawnedEvent('bench-agent', 'worker', 'default', ['test']);
+      await eventBus.emit(event);
     }
 
     return count;

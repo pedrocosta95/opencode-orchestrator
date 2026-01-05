@@ -26,9 +26,9 @@ describe('QUICClient', () => {
       const client = createQUICClient({
         host: 'localhost',
         port: 4433,
-        cert: './cert.pem',
-        key: './key.pem',
-        alpn: ['h3'],
+        certPath: './cert.pem',
+        keyPath: './key.pem',
+        alpnProtocols: ['h3'],
       });
 
       expect(client).toBeDefined();
@@ -54,8 +54,8 @@ describe('QUICServer', () => {
       const server = createQUICServer({
         host: '0.0.0.0',
         port: 4433,
-        cert: './cert.pem',
-        key: './key.pem',
+        certPath: './cert.pem',
+        keyPath: './key.pem',
       });
 
       expect(server).toBeInstanceOf(QUICServer);
@@ -67,8 +67,8 @@ describe('QUICServer', () => {
       const server = createQUICServer({
         host: '0.0.0.0',
         port: 4433,
-        cert: './cert.pem',
-        key: './key.pem',
+        certPath: './cert.pem',
+        keyPath: './key.pem',
       });
 
       expect(typeof server.on).toBe('function');
@@ -80,9 +80,13 @@ describe('QUICServer', () => {
 describe('QUICConnectionPool', () => {
   describe('Configuration', () => {
     it('should create pool with config', () => {
-      const pool = createConnectionPool({
-        maxConnections: 10,
-        minConnections: 2,
+      const client = createQUICClient({
+        host: 'localhost',
+        port: 4433,
+      });
+      const pool = createConnectionPool(client, {
+        maxSize: 10,
+        minSize: 2,
         idleTimeout: 30000,
       });
 
@@ -90,7 +94,11 @@ describe('QUICConnectionPool', () => {
     });
 
     it('should use default values', () => {
-      const pool = createConnectionPool();
+      const client = createQUICClient({
+        host: 'localhost',
+        port: 4433,
+      });
+      const pool = createConnectionPool(client, { maxSize: 5 });
       expect(pool).toBeDefined();
     });
   });

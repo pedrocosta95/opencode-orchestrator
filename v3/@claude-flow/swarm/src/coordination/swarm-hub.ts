@@ -161,7 +161,7 @@ export class SwarmHub implements ISwarmHub {
     // DELEGATE to canonical coordinator
     await this.coordinator.initialize();
 
-    await this.eventBus.emit(swarmInitializedEvent({
+    await this.eventBus.emit(swarmInitializedEvent('swarm-hub', {
       topology: this.coordinator.getTopology(),
       maxAgents: 15,
       performanceTargets: V3_PERFORMANCE_TARGETS
@@ -301,7 +301,7 @@ export class SwarmHub implements ISwarmHub {
       const previousPhase = this.currentPhase;
       this.currentPhase = phaseOrder[currentIndex + 1];
 
-      this.eventBus.emitSync(swarmPhaseChangedEvent(previousPhase, this.currentPhase));
+      this.eventBus.emitSync(swarmPhaseChangedEvent('swarm-hub', previousPhase, this.currentPhase));
 
       console.log(`[SwarmHub] Advanced from ${previousPhase} to ${this.currentPhase}`);
     }
@@ -399,9 +399,10 @@ export class SwarmHub implements ISwarmHub {
       tasks.set(task.id, task);
     }
 
+    const status = this.coordinator.getStatus();
     return {
-      initialized: this.initialized,
-      topology: this.config.topology,
+      initialized: status.status === 'running',
+      topology: status.topology as TopologyType,
       agents,
       tasks,
       currentPhase: this.currentPhase,

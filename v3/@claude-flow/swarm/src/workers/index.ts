@@ -26,15 +26,16 @@
 export {
   WorkerDispatchService,
   getWorkerDispatchService,
+  createWorkerDispatchService,
   type WorkerTrigger,
   type WorkerStatus,
-  type WorkerPriority,
-  type TriggerConfig,
+  type WorkerConfig,
   type WorkerInstance,
   type WorkerResult,
-  type WorkerDispatchOptions,
+  type WorkerMetrics,
+  type WorkerArtifact,
+  type DispatchOptions,
   type TriggerDetectionResult,
-  type WorkerStats,
 } from './worker-dispatch.js';
 
 // Re-export trigger types for convenience

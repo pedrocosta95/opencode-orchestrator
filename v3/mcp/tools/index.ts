@@ -33,6 +33,7 @@ import { sessionTools } from './session-tools.js';
 import { workerTools } from './worker-tools.js';
 import { sonaTools } from './sona-tools.js';
 import { federationTools } from './federation-tools.js';
+import { v2CompatTools, getV2Tool, mapV2ToV3ToolName } from './v2-compat-tools.js';
 
 // ============================================================================
 // Individual Tool Exports
@@ -146,6 +147,28 @@ export {
   federationTools,
 } from './federation-tools.js';
 
+// V2 Compatibility tools (backward compatibility with V2 MCP naming)
+export {
+  v2CompatTools,
+  getV2Tool,
+  mapV2ToV3ToolName,
+  swarmInitTool as v2SwarmInitTool,
+  swarmStatusV2Tool,
+  swarmMonitorTool,
+  agentSpawnTool as v2AgentSpawnTool,
+  agentListTool as v2AgentListTool,
+  agentMetricsTool,
+  taskOrchestrateTool,
+  taskStatusV2Tool,
+  taskResultsV2Tool,
+  memoryUsageTool,
+  neuralStatusTool,
+  neuralTrainTool,
+  neuralPatternsTool,
+  benchmarkRunTool,
+  featuresDetectTool,
+} from './v2-compat-tools.js';
+
 // ============================================================================
 // Tool Registry
 // ============================================================================
@@ -166,8 +189,8 @@ export {
  * server.registerTools(tools);
  * ```
  */
-export function getAllTools(): MCPTool[] {
-  return [
+export function getAllTools(includeV2Compat = true): MCPTool[] {
+  const v3Tools = [
     ...agentTools,
     ...swarmTools,
     ...memoryTools,
@@ -180,6 +203,20 @@ export function getAllTools(): MCPTool[] {
     ...sonaTools,
     ...federationTools,
   ];
+
+  // Include V2 compatibility tools if requested (default: true for backward compatibility)
+  if (includeV2Compat) {
+    return [...v3Tools, ...v2CompatTools];
+  }
+
+  return v3Tools;
+}
+
+/**
+ * Get only V3 tools (excludes V2 compatibility tools)
+ */
+export function getV3Tools(): MCPTool[] {
+  return getAllTools(false);
 }
 
 /**
@@ -383,11 +420,13 @@ export function validateToolRegistration(): {
 
 export default {
   getAllTools,
+  getV3Tools,
   getToolsByCategory,
   getToolByName,
   getToolsByTag,
   getToolStats,
   validateToolRegistration,
+  // V3 Tool Groups
   agentTools,
   swarmTools,
   memoryTools,
@@ -399,4 +438,8 @@ export default {
   workerTools,
   sonaTools,
   federationTools,
+  // V2 Compatibility
+  v2CompatTools,
+  getV2Tool,
+  mapV2ToV3ToolName,
 };

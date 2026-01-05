@@ -8,22 +8,20 @@ describe('MeteringEngine', () => {
   let engine: MeteringEngine;
   let storage: InMemoryBillingStorage;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     storage = new InMemoryBillingStorage();
-    engine = new MeteringEngine({}, storage);
-    await engine.initialize();
+    engine = new MeteringEngine(storage, {});
   });
 
   describe('Initialization', () => {
-    it('should initialize successfully', async () => {
-      const newEngine = new MeteringEngine({});
-      await newEngine.initialize();
+    it('should initialize successfully', () => {
+      const newStorage = new InMemoryBillingStorage();
+      const newEngine = new MeteringEngine(newStorage);
       expect(newEngine).toBeDefined();
     });
 
-    it('should create engine with factory function', async () => {
+    it('should create engine with factory function', () => {
       const factoryEngine = createMeteringEngine({});
-      await factoryEngine.initialize();
       expect(factoryEngine).toBeInstanceOf(MeteringEngine);
     });
   });
@@ -78,16 +76,16 @@ describe('InMemoryBillingStorage', () => {
         id: 'record-1',
         subscriptionId: 'sub-1',
         metric: 'tokens',
-        value: 1000,
+        amount: 1000,
         timestamp: Date.now(),
         billingPeriod: '2026-01',
       };
-      
-      await storage.saveUsageRecord(record);
+
+      await storage.saveUsageRecord(record as any);
       const records = await storage.getUsageRecords('sub-1', '2026-01');
-      
+
       expect(records).toHaveLength(1);
-      expect(records[0].value).toBe(1000);
+      expect(records[0].amount).toBe(1000);
     });
 
     it('should return empty array for no records', async () => {

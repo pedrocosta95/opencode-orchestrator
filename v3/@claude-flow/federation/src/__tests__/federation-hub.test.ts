@@ -117,7 +117,10 @@ describe('FederationHub', () => {
   describe('Creation', () => {
     it('should create hub with config', () => {
       const hub = createFederationHub({
-        clusterId: 'test-cluster',
+        endpoint: 'quic://localhost:4433',
+        agentId: 'test-agent',
+        tenantId: 'test-tenant',
+        token: 'test-token',
       });
 
       expect(hub).toBeInstanceOf(FederationHub);
@@ -125,7 +128,10 @@ describe('FederationHub', () => {
 
     it('should accept optional config options', () => {
       const hub = createFederationHub({
-        clusterId: 'test-cluster',
+        endpoint: 'quic://localhost:4433',
+        agentId: 'test-agent',
+        tenantId: 'test-tenant',
+        token: 'test-token',
         syncInterval: 5000,
         conflictResolution: 'last-write-wins',
       });
@@ -136,7 +142,12 @@ describe('FederationHub', () => {
 
   describe('Event Emission', () => {
     it('should be an EventEmitter', () => {
-      const hub = createFederationHub({ clusterId: 'test' });
+      const hub = createFederationHub({
+        endpoint: 'quic://localhost:4433',
+        agentId: 'test-agent',
+        tenantId: 'test-tenant',
+        token: 'test-token',
+      });
 
       expect(typeof hub.on).toBe('function');
       expect(typeof hub.emit).toBe('function');

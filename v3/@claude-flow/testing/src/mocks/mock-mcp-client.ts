@@ -275,7 +275,7 @@ export class MockMCPClient {
   /**
    * Configure latency simulation
    */
-  simulateLatency(ms: number): void {
+  setLatency(ms: number): void {
     this._latencySimulation = ms;
   }
 
@@ -718,6 +718,6 @@ export function createFailingMockMCPClient(
  */
 export function createSlowMockMCPClient(latencyMs: number): MockMCPClient {
   const client = new MockMCPClient();
-  client.simulateLatency(latencyMs);
+  client.setLatency(latencyMs);
   return client;
 }

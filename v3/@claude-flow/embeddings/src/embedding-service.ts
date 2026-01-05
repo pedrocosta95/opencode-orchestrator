@@ -58,7 +58,9 @@ class LRUCache<K, V> {
     } else if (this.cache.size >= this.maxSize) {
       // Remove oldest (first) entry
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
     }
     this.cache.set(key, value);
   }
@@ -96,7 +98,7 @@ class LRUCache<K, V> {
 abstract class BaseEmbeddingService extends EventEmitter implements IEmbeddingService {
   abstract readonly provider: EmbeddingProvider;
   protected cache: LRUCache<string, Float32Array>;
-  protected listeners: Set<EmbeddingEventListener> = new Set();
+  protected embeddingListeners: Set<EmbeddingEventListener> = new Set();
 
   constructor(protected readonly config: EmbeddingConfig) {
     super();
@@ -107,7 +109,7 @@ abstract class BaseEmbeddingService extends EventEmitter implements IEmbeddingSe
   abstract embedBatch(texts: string[]): Promise<BatchEmbeddingResult>;
 
   protected emitEvent(event: EmbeddingEvent): void {
-    for (const listener of this.listeners) {
+    for (const listener of this.embeddingListeners) {
       try {
         listener(event);
       } catch (error) {
@@ -118,11 +120,11 @@ abstract class BaseEmbeddingService extends EventEmitter implements IEmbeddingSe
   }
 
   addEventListener(listener: EmbeddingEventListener): void {
-    this.listeners.add(listener);
+    this.embeddingListeners.add(listener);
   }
 
   removeEventListener(listener: EmbeddingEventListener): void {
-    this.listeners.delete(listener);
+    this.embeddingListeners.delete(listener);
   }
 
   clearCache(): void {
@@ -142,7 +144,7 @@ abstract class BaseEmbeddingService extends EventEmitter implements IEmbeddingSe
 
   async shutdown(): Promise<void> {
     this.clearCache();
-    this.listeners.clear();
+    this.embeddingListeners.clear();
   }
 }
 
@@ -300,7 +302,10 @@ export class OpenAIEmbeddingService extends BaseEmbeddingService {
           throw new Error(`OpenAI API error: ${response.status} - ${error}`);
         }
 
-        return await response.json();
+        return await response.json() as {
+          data: Array<{ embedding: number[] }>;
+          usage?: { prompt_tokens: number; total_tokens: number };
+        };
       } catch (error) {
         if (attempt === this.maxRetries - 1) {
           throw error;

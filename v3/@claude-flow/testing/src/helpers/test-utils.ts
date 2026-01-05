@@ -622,7 +622,8 @@ export async function expectToReject<T extends Error>(
 export function createTrackedMock<T extends (...args: unknown[]) => unknown>(
   implementation?: T
 ): TrackedMock<T> {
-  const mock = vi.fn(implementation);
+  // Use type assertion to handle the optional implementation
+  const mock = implementation ? vi.fn(implementation) : vi.fn();
   const calls: Array<{ args: Parameters<T>; result?: ReturnType<T>; error?: Error; duration: number }> = [];
 
   const tracked = ((...args: Parameters<T>) => {
@@ -661,7 +662,7 @@ export function createTrackedMock<T extends (...args: unknown[]) => unknown>(
  */
 export interface TrackedMock<T extends (...args: unknown[]) => unknown> {
   (...args: Parameters<T>): ReturnType<T>;
-  mock: ReturnType<typeof vi.fn<T>>;
+  mock: ReturnType<typeof vi.fn>;
   calls: Array<{ args: Parameters<T>; result?: ReturnType<T>; error?: Error; duration: number }>;
   getAverageDuration(): number;
   getTotalDuration(): number;

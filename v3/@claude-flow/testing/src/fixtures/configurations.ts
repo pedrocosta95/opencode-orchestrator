@@ -409,55 +409,59 @@ export function createSecurityConfig(
   base: keyof typeof securityConfigs,
   overrides?: Partial<SecurityConfig>
 ): SecurityConfig {
-  return mergeDeep(securityConfigs[base], overrides ?? {}) as SecurityConfig;
+  return mergeDeep(securityConfigs[base] as SecurityConfig & Record<string, unknown>, (overrides ?? {}) as Partial<SecurityConfig & Record<string, unknown>>);
 }
 
 export function createMemoryConfig(
   base: keyof typeof memoryConfigs,
   overrides?: Partial<MemoryConfig>
 ): MemoryConfig {
-  return mergeDeep(memoryConfigs[base], overrides ?? {}) as MemoryConfig;
+  return mergeDeep(memoryConfigs[base] as MemoryConfig & Record<string, unknown>, (overrides ?? {}) as Partial<MemoryConfig & Record<string, unknown>>);
 }
 
-export function createSwarmConfig(
+export function createSwarmConfigFromBase(
   base: keyof typeof swarmConfigs,
   overrides?: Partial<SwarmConfig>
 ): SwarmConfig {
-  return mergeDeep(swarmConfigs[base], overrides ?? {}) as SwarmConfig;
+  return mergeDeep(swarmConfigs[base] as SwarmConfig & Record<string, unknown>, (overrides ?? {}) as Partial<SwarmConfig & Record<string, unknown>>);
 }
 
 export function createMCPConfig(
   base: keyof typeof mcpConfigs,
   overrides?: Partial<MCPConfig>
 ): MCPConfig {
-  return mergeDeep(mcpConfigs[base], overrides ?? {}) as MCPConfig;
+  return mergeDeep(mcpConfigs[base] as MCPConfig & Record<string, unknown>, (overrides ?? {}) as Partial<MCPConfig & Record<string, unknown>>);
 }
 
 export function createPerformanceConfig(
   base: keyof typeof performanceConfigs,
   overrides?: Partial<PerformanceConfig>
 ): PerformanceConfig {
-  return mergeDeep(performanceConfigs[base], overrides ?? {}) as PerformanceConfig;
+  return mergeDeep(performanceConfigs[base] as PerformanceConfig & Record<string, unknown>, (overrides ?? {}) as Partial<PerformanceConfig & Record<string, unknown>>);
 }
 
 /**
  * Deep merge utility
  */
-function mergeDeep(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
-  const output = { ...target };
+function mergeDeep<T extends Record<string, unknown>>(
+  target: T,
+  source: Partial<T>
+): T {
+  const output = { ...target } as Record<string, unknown>;
 
   for (const key of Object.keys(source)) {
-    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+    const sourceValue = source[key as keyof T];
+    if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
       output[key] = mergeDeep(
-        (target[key] as Record<string, unknown>) ?? {},
-        source[key] as Record<string, unknown>
+        (target[key as keyof T] as Record<string, unknown>) ?? {},
+        sourceValue as Record<string, unknown>
       );
     } else {
-      output[key] = source[key];
+      output[key] = sourceValue;
     }
   }
 
-  return output;
+  return output as T;
 }
 
 /**
@@ -479,8 +483,8 @@ export const invalidConfigs = {
   },
 
   swarm: {
-    zeroAgents: createSwarmConfig('v3Default', { maxAgents: 0 }),
-    negativeHeartbeat: createSwarmConfig('v3Default', {
+    zeroAgents: createSwarmConfigFromBase('v3Default', { maxAgents: 0 }),
+    negativeHeartbeat: createSwarmConfigFromBase('v3Default', {
       coordination: { consensusProtocol: 'raft', heartbeatInterval: -100, electionTimeout: 5000 },
     }),
   },

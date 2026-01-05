@@ -16,8 +16,6 @@ export * from './swarm-fixtures.js';
 // MCP fixtures (tools, resources, prompts)
 export * from './mcp-fixtures.js';
 
-// Legacy exports for backward compatibility
-export * from './agents.js';
-export * from './tasks.js';
-export * from './memory-entries.js';
-export * from './configurations.js';
+// Note: Legacy files (agents.js, tasks.js, memory-entries.js, configurations.js)
+// are deprecated. Their contents have been merged into the comprehensive fixtures above.
+// Import directly from the specific fixture files if needed.

@@ -244,7 +244,7 @@ async function main() {
       aggregateId: 'agent-2',
       aggregateType: 'agent',
       version: 5,
-      state: agent2State,
+      state: agent2State as unknown as Record<string, unknown>,
       timestamp: Date.now(),
     });
     console.log('   Snapshot saved for agent-2');

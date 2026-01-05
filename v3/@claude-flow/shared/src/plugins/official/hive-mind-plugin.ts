@@ -8,7 +8,7 @@
  */
 
 import type { ClaudeFlowPlugin, PluginContext, PluginConfig } from '../types.js';
-import { HookEvent } from '../../hooks/index.js';
+import { HookEvent, HookPriority, type TaskInfo } from '../../hooks/index.js';
 
 /**
  * HiveMind configuration
@@ -76,46 +76,46 @@ export class HiveMindPlugin implements ClaudeFlowPlugin {
     this.context = context;
 
     // Register hooks for collective behavior
-    context.hooks?.register({
-      id: 'hive-mind-pre-task',
-      event: HookEvent.PreTaskExecute,
-      priority: 100,
-      handler: async (ctx) => {
+    context.hooks?.register(
+      HookEvent.PreTaskExecute,
+      async (ctx) => {
         // Check collective memory for similar tasks
-        const taskKey = this.generateTaskKey(ctx.data);
+        const taskKey = this.generateTaskKey(ctx.task);
         const previous = this.collectiveMemory.get(taskKey);
 
-        if (previous) {
-          ctx.data.collectiveInsight = previous;
+        if (previous && ctx.metadata) {
+          ctx.metadata.collectiveInsight = previous;
         }
 
-        return { proceed: true, context: ctx };
+        return { success: true, continueChain: true };
       },
-    });
+      HookPriority.Normal,
+      { name: 'hive-mind-pre-task' }
+    );
 
-    context.hooks?.register({
-      id: 'hive-mind-post-task',
-      event: HookEvent.PostTaskComplete,
-      priority: 100,
-      handler: async (ctx) => {
+    context.hooks?.register(
+      HookEvent.PostTaskComplete,
+      async (ctx) => {
         // Store result in collective memory
-        if (this.config.collectiveMemoryEnabled) {
-          const taskKey = this.generateTaskKey(ctx.data);
-          this.collectiveMemory.set(taskKey, {
-            result: ctx.data.result,
+        if (this.config.collectiveMemoryEnabled && ctx.task) {
+          const taskInfo = ctx.task;
+          this.collectiveMemory.set(taskInfo.id, {
+            result: ctx.metadata?.result,
             timestamp: new Date(),
-            agentId: ctx.data.agentId,
+            agentId: ctx.agent?.id,
           });
         }
 
         // Detect emergent patterns
-        if (this.config.emergentBehaviorEnabled) {
-          this.detectEmergentPatterns(ctx.data);
+        if (this.config.emergentBehaviorEnabled && ctx.task) {
+          this.detectEmergentPatterns(ctx.task);
         }
 
-        return { proceed: true, context: ctx };
+        return { success: true, continueChain: true };
       },
-    });
+      HookPriority.Normal,
+      { name: 'hive-mind-post-task' }
+    );
   }
 
   async shutdown(): Promise<void> {
@@ -208,9 +208,9 @@ export class HiveMindPlugin implements ClaudeFlowPlugin {
   /**
    * Detect emergent patterns from agent behavior
    */
-  private detectEmergentPatterns(taskData: Record<string, unknown>): void {
+  private detectEmergentPatterns(taskData: TaskInfo): void {
     // Analyze task patterns
-    const type = String(taskData.type ?? 'unknown');
+    const type = taskData.description?.split(' ')[0] ?? 'unknown';
     const patternKey = `pattern-${type}`;
 
     const existing = this.patterns.get(patternKey);
@@ -287,8 +287,9 @@ export class HiveMindPlugin implements ClaudeFlowPlugin {
   // Private Helpers
   // ============================================================================
 
-  private generateTaskKey(taskData: Record<string, unknown>): string {
-    return `${taskData.type}-${JSON.stringify(taskData.input ?? {})}`.slice(0, 100);
+  private generateTaskKey(taskData: TaskInfo | undefined): string {
+    if (!taskData) return 'unknown';
+    return `${taskData.description || 'task'}-${JSON.stringify(taskData.metadata ?? {})}`.slice(0, 100);
   }
 
   private recalculateConsensus(decision: CollectiveDecision): void {

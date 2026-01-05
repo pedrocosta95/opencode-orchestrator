@@ -19,9 +19,9 @@ import {
  * Mock CLI executor for testing
  */
 interface MockCLIExecutor {
-  execute: Mock<[string, string[]], Promise<{ success: boolean; output: string; exitCode: number }>>;
-  getCommands: Mock<[], string[]>;
-  parseOutput: Mock<[string], Record<string, unknown>>;
+  execute: Mock<(command: string, args: string[]) => Promise<{ success: boolean; output: string; exitCode: number }>>;
+  getCommands: Mock<() => string[]>;
+  parseOutput: Mock<(output: string) => Record<string, unknown>>;
 }
 
 /**

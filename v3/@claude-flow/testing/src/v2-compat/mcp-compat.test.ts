@@ -54,10 +54,10 @@ const TOOL_NAME_MAPPING: Record<string, string> = {
  * Mock MCP client for testing
  */
 interface MockMCPClient {
-  callTool: Mock<[string, Record<string, unknown>], Promise<unknown>>;
-  getTools: Mock<[], string[]>;
-  translateToolName: Mock<[string], string>;
-  translateParams: Mock<[string, Record<string, unknown>], Record<string, unknown>>;
+  callTool: Mock<(name: string, params: Record<string, unknown>) => Promise<unknown>>;
+  getTools: Mock<() => string[]>;
+  translateToolName: Mock<(name: string) => string>;
+  translateParams: Mock<(name: string, params: Record<string, unknown>) => Record<string, unknown>>;
 }
 
 /**

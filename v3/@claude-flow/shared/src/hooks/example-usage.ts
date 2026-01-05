@@ -6,7 +6,8 @@
  * @module v3/shared/hooks/example-usage
  */
 
-import { createHookRegistry, createHookExecutor } from './registry.js';
+import { createHookRegistry } from './registry.js';
+import { createHookExecutor } from './executor.js';
 import { HookEvent, HookPriority, HookContext } from './types.js';
 import { createEventBus } from '../core/event-bus.js';
 

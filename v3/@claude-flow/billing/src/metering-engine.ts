@@ -105,7 +105,7 @@ export class MeteringEngine extends EventEmitter implements IMeteringEngine {
   private buffer: UsageRecord[] = [];
   private flushTimer?: NodeJS.Timeout;
   private usageCache: Map<string, Map<UsageMetric, number>> = new Map();
-  private listeners: Set<BillingEventListener> = new Set();
+  private billingListeners: Set<BillingEventListener> = new Set();
 
   constructor(storage: IBillingStorage, config?: Partial<MeteringConfig>) {
     super();
@@ -304,7 +304,7 @@ export class MeteringEngine extends EventEmitter implements IMeteringEngine {
   async stop(): Promise<void> {
     this.stopFlushTimer();
     await this.flush();
-    this.listeners.clear();
+    this.billingListeners.clear();
   }
 
   clearCache(subscriptionId?: string): void {
@@ -316,11 +316,11 @@ export class MeteringEngine extends EventEmitter implements IMeteringEngine {
   }
 
   addEventListener(listener: BillingEventListener): void {
-    this.listeners.add(listener);
+    this.billingListeners.add(listener);
   }
 
   removeEventListener(listener: BillingEventListener): void {
-    this.listeners.delete(listener);
+    this.billingListeners.delete(listener);
   }
 
   // ============================================================================
@@ -390,7 +390,7 @@ export class MeteringEngine extends EventEmitter implements IMeteringEngine {
   }
 
   private emitEvent(event: BillingEvent): void {
-    for (const listener of this.listeners) {
+    for (const listener of this.billingListeners) {
       try {
         listener(event);
       } catch (error) {

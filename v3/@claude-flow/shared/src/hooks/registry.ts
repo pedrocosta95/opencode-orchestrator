@@ -226,7 +226,8 @@ export class HookRegistry {
     }
 
     if (filter?.minPriority !== undefined) {
-      hooks = hooks.filter(h => h.priority >= filter.minPriority);
+      const minPriority = filter.minPriority;
+      hooks = hooks.filter(h => h.priority >= minPriority);
     }
 
     return hooks;

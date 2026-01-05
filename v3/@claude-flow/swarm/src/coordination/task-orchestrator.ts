@@ -157,7 +157,7 @@ export class TaskOrchestrator implements ITaskOrchestrator {
 
     this.updateBlockedStatus(taskId);
 
-    this.eventBus.emitSync(taskCreatedEvent(taskId, spec.type, spec.title));
+    this.eventBus.emitSync(taskCreatedEvent(taskId, { type: spec.type, title: spec.title }));
 
     return task;
   }
@@ -179,7 +179,7 @@ export class TaskOrchestrator implements ITaskOrchestrator {
     }
 
     this.updateTaskStatus(taskId, 'queued');
-    this.eventBus.emitSync(taskQueuedEvent(taskId, task.priority));
+    this.eventBus.emitSync(taskQueuedEvent(taskId, this.getQueuePosition(taskId)));
   }
 
   assignTask(taskId: TaskId, agentId: AgentId): void {
@@ -506,7 +506,8 @@ export class TaskOrchestrator implements ITaskOrchestrator {
 
     if (isBlocked && task.status !== 'blocked') {
       this.updateTaskStatus(taskId, 'blocked');
-      this.eventBus.emitSync(taskBlockedEvent(taskId, this.getBlockingTasks(taskId)));
+      const blockingTasks = this.getBlockingTasks(taskId);
+      this.eventBus.emitSync(taskBlockedEvent(taskId, 'Blocked by dependencies', blockingTasks[0]));
     } else if (!isBlocked && task.status === 'blocked') {
       this.updateTaskStatus(taskId, 'queued');
     }
@@ -572,6 +573,23 @@ export class TaskOrchestrator implements ITaskOrchestrator {
       coveragePercent: 0,
       performanceImpact: 0
     };
+  }
+
+  private getQueuePosition(taskId: TaskId): number {
+    const priorityOrder: Record<string, number> = {
+      critical: 5,
+      high: 4,
+      normal: 3,
+      low: 2,
+      background: 1,
+    };
+
+    const queuedTasks = Array.from(this.tasks.values())
+      .filter(t => t.status === 'queued')
+      .sort((a, b) => (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0));
+
+    const position = queuedTasks.findIndex(t => t.id === taskId);
+    return position >= 0 ? position + 1 : queuedTasks.length + 1;
   }
 }
 

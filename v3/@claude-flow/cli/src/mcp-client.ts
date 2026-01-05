@@ -8,13 +8,13 @@
  * containing hardcoded business logic. All business logic lives in MCP tool handlers.
  */
 
-import type { MCPTool } from '../../../mcp/types.js';
+import type { MCPTool } from './mcp-tools/types.js';
 
-// Import MCP tool handlers
-import { agentTools } from '../../../mcp/tools/agent-tools.js';
-import { swarmTools } from '../../../mcp/tools/swarm-tools.js';
-import { memoryTools } from '../../../mcp/tools/memory-tools.js';
-import { configTools } from '../../../mcp/tools/config-tools.js';
+// Import MCP tool handlers from local package
+import { agentTools } from './mcp-tools/agent-tools.js';
+import { swarmTools } from './mcp-tools/swarm-tools.js';
+import { memoryTools } from './mcp-tools/memory-tools.js';
+import { configTools } from './mcp-tools/config-tools.js';
 
 /**
  * MCP Tool Registry

@@ -27,7 +27,7 @@ function createSwarmEvent<T>(
   return {
     id: generateEventId(),
     type,
-    timestamp: new Date(),
+    timestamp: Date.now(),
     source,
     payload,
   };

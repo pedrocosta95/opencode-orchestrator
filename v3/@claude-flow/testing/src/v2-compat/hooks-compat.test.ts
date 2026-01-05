@@ -34,12 +34,12 @@ interface HookResult {
  * Mock hooks system for testing
  */
 interface MockHooksSystem {
-  trigger: Mock<[string, Record<string, unknown>], Promise<HookResult>>;
-  register: Mock<[string, (params: unknown) => Promise<HookResult>], void>;
-  getHooks: Mock<[], string[]>;
-  isRegistered: Mock<[string], boolean>;
-  getHookInfo: Mock<[string], V2Hook | null>;
-  getLearningMetrics: Mock<[], { patterns: number; successRate: number }>;
+  trigger: Mock<(name: string, params: Record<string, unknown>) => Promise<HookResult>>;
+  register: Mock<(name: string, handler: (params: unknown) => Promise<HookResult>) => void>;
+  getHooks: Mock<() => string[]>;
+  isRegistered: Mock<(name: string) => boolean>;
+  getHookInfo: Mock<(name: string) => V2Hook | null>;
+  getLearningMetrics: Mock<() => { patterns: number; successRate: number }>;
 }
 
 /**

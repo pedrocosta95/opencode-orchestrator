@@ -8,7 +8,7 @@
  */
 
 import type { ClaudeFlowPlugin, PluginContext, PluginConfig } from '../types.js';
-import { HookEvent } from '../../hooks/index.js';
+import { HookEvent, HookPriority, type TaskInfo, type ErrorInfo } from '../../hooks/index.js';
 
 /**
  * Maestro configuration
@@ -98,37 +98,37 @@ export class MaestroPlugin implements ClaudeFlowPlugin {
     this.context = context;
 
     // Register hooks for workflow monitoring
-    context.hooks?.register({
-      id: 'maestro-task-complete',
-      event: HookEvent.PostTaskComplete,
-      priority: 200,
-      handler: async (ctx) => {
+    context.hooks?.register(
+      HookEvent.PostTaskComplete,
+      async (ctx) => {
         // Update workflow progress on task completion
         for (const workflow of this.workflows.values()) {
-          if (workflow.status === 'running') {
-            this.updateWorkflowProgress(workflow, ctx.data);
+          if (workflow.status === 'running' && ctx.task) {
+            this.updateWorkflowProgress(workflow, ctx.task);
           }
         }
-        return { proceed: true, context: ctx };
+        return { success: true, continueChain: true };
       },
-    });
+      HookPriority.High,
+      { name: 'maestro-task-complete' }
+    );
 
-    context.hooks?.register({
-      id: 'maestro-error-handler',
-      event: HookEvent.OnError,
-      priority: 200,
-      handler: async (ctx) => {
+    context.hooks?.register(
+      HookEvent.OnError,
+      async (ctx) => {
         // Handle workflow errors with recovery
-        if (this.config.autoRecovery) {
+        if (this.config.autoRecovery && ctx.error) {
           for (const workflow of this.workflows.values()) {
             if (workflow.status === 'running') {
-              this.handleWorkflowError(workflow, ctx.data);
+              this.handleWorkflowError(workflow, ctx.error);
             }
           }
         }
-        return { proceed: true, context: ctx };
+        return { success: true, continueChain: true };
       },
-    });
+      HookPriority.High,
+      { name: 'maestro-error-handler' }
+    );
   }
 
   async shutdown(): Promise<void> {
@@ -468,25 +468,25 @@ export class MaestroPlugin implements ClaudeFlowPlugin {
     workflow.progress = (completed / workflow.steps.length) * 100;
   }
 
-  private updateWorkflowProgress(workflow: Workflow, taskData: Record<string, unknown>): void {
+  private updateWorkflowProgress(workflow: Workflow, taskData: TaskInfo): void {
     // Match task to workflow step and update
-    const taskId = String(taskData.taskId ?? '');
+    const taskId = taskData.id;
     const step = workflow.steps.find((s) => s.id === taskId);
     if (step && step.status === 'running') {
       step.status = 'completed';
-      step.output = taskData.result;
+      step.output = taskData.metadata;
       step.completedAt = new Date();
       this.updateProgress(workflow);
     }
   }
 
-  private handleWorkflowError(workflow: Workflow, errorData: Record<string, unknown>): void {
-    const stepId = String(errorData.stepId ?? '');
+  private handleWorkflowError(workflow: Workflow, errorData: ErrorInfo): void {
+    const stepId = errorData.context ?? '';
     const step = workflow.steps.find((s) => s.id === stepId);
 
     if (step && step.status === 'running') {
       step.status = 'failed';
-      step.error = String(errorData.error ?? 'Unknown error');
+      step.error = errorData.error?.message ?? 'Unknown error';
       step.completedAt = new Date();
     }
   }

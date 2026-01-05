@@ -87,17 +87,23 @@ afterEach(() => {
 });
 
 // Type declarations for custom matchers
+// Note: Custom matcher types are available via expect.extend() at runtime
+// For TypeScript, we use interface merging with CustomMatchers
+interface CustomMatchers<R = unknown> {
+  toHaveBeenCalledWithInteraction(expected: unknown[]): R;
+  toHaveBeenCalledBefore(other: ReturnType<typeof vi.fn>): R;
+  toHaveInteractionCount(expected: number): R;
+  // Additional matchers from assertion-helpers
+  toHaveBeenCalledWithPattern(pattern: Record<string, unknown>): R;
+  toHaveEventType(eventType: string): R;
+  toMeetV3PerformanceTargets(): R;
+  toBeValidTransition(from: string, allowedTransitions: Record<string, string[]>): R;
+}
+
 declare module 'vitest' {
-  interface Assertion<T = unknown> {
-    toHaveBeenCalledWithInteraction(expected: unknown[]): T;
-    toHaveBeenCalledBefore(other: ReturnType<typeof vi.fn>): T;
-    toHaveInteractionCount(expected: number): T;
-  }
-  interface AsymmetricMatchersContaining {
-    toHaveBeenCalledWithInteraction(expected: unknown[]): unknown;
-    toHaveBeenCalledBefore(other: ReturnType<typeof vi.fn>): unknown;
-    toHaveInteractionCount(expected: number): unknown;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface Assertion<T> extends CustomMatchers<T> {}
+  interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
 
 /**

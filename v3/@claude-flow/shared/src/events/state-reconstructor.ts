@@ -166,8 +166,13 @@ export class StateReconstructor {
   /**
    * Get aggregate type from instance
    */
-  private getAggregateType(aggregate: AggregateRoot): string {
-    return aggregate.constructor.name.toLowerCase().replace('aggregate', '');
+  private getAggregateType(aggregate: AggregateRoot): 'agent' | 'task' | 'memory' | 'swarm' {
+    const typeName = aggregate.constructor.name.toLowerCase().replace('aggregate', '');
+    // Map to valid aggregate types
+    if (typeName === 'agent' || typeName === 'task' || typeName === 'memory' || typeName === 'swarm') {
+      return typeName;
+    }
+    return 'agent'; // Default fallback
   }
 }
 

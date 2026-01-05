@@ -17,15 +17,15 @@ export function systemConfigToV3Config(systemConfig: SystemConfig): V3Config {
     // Agent configuration
     agents: {
       defaultType: 'coder',
-      autoSpawn: systemConfig.orchestrator?.lifecycle?.autoStart ?? false,
+      autoSpawn: false, // Not in SystemConfig
       maxConcurrent: systemConfig.orchestrator?.lifecycle?.maxConcurrentAgents ?? 15,
-      timeout: 300000, // 5 minutes default
+      timeout: systemConfig.orchestrator?.lifecycle?.spawnTimeout ?? 300000,
       providers: [],
     },
 
     // Swarm configuration
     swarm: {
-      topology: systemConfig.swarm?.topology || 'hierarchical-mesh',
+      topology: normalizeTopology(systemConfig.swarm?.topology),
       maxAgents: systemConfig.swarm?.maxAgents ?? 15,
       autoScale: systemConfig.swarm?.autoScale?.enabled ?? false,
       coordinationStrategy: systemConfig.swarm?.coordination?.consensusRequired ? 'consensus' : 'leader',
@@ -34,7 +34,7 @@ export function systemConfigToV3Config(systemConfig: SystemConfig): V3Config {
 
     // Memory configuration
     memory: {
-      backend: systemConfig.memory?.type || 'hybrid',
+      backend: normalizeMemoryBackend(systemConfig.memory?.type),
       persistPath: systemConfig.memory?.path || './data/memory',
       cacheSize: systemConfig.memory?.maxSize ?? 1000000,
       enableHNSW: systemConfig.memory?.agentdb?.indexType === 'hnsw',
@@ -45,31 +45,25 @@ export function systemConfigToV3Config(systemConfig: SystemConfig): V3Config {
     mcp: {
       serverHost: systemConfig.mcp?.transport?.host || 'localhost',
       serverPort: systemConfig.mcp?.transport?.port ?? 3000,
-      autoStart: systemConfig.mcp?.enabled ?? false,
+      autoStart: false, // Not in SystemConfig
       transportType: systemConfig.mcp?.transport?.type || 'stdio',
-      tools: systemConfig.mcp?.enabledTools || [],
+      tools: [], // Not in SystemConfig
     },
 
     // CLI preferences
     cli: {
-      colorOutput: systemConfig.logging?.pretty ?? true,
+      colorOutput: true,
       interactive: true,
-      verbosity: systemConfig.logging?.level || 'normal',
+      verbosity: 'normal',
       outputFormat: 'text',
       progressStyle: 'spinner',
     },
 
     // Hooks configuration
     hooks: {
-      enabled: systemConfig.hooks?.enabled ?? false,
-      autoExecute: systemConfig.hooks?.autoExecute ?? false,
-      hooks: (systemConfig.hooks?.definitions || []).map(hook => ({
-        name: hook.name,
-        event: hook.event,
-        handler: hook.handler,
-        priority: hook.priority ?? 50,
-        enabled: hook.enabled ?? true,
-      })),
+      enabled: false,
+      autoExecute: false,
+      hooks: [],
     },
   };
 }
@@ -81,25 +75,26 @@ export function v3ConfigToSystemConfig(v3Config: V3Config): Partial<SystemConfig
   return {
     orchestrator: {
       lifecycle: {
-        autoStart: v3Config.agents.autoSpawn,
         maxConcurrentAgents: v3Config.agents.maxConcurrent,
-        shutdownTimeoutMs: v3Config.agents.timeout,
-        cleanupOrphanedAgents: true,
+        spawnTimeout: v3Config.agents.timeout,
+        terminateTimeout: 10000,
+        maxSpawnRetries: 3,
       },
       session: {
         dataDir: v3Config.projectRoot,
-        persistState: true,
-        stateFile: 'session.json',
+        persistSessions: true,
+        sessionRetentionMs: 3600000,
       },
-      monitoring: {
-        enabled: true,
-        metricsIntervalMs: 5000,
-        healthCheckIntervalMs: v3Config.swarm.healthCheckInterval,
+      health: {
+        checkInterval: v3Config.swarm.healthCheckInterval,
+        historyLimit: 100,
+        degradedThreshold: 1,
+        unhealthyThreshold: 2,
       },
     },
 
     swarm: {
-      topology: v3Config.swarm.topology,
+      topology: denormalizeTopology(v3Config.swarm.topology),
       maxAgents: v3Config.swarm.maxAgents,
       autoScale: {
         enabled: v3Config.swarm.autoScale,
@@ -124,7 +119,7 @@ export function v3ConfigToSystemConfig(v3Config: V3Config): Partial<SystemConfig
     },
 
     memory: {
-      type: v3Config.memory.backend,
+      type: denormalizeMemoryBackend(v3Config.memory.backend),
       path: v3Config.memory.persistPath,
       maxSize: v3Config.memory.cacheSize,
       agentdb: {
@@ -137,40 +132,79 @@ export function v3ConfigToSystemConfig(v3Config: V3Config): Partial<SystemConfig
     },
 
     mcp: {
-      enabled: v3Config.mcp.autoStart,
+      name: 'claude-flow',
+      version: '3.0.0',
       transport: {
-        type: v3Config.mcp.transportType,
+        type: v3Config.mcp.transportType as 'stdio' | 'http' | 'websocket',
         host: v3Config.mcp.serverHost,
         port: v3Config.mcp.serverPort,
       },
-      enabledTools: v3Config.mcp.tools,
-      security: {
-        requireAuth: false,
-        allowedOrigins: ['*'],
-        rateLimiting: {
-          enabled: true,
-          maxRequestsPerMinute: 100,
-        },
+      capabilities: {
+        tools: true,
+        resources: true,
+        prompts: true,
+        logging: true,
       },
     },
-
-    logging: {
-      level: v3Config.cli.verbosity,
-      pretty: v3Config.cli.colorOutput,
-      destination: 'console',
-      format: 'text',
-    },
-
-    hooks: {
-      enabled: v3Config.hooks.enabled,
-      autoExecute: v3Config.hooks.autoExecute,
-      definitions: v3Config.hooks.hooks.map(hook => ({
-        name: hook.name,
-        event: hook.event,
-        handler: hook.handler,
-        priority: hook.priority,
-        enabled: hook.enabled,
-      })),
-    },
   };
+}
+
+/**
+ * Normalize topology from SystemConfig to V3Config
+ */
+function normalizeTopology(
+  topology: string | undefined
+): 'hierarchical' | 'mesh' | 'ring' | 'star' | 'hybrid' {
+  switch (topology) {
+    case 'hierarchical':
+    case 'mesh':
+    case 'ring':
+    case 'star':
+      return topology;
+    case 'hierarchical-mesh':
+    case 'adaptive':
+      return 'hybrid';
+    default:
+      return 'hierarchical';
+  }
+}
+
+/**
+ * Denormalize topology from V3Config to SystemConfig
+ */
+function denormalizeTopology(
+  topology: 'hierarchical' | 'mesh' | 'ring' | 'star' | 'hybrid'
+): 'hierarchical' | 'mesh' | 'ring' | 'star' | 'adaptive' | 'hierarchical-mesh' {
+  if (topology === 'hybrid') {
+    return 'hierarchical-mesh';
+  }
+  return topology;
+}
+
+/**
+ * Normalize memory backend from SystemConfig to V3Config
+ */
+function normalizeMemoryBackend(
+  backend: string | undefined
+): 'memory' | 'sqlite' | 'agentdb' | 'hybrid' {
+  switch (backend) {
+    case 'memory':
+    case 'sqlite':
+    case 'agentdb':
+    case 'hybrid':
+      return backend;
+    case 'redis':
+      return 'memory'; // Redis maps to memory for CLI purposes
+    default:
+      return 'hybrid';
+  }
+}
+
+/**
+ * Denormalize memory backend from V3Config to SystemConfig
+ */
+function denormalizeMemoryBackend(
+  backend: 'memory' | 'sqlite' | 'agentdb' | 'hybrid'
+): 'memory' | 'sqlite' | 'agentdb' | 'hybrid' | 'redis' {
+  return backend;
 }

@@ -416,6 +416,34 @@ export function createAgentFailedEvent(agentId: AgentId, error: Error): AgentFai
   });
 }
 
+export function createAgentTaskAssignedEvent(
+  agentId: AgentId,
+  taskId: TaskId,
+  assignedAt?: number
+): AgentTaskAssignedEvent {
+  return createDomainEvent('agent:task-assigned', agentId, 'agent', {
+    agentId,
+    taskId,
+    assignedAt: assignedAt ?? Date.now(),
+  });
+}
+
+export function createAgentTaskCompletedEvent(
+  agentId: AgentId,
+  taskId: TaskId,
+  result: unknown,
+  completedAt: number,
+  duration: number
+): AgentTaskCompletedEvent {
+  return createDomainEvent('agent:task-completed', agentId, 'agent', {
+    agentId,
+    taskId,
+    result,
+    completedAt,
+    duration,
+  });
+}
+
 // Task Event Factories
 export function createTaskCreatedEvent(
   taskId: TaskId,
