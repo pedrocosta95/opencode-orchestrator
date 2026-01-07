@@ -70,6 +70,9 @@ export {
   loadRuVector,
   fallbackMinCut,
   fallbackLouvain,
+  // Cache utilities (NEW)
+  clearGraphCaches,
+  getGraphCacheStats,
   type GraphNode,
   type GraphEdge,
   type DependencyGraph,
