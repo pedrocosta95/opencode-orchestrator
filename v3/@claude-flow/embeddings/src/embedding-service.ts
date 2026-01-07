@@ -432,10 +432,17 @@ export class MockEmbeddingService extends BaseEmbeddingService {
   private readonly dimensions: number;
   private readonly simulatedLatency: number;
 
-  constructor(config: MockEmbeddingConfig) {
-    super(config);
-    this.dimensions = config.dimensions ?? 384;
-    this.simulatedLatency = config.simulatedLatency ?? 0;
+  constructor(config: Partial<MockEmbeddingConfig> = {}) {
+    const fullConfig: MockEmbeddingConfig = {
+      provider: 'mock',
+      dimensions: config.dimensions ?? 384,
+      cacheSize: config.cacheSize ?? 1000,
+      simulatedLatency: config.simulatedLatency ?? 0,
+      enableCache: config.enableCache ?? true,
+    };
+    super(fullConfig);
+    this.dimensions = fullConfig.dimensions!;
+    this.simulatedLatency = fullConfig.simulatedLatency!;
   }
 
   async embed(text: string): Promise<EmbeddingResult> {
