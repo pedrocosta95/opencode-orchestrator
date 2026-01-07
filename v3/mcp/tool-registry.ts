@@ -346,6 +346,30 @@ export class ToolRegistry extends EventEmitter {
   }
 
   /**
+   * Validate input against schema
+   */
+  private validateInput(input: Record<string, unknown>, schema: JSONSchema): { valid: boolean; errors?: string[] } {
+    try {
+      const validate = ajv.compile(schema);
+      const valid = validate(input);
+
+      if (!valid && validate.errors) {
+        return {
+          valid: false,
+          errors: validate.errors.map(e => `${e.instancePath || 'input'}: ${e.message}`),
+        };
+      }
+
+      return { valid: true };
+    } catch (error) {
+      return {
+        valid: false,
+        errors: [`Schema validation error: ${error instanceof Error ? error.message : String(error)}`],
+      };
+    }
+  }
+
+  /**
    * Execute a tool
    */
   async execute(
@@ -359,6 +383,19 @@ export class ToolRegistry extends EventEmitter {
     if (!metadata) {
       return {
         content: [{ type: 'text', text: `Tool not found: ${name}` }],
+        isError: true,
+      };
+    }
+
+    // Validate input against schema before execution (security boundary)
+    const validation = this.validateInput(input, metadata.tool.inputSchema);
+    if (!validation.valid) {
+      this.logger.warn('Tool input validation failed', {
+        name,
+        errors: validation.errors,
+      });
+      return {
+        content: [{ type: 'text', text: `Input validation failed: ${validation.errors?.join(', ')}` }],
         isError: true,
       };
     }
