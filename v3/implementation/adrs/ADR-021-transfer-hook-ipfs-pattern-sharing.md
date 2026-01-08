@@ -1933,70 +1933,110 @@ Trust:       verified
 
 ## Implementation Status
 
-### Completed (Phase 1-5)
+### Honest Assessment: What Actually Works
+
+#### ✅ FULLY WORKING (Real Data & Persistence)
+
+| Feature | Status | Evidence |
+|---------|--------|----------|
+| **Memory Store** | ✅ Real | Data persists to `.claude-flow/memory/store.json` |
+| **CLI-to-Store Wiring** | ✅ Real | `plugins list` calls actual `createPluginDiscoveryService()` |
+| **Pattern Store Module** | ✅ Real | `PatternStore` class with search, download, publish APIs |
+| **Plugin Store Module** | ✅ Real | `PluginDiscoveryService` with 9 plugins in registry |
+| **PII Detection** | ✅ Real | `detectPII()` finds emails, IPs, paths, API keys |
+| **4-Level Anonymization** | ✅ Real | minimal, standard, strict, paranoid all implemented |
+| **MCP Tools** | ✅ Real | 11 transfer tools registered and callable |
+
+#### ⚠️ DEMO MODE (Works but uses fallback data)
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| **IPNS Resolution** | ⚠️ Demo | Attempts real IPNS resolution, falls back to demo registry |
+| **IPFS Gateway Fetch** | ⚠️ Demo | Tries w3s.link/dweb.link/ipfs.io, uses demo on failure |
+| **Registry Discovery** | ⚠️ Demo | Shows "claude-flow-official (demo)" source |
+
+**Why Demo Mode?** IPFS public gateways often have:
+- Rate limiting
+- Slow resolution times
+- Content not pinned to public network
+
+The demo registry provides instant responses for development/testing.
+
+#### ✅ REAL IPFS UPLOAD (New in v3.0.0-alpha.56)
+
+| Service | Status | Requirements |
+|---------|--------|--------------|
+| **Web3.Storage** | ✅ Ready | Set `WEB3_STORAGE_TOKEN` env var |
+| **Pinata** | ✅ Ready | Set `PINATA_API_KEY` + `PINATA_API_SECRET` |
+| **Demo Mode** | ✅ Default | Generates deterministic CIDs when no credentials |
+
+```bash
+# Enable real IPFS uploads
+export WEB3_STORAGE_TOKEN=your-token  # Get free at https://web3.storage
+
+# Or use Pinata
+export PINATA_API_KEY=your-key
+export PINATA_API_SECRET=your-secret
+```
+
+### Test Results
+
+```
+Pattern Store Tests:  11/11 pass ✅
+Plugin Store Tests:   10/10 pass ✅
+Build Status:         Compiles without errors ✅
+CLI Commands:         Wired to real store modules ✅
+```
+
+### Completed Features
 
 - [x] CFPFormat serialization (JSON/CBOR)
 - [x] Export pipeline with anonymization
 - [x] PII detection (email, phone, IP, paths, API keys, JWT)
 - [x] 4-level anonymization (minimal, standard, strict, paranoid)
-- [x] IPFS upload/download (mock for demo)
+- [x] **Real IPFS upload** via Web3.Storage/Pinata (with fallback to demo)
 - [x] Pinning service integration
 - [x] Decentralized registry format
-- [x] IPNS-based discovery
+- [x] IPNS-based discovery (with demo fallback)
 - [x] Pattern search with filters
 - [x] Download with verification
 - [x] Publish workflow
-- [x] Seraphine genesis deployment
-- [x] **MCP Tools Integration** (16 transfer tools registered)
-- [x] **Plugin Store** (IPFS-based plugin marketplace)
-- [x] **Plugin Creator Pro** (official plugin in store)
-- [x] **CLI Integration** (hooks transfer commands)
+- [x] MCP Tools Integration (11 transfer tools)
+- [x] Plugin Store (IPFS-based plugin marketplace)
+- [x] CLI Integration (wired to real modules)
 
-### Plugin Store Features (NEW)
+### To Enable Real IPFS Network
 
-- [x] Plugin discovery via IPNS
-- [x] 4-tier trust levels (official, verified, community, unverified)
-- [x] 9 permission types (network, filesystem, execute, etc.)
-- [x] Security audit tracking
-- [x] Full-text search with filters
-- [x] Plugin Creator Pro available for download
+1. **Get Web3.Storage Token** (free, recommended):
+   ```bash
+   # Visit https://web3.storage and create account
+   export WEB3_STORAGE_TOKEN=your-token
+   ```
 
-### Production Readiness (Phase 6 - Future)
+2. **Or use Pinata** (free tier available):
+   ```bash
+   # Visit https://pinata.cloud and create account
+   export PINATA_API_KEY=your-key
+   export PINATA_API_SECRET=your-secret
+   ```
 
-- [ ] Real IPFS/Web3.Storage integration (currently using demo data)
-- [ ] Production Ed25519 signature verification
+3. **Test Upload**:
+   ```bash
+   npx @claude-flow/cli hooks transfer store publish \
+     -i patterns.cfp \
+     -n my-patterns \
+     -d "My patterns" \
+     -c routing \
+     -t custom
+   ```
+
+### Production Readiness (Future)
+
+- [ ] Ed25519 signature verification (cryptographic proofs)
 - [ ] Malware scanning heuristics
 - [ ] Import sandboxing
-- [ ] Registry governance
-
-### Test Results
-
-```
-Pattern Store Tests:
-  Test Suite:     Pattern Store
-  Tests:          23
-  Passed:         23
-  Failed:         0
-
-Plugin Store Tests:
-  Test Suite:     Plugin Store
-  Tests:          21
-  Passed:         21
-  Failed:         0
-
-Total:           44 tests passed
-
-Features Verified:
-  ✅ Registry discovery via IPNS
-  ✅ Pattern search with filters
-  ✅ Download with verification
-  ✅ Publish with anonymization
-  ✅ Plugin store discovery
-  ✅ Plugin search with filters
-  ✅ Plugin Creator Pro available
-  ✅ MCP tools registered (16 tools)
-  ✅ CLI commands working (hooks transfer)
-```
+- [ ] Registry governance (multi-sig updates)
+- [ ] Pin official registry to production IPFS nodes
 
 ---
 
