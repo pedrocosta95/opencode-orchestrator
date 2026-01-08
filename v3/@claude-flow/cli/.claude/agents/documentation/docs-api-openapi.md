@@ -1,5 +1,6 @@
 ---
 name: "api-docs"
+description: "Expert agent for creating OpenAPI documentation with pattern learning"
 color: "indigo"
 type: "documentation"
 version: "2.0.0-alpha"
