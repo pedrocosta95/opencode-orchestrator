@@ -1376,13 +1376,18 @@ export const memoryCommand: Command = {
     output.writeln();
     output.writeln('Subcommands:');
     output.printList([
+      `${output.highlight('init')}       - Initialize memory database (sql.js)`,
       `${output.highlight('store')}      - Store data in memory`,
       `${output.highlight('retrieve')}   - Retrieve data from memory`,
       `${output.highlight('search')}     - Semantic/vector search`,
       `${output.highlight('list')}       - List memory entries`,
       `${output.highlight('delete')}     - Delete memory entry`,
       `${output.highlight('stats')}      - Show statistics`,
-      `${output.highlight('configure')}  - Configure backend`
+      `${output.highlight('configure')}  - Configure backend`,
+      `${output.highlight('cleanup')}    - Clean expired entries`,
+      `${output.highlight('compress')}   - Compress database`,
+      `${output.highlight('export')}     - Export memory to file`,
+      `${output.highlight('import')}     - Import from file`
     ]);
 
     return { success: true };
