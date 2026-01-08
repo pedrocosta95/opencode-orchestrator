@@ -76,6 +76,60 @@ Bash("npx @claude-flow/cli@latest memory store --namespace swarm --key current-s
 
 **NEVER continuously poll swarm status. Trust the agents to complete and report back.**
 
+## 🧠 AUTO-LEARNING PROTOCOL
+
+### Before Starting Any Task
+\`\`\`bash
+# 1. Search memory for relevant patterns from past successes
+Bash("npx @claude-flow/cli@latest memory search -q '[task keywords]' --namespace patterns")
+
+# 2. Check if similar task was done before
+Bash("npx @claude-flow/cli@latest memory search -q '[task type]' --namespace tasks")
+
+# 3. Load learned optimizations
+Bash("npx @claude-flow/cli@latest hooks route --task '[task description]'")
+\`\`\`
+
+### After Completing Any Task Successfully
+\`\`\`bash
+# 1. Store successful pattern for future reference
+Bash("npx @claude-flow/cli@latest memory store --namespace patterns --key '[pattern-name]' --value '[what worked]'")
+
+# 2. Train neural patterns on the successful approach
+Bash("npx @claude-flow/cli@latest hooks post-edit --file '[main-file]' --train-neural true")
+
+# 3. Record task completion with metrics
+Bash("npx @claude-flow/cli@latest hooks post-task --task-id '[id]' --success true --store-results true")
+
+# 4. Trigger optimization worker if performance-related
+Bash("npx @claude-flow/cli@latest hooks worker dispatch --trigger optimize")
+\`\`\`
+
+### Continuous Improvement Triggers
+
+| Trigger | Worker | When to Use |
+|---------|--------|-------------|
+| After major refactor | \`optimize\` | Performance optimization |
+| After adding features | \`testgaps\` | Find missing test coverage |
+| After security changes | \`audit\` | Security analysis |
+| After API changes | \`document\` | Update documentation |
+| Every 5+ file changes | \`map\` | Update codebase map |
+| Complex debugging | \`deepdive\` | Deep code analysis |
+
+### Memory-Enhanced Development
+
+**ALWAYS check memory before:**
+- Starting a new feature (search for similar implementations)
+- Debugging an issue (search for past solutions)
+- Refactoring code (search for learned patterns)
+- Performance work (search for optimization strategies)
+
+**ALWAYS store in memory after:**
+- Solving a tricky bug (store the solution pattern)
+- Completing a feature (store the approach)
+- Finding a performance fix (store the optimization)
+- Discovering a security issue (store the vulnerability pattern)
+
 ### 📋 Agent Routing by Task Type
 
 | Task Type | Required Agents | Topology |
