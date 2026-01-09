@@ -83,7 +83,7 @@ const storeCommand: Command = {
     }
 
     if (!value) {
-      output.printError('Value is required. Use --value or -v');
+      output.printError('Value is required. Use --value');
       return { success: false, exitCode: 1 };
     }
 
@@ -100,18 +100,27 @@ const storeCommand: Command = {
 
     output.printInfo(`Storing in ${namespace}/${key}...`);
 
-    if (asVector) {
-      output.writeln(output.dim('  Generating embedding vector...'));
-      output.writeln(output.dim('  Indexing with HNSW (M=16, ef=200)...'));
-    }
-
-    // Call MCP memory/store tool for real persistence
+    // Use direct sql.js storage with automatic embedding generation
     try {
-      const result = await callMCPTool('memory/store', {
+      const { storeEntry } = await import('../memory/memory-initializer.js');
+
+      if (asVector) {
+        output.writeln(output.dim('  Generating embedding vector...'));
+      }
+
+      const result = await storeEntry({
         key,
         value,
-        metadata: { namespace, tags, ttl, asVector, size: storeData.size }
+        namespace,
+        generateEmbeddingFlag: true, // Always generate embeddings for semantic search
+        tags,
+        ttl
       });
+
+      if (!result.success) {
+        output.printError(result.error || 'Failed to store');
+        return { success: false, exitCode: 1 };
+      }
 
       output.writeln();
       output.printTable({
@@ -125,15 +134,15 @@ const storeCommand: Command = {
           { property: 'Size', val: `${storeData.size} bytes` },
           { property: 'TTL', val: ttl ? `${ttl}s` : 'None' },
           { property: 'Tags', val: tags.length > 0 ? tags.join(', ') : 'None' },
-          { property: 'Vector', val: asVector ? 'Yes' : 'No' },
-          { property: 'Total Entries', val: String((result as { totalEntries?: number }).totalEntries || 1) }
+          { property: 'Vector', val: result.embedding ? `Yes (${result.embedding.dimensions}-dim)` : 'No' },
+          { property: 'ID', val: result.id.substring(0, 20) }
         ]
       });
 
       output.writeln();
       output.printSuccess('Data stored successfully');
 
-      return { success: true, data: { ...storeData, ...(result as Record<string, unknown>) } };
+      return { success: true, data: { ...storeData, id: result.id, embedding: result.embedding } };
     } catch (error) {
       output.printError(`Failed to store: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return { success: false, exitCode: 1 };
