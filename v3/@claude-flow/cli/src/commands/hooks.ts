@@ -3527,7 +3527,7 @@ const tokenOptimizeCommand: Command = {
   examples: [
     { command: 'claude-flow hooks token-optimize --stats', description: 'Show token savings stats' },
     { command: 'claude-flow hooks token-optimize -q "auth patterns"', description: 'Get compact context' },
-    { command: 'claude-flow hooks token-optimize -a 8 --report', description: 'Config for 8 agents + report' },
+    { command: 'claude-flow hooks token-optimize -n 8 --report', description: 'Config for 8 agents + report' },
   ],
   action: async (ctx: CommandContext): Promise<CommandResult> => {
     const query = ctx.flags['query'] as string;
