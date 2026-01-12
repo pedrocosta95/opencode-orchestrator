@@ -458,6 +458,26 @@ const wizardCommand: Command = {
       }
 
       spinner.succeed('Setup complete!');
+
+      // Initialize embeddings if enabled
+      let embeddingsInitialized = false;
+      if (enableEmbeddings) {
+        output.writeln();
+        output.printInfo('Initializing ONNX embedding subsystem...');
+        const { execSync } = await import('child_process');
+        try {
+          execSync(`npx @claude-flow/cli@latest embeddings init --model ${embeddingModel} --no-download --force 2>/dev/null`, {
+            stdio: 'pipe',
+            cwd: ctx.cwd,
+            timeout: 30000
+          });
+          output.writeln(output.success('  ✓ Embeddings configured'));
+          embeddingsInitialized = true;
+        } catch {
+          output.writeln(output.dim('  Embeddings will be configured on first use'));
+        }
+      }
+
       output.writeln();
 
       // Summary table
@@ -473,6 +493,7 @@ const wizardCommand: Command = {
           { setting: 'Memory Backend', value: options.runtime.memoryBackend },
           { setting: 'HNSW Indexing', value: options.runtime.enableHNSW ? 'Enabled' : 'Disabled' },
           { setting: 'Neural Learning', value: options.runtime.enableNeural ? 'Enabled' : 'Disabled' },
+          { setting: 'Embeddings', value: enableEmbeddings ? `${embeddingModel} (hyperbolic)` : 'Disabled' },
           { setting: 'Skills', value: `${result.summary.skillsCount} installed` },
           { setting: 'Commands', value: `${result.summary.commandsCount} installed` },
           { setting: 'Agents', value: `${result.summary.agentsCount} installed` },
