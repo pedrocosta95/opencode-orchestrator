@@ -148,8 +148,8 @@
 
 | Package | Version | Published |
 |---------|---------|-----------|
-| @claude-flow/cli | **3.0.0-alpha.84** | 2026-01-13 |
-| claude-flow | 3.0.0-alpha.18 | 2026-01-07 |
+| @claude-flow/cli | **3.0.0-alpha.86** | 2026-01-13 |
+| claude-flow | **3.0.0-alpha.33** | 2026-01-13 |
 | @claude-flow/memory | 3.0.0-alpha.2 | 2026-01-07 |
 | @claude-flow/mcp | 3.0.0-alpha.8 | 2026-01-07 |
 | @claude-flow/neural | 3.0.0-alpha.2 | 2026-01-06 |
@@ -165,9 +165,18 @@
 
 | Tag | Version |
 |-----|---------|
-| `latest` | 3.0.0-alpha.84 |
-| `v3alpha` | 3.0.0-alpha.84 |
-| `alpha` | 3.0.0-alpha.84 |
+| `latest` (cli) | 3.0.0-alpha.86 |
+| `v3alpha` (cli) | 3.0.0-alpha.86 |
+| `alpha` (cli) | 3.0.0-alpha.86 |
+| `latest` (wrapper) | 3.0.0-alpha.33 |
+| `v3alpha` (wrapper) | 3.0.0-alpha.33 |
+| `alpha` (wrapper) | 3.0.0-alpha.33 |
+
+### Deprecated Versions
+
+| Package | Version | Reason |
+|---------|---------|--------|
+| @claude-flow/cli | 3.0.0, 3.0.1, 3.0.2 | Buggy early releases - use alpha.86+ |
 
 ---
 
