@@ -63,6 +63,16 @@ registerTools([
   ...progressTools,
   ...embeddingsTools,
   ...claimsTools,
+  ...securityTools,
+  ...transferTools,
+  // V2 Compatibility tools
+  ...systemTools,
+  ...terminalTools,
+  ...neuralTools,
+  ...performanceTools,
+  ...githubTools,
+  ...daaTools,
+  ...coordinationTools,
 ]);
 
 /**
