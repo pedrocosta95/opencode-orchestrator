@@ -1436,6 +1436,60 @@ export const hooksTrajectoryEnd: MCPTool = {
       activeTrajectories.delete(trajectoryId);
     }
 
+    // SONA Learning - process trajectory outcome for routing optimization
+    let sonaResult: { learned: boolean; patternKey: string; confidence: number } = {
+      learned: false, patternKey: '', confidence: 0
+    };
+    let ewcResult: { consolidated: boolean; penalty: number } = {
+      consolidated: false, penalty: 0
+    };
+
+    if (trajectory && persistResult.success) {
+      // Try SONA learning
+      const sona = await getSONAOptimizer();
+      if (sona) {
+        try {
+          const outcome = {
+            trajectoryId,
+            task: trajectory.task,
+            agent: trajectory.agent,
+            success,
+            steps: trajectory.steps,
+            feedback,
+            duration: trajectory.startedAt
+              ? new Date(endedAt).getTime() - new Date(trajectory.startedAt).getTime()
+              : 0,
+          };
+          const result = sona.processTrajectoryOutcome(outcome);
+          sonaResult = {
+            learned: result.learned,
+            patternKey: result.patternKey,
+            confidence: result.confidence,
+          };
+        } catch {
+          // SONA learning failed, continue without it
+        }
+      }
+
+      // Try EWC++ consolidation on successful trajectories
+      if (success) {
+        const ewc = await getEWCConsolidator();
+        if (ewc) {
+          try {
+            // Record outcome for Fisher matrix update
+            ewc.recordOutcome(trajectory.agent, success, trajectory.steps.length);
+            const stats = ewc.getStats();
+            ewcResult = {
+              consolidated: true,
+              penalty: stats.avgPenalty,
+            };
+          } catch {
+            // EWC consolidation failed, continue without it
+          }
+        }
+      }
+    }
+
     const learningTimeMs = Date.now() - startTime;
 
     return {
@@ -1445,8 +1499,11 @@ export const hooksTrajectoryEnd: MCPTool = {
       persisted: persistResult.success,
       persistedId: persistResult.id,
       learning: {
-        sonaUpdate: persistResult.success, // Only true if actually persisted
-        ewcConsolidation: false, // Honest: EWC++ not yet implemented
+        sonaUpdate: sonaResult.learned,
+        sonaPatternKey: sonaResult.patternKey || undefined,
+        sonaConfidence: sonaResult.confidence || undefined,
+        ewcConsolidation: ewcResult.consolidated,
+        ewcPenalty: ewcResult.penalty || undefined,
         patternsExtracted: trajectory?.steps.length || 0,
         learningTimeMs,
       },
@@ -1456,8 +1513,10 @@ export const hooksTrajectoryEnd: MCPTool = {
         totalSteps: trajectory.steps.length,
         duration: trajectory.startedAt ? new Date(endedAt).getTime() - new Date(trajectory.startedAt).getTime() : 0,
       } : null,
-      implementation: persistResult.success ? 'real-persistence' : 'memory-only',
-      note: persistResult.success ? 'Trajectory persisted with embeddings for future learning' : (persistResult.error || 'Trajectory not found or store unavailable'),
+      implementation: sonaResult.learned ? 'real-sona-learning' : (persistResult.success ? 'real-persistence' : 'memory-only'),
+      note: sonaResult.learned
+        ? `SONA learned pattern "${sonaResult.patternKey}" with ${(sonaResult.confidence * 100).toFixed(1)}% confidence`
+        : (persistResult.success ? 'Trajectory persisted for future learning' : (persistResult.error || 'Trajectory not found')),
     };
   },
 };
