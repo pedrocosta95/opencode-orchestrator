@@ -235,11 +235,17 @@ function getSwarmStatus() {
   let coordinationActive = false;
 
   try {
-    const ps = execSync('ps aux 2>/dev/null | grep -c agentic-flow || echo "0"', { encoding: 'utf-8' });
-    activeAgents = Math.max(0, parseInt(ps.trim()) - 1);
+    if (isWindows) {
+      // Windows: use tasklist and findstr
+      const ps = execSync('tasklist 2>NUL | findstr /I "agentic-flow" 2>NUL | find /C /V "" 2>NUL || echo 0', { encoding: 'utf-8' });
+      activeAgents = Math.max(0, parseInt(ps.trim()) || 0);
+    } else {
+      const ps = execSync('ps aux 2>/dev/null | grep -c agentic-flow || echo "0"', { encoding: 'utf-8' });
+      activeAgents = Math.max(0, parseInt(ps.trim()) - 1);
+    }
     coordinationActive = activeAgents > 0;
   } catch (e) {
-    // Ignore errors
+    // Ignore errors - default to 0 agents
   }
 
   return {
