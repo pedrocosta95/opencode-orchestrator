@@ -1505,6 +1505,35 @@ const preTaskCommand: Command = {
         output.printList(result.recommendations);
       }
 
+      // Dynamic model routing based on task complexity
+      try {
+        const { getModelRouter } = await import('../ruvector/model-router.js');
+        const router = getModelRouter();
+        const modelResult = await router.route(description);
+
+        output.writeln();
+        output.writeln(output.bold('Model Recommendation'));
+        output.writeln(`  ${output.highlight(`model: "${modelResult.model}"`)} - ${modelResult.reasoning}`);
+        output.writeln();
+
+        // Output clear instruction for Claude to use
+        output.writeln(output.dim('─'.repeat(60)));
+        output.writeln(output.bold(output.success(`[TASK_MODEL_RECOMMENDATION] Use model="${modelResult.model}" for this task`)));
+        output.writeln(output.dim(`Complexity: ${(modelResult.complexity * 100).toFixed(0)}% | Confidence: ${(modelResult.confidence * 100).toFixed(0)}%`));
+        output.writeln(output.dim('─'.repeat(60)));
+
+        // Add model to result for programmatic use
+        (result as Record<string, unknown>).recommendedModel = modelResult.model;
+        (result as Record<string, unknown>).modelRouting = {
+          model: modelResult.model,
+          confidence: modelResult.confidence,
+          complexity: modelResult.complexity,
+          reasoning: modelResult.reasoning
+        };
+      } catch {
+        // Model router not available, skip recommendation
+      }
+
       return { success: true, data: result };
     } catch (error) {
       if (error instanceof MCPClientError) {
