@@ -31,6 +31,7 @@ User → MCP Server → Router → Swarm → Agents → Memory → LLM Providers
 |-------|------------|--------------|
 | **User** | Claude Code, CLI | Your interface to control agents and run commands |
 | **Orchestration** | MCP Server, Router, Hooks | Receives requests, decides which agents to use |
+| **Optimization** | Agent Booster, Token Optimizer, AST | Skips LLM for simple edits, reduces tokens 30-50% |
 | **Coordination** | Queen, Swarm, Consensus | Manages teams of agents working together |
 | **Drift Control** | Hierarchical topology, Checkpoints | Detects and prevents agents from going off-task |
 | **Agents** | 54+ types (coder, tester, reviewer...) | Specialized workers that do the actual tasks |
