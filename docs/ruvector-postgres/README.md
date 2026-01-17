@@ -378,6 +378,79 @@ Ensure you're using:
 - `real[]` for hyperbolic function arguments
 - `::ruvector(384)` for casting string vectors
 
+## CLI Commands
+
+Claude-Flow provides CLI commands for RuVector PostgreSQL management:
+
+### `ruvector setup`
+
+Generate Docker files and SQL for easy setup:
+
+```bash
+# Output to default directory (./ruvector-postgres)
+npx claude-flow ruvector setup
+
+# Output to custom directory
+npx claude-flow ruvector setup --output /path/to/dir
+
+# Print files to stdout (for inspection)
+npx claude-flow ruvector setup --print
+
+# Force overwrite existing files
+npx claude-flow ruvector setup --force
+```
+
+**Generated files:**
+```
+ruvector-postgres/
+├── docker-compose.yml    # Docker services configuration
+├── README.md             # Quick start guide
+└── scripts/
+    └── init-db.sql       # Database initialization
+```
+
+### `ruvector import`
+
+Import data from sql.js/JSON memory to PostgreSQL:
+
+```bash
+# Import from JSON file (direct execution)
+npx claude-flow ruvector import --input memory-export.json
+
+# Generate SQL file (dry-run)
+npx claude-flow ruvector import --input memory-export.json --output import.sql
+
+# Use custom Docker container
+npx claude-flow ruvector import --input data.json --container my-postgres
+
+# Verbose output
+npx claude-flow ruvector import --input data.json --verbose
+```
+
+**Supported JSON formats:**
+- Array of entries: `[{"key": "...", "value": "...", "namespace": "..."}]`
+- Object with entries: `{"entries": [...]}`
+- Key-value object: `{"key1": "value1", "key2": "value2"}`
+
+### Other Commands
+
+```bash
+# Check connection and schema status
+npx claude-flow ruvector status --verbose
+
+# Run database migrations
+npx claude-flow ruvector migrate --up
+
+# Run performance benchmarks
+npx claude-flow ruvector benchmark --vectors 10000
+
+# Analyze and optimize
+npx claude-flow ruvector optimize --analyze
+
+# Backup data
+npx claude-flow ruvector backup --output backup.sql
+```
+
 ## Performance Benchmarks
 
 | Metric | Value |
