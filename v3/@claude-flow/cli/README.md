@@ -301,6 +301,18 @@ npx claude-flow@v3alpha --agent coder --task "Implement user authentication"
 npx claude-flow@v3alpha --list
 ```
 
+### Upgrading
+
+```bash
+# Update helpers and statusline (preserves your data)
+npx claude-flow@v3alpha init upgrade
+
+# Update AND add any missing skills/agents/commands
+npx claude-flow@v3alpha init upgrade --add-missing
+```
+
+The `--add-missing` flag automatically detects and installs new skills, agents, and commands that were added in newer versions, without overwriting your existing customizations.
+
 ### Claude Code MCP Integration
 
 Add claude-flow as an MCP server for seamless integration:
@@ -4494,6 +4506,7 @@ Domain-Driven Design with bounded contexts, clean architecture, and measured per
 | `@claude-flow/testing` | Quality assurance | London School TDD, Vitest, fixtures, mocks |
 | `@claude-flow/deployment` | Release automation | Versioning, changelogs, NPM publishing |
 | `@claude-flow/shared` | Common utilities | Types, validation schemas, constants |
+| `@claude-flow/browser` | Browser automation | 59 MCP tools, element refs, trajectory learning |
 
 ### Architecture Principles
 
@@ -4528,6 +4541,93 @@ Domain-Driven Design with bounded contexts, clean architecture, and measured per
 | **Mesh** | 4+ | 0.15s | 192 MB | Collaborative, fault-tolerant |
 | **Hybrid** | 7+ | 0.18s | 320 MB | Multi-domain, mixed workloads |
 | **Adaptive** | 2+ | Variable | Dynamic | Auto-scaling, unpredictable load |
+
+</details>
+
+---
+
+<details>
+<summary><strong>🌐 Browser Automation — @claude-flow/browser</strong></summary>
+
+[![npm version](https://img.shields.io/npm/v/@claude-flow/browser?color=blue&label=npm)](https://www.npmjs.com/package/@claude-flow/browser)
+
+AI-optimized browser automation integrating [agent-browser](https://github.com/AugmentCode/agent-browser) with claude-flow for intelligent web automation, trajectory learning, and multi-agent browser coordination.
+
+### Installation
+
+```bash
+npm install @claude-flow/browser
+
+# agent-browser CLI (auto-suggested on install, or install manually)
+npm install -g agent-browser@latest
+```
+
+### Quick Start
+
+```typescript
+import { createBrowserService } from '@claude-flow/browser';
+
+const browser = createBrowserService({
+  sessionId: 'my-session',
+  enableSecurity: true,  // URL/PII scanning
+  enableMemory: true,    // Trajectory learning
+});
+
+// Track actions for ReasoningBank/SONA learning
+browser.startTrajectory('Login to dashboard');
+
+await browser.open('https://example.com/login');
+
+// Use element refs (93% context reduction vs CSS selectors)
+const snapshot = await browser.snapshot({ interactive: true });
+await browser.fill('@e1', 'user@example.com');
+await browser.fill('@e2', 'password');
+await browser.click('@e3');
+
+await browser.endTrajectory(true, 'Login successful');
+await browser.close();
+```
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **59 MCP Tools** | Complete browser automation via MCP protocol |
+| **Element Refs** | 93% context reduction with `@e1`, `@e2` refs |
+| **Trajectory Learning** | Records actions for ReasoningBank/SONA |
+| **Security Scanning** | URL validation, PII detection, XSS/SQL injection prevention |
+| **9 Workflow Templates** | Login, OAuth, scraping, testing, monitoring |
+| **Swarm Coordination** | Multi-session parallel browser automation |
+
+### Security Integration
+
+```typescript
+import { getSecurityScanner, isUrlSafe, containsPII } from '@claude-flow/browser';
+
+// URL threat detection
+const scanner = getSecurityScanner({ requireHttps: true });
+const result = await scanner.scanUrl('https://example.com');
+// { safe: true, threats: [], score: 1.0 }
+
+// PII detection
+containsPII('SSN: 123-45-6789'); // true
+
+// Input validation (XSS, SQL injection)
+scanner.validateInput('<script>alert(1)</script>', 'comment');
+// { safe: false, threats: [{type: 'xss', ...}] }
+```
+
+### Workflow Templates
+
+```typescript
+import { listWorkflows, getWorkflow } from '@claude-flow/browser';
+
+listWorkflows(); // ['login-basic', 'login-oauth', 'scrape-table', ...]
+const template = getWorkflow('login-basic');
+// { steps: [{action: 'open'}, {action: 'fill'}, ...], variables: [...] }
+```
+
+📖 [Full Documentation](./v3/@claude-flow/browser/README.md)
 
 </details>
 
@@ -5784,6 +5884,7 @@ cp -r ./data-backup-v2 ./data
 | `@claude-flow/performance` | Benchmarking & optimization | [Source](./v3/@claude-flow/performance/) |
 | `@claude-flow/deployment` | Release & CI/CD | [Source](./v3/@claude-flow/deployment/) |
 | `@claude-flow/shared` | Shared utilities, types & V3ProgressService | [Source](./v3/@claude-flow/shared/) |
+| `@claude-flow/browser` | AI-optimized browser automation with agent-browser | [README](./v3/@claude-flow/browser/README.md) |
 
 ### Additional Resources
 

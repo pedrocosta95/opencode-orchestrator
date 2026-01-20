@@ -10,6 +10,8 @@
 [![Agentics Foundation](https://img.shields.io/badge/Agentics-Foundation-crimson?style=for-the-badge&logo=openai)](https://discord.com/invite/dfxmpwkG2D)
 [![ruv.io](https://img.shields.io/badge/ruv.io-AI%20Platform-purple?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0wIDE4Yy00LjQyIDAtOC0zLjU4LTgtOHMzLjU4LTggOC04IDggMy41OCA4IDgtMy41OCA4LTggOHoiLz48L3N2Zz4=)](https://ruv.io)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative)](https://opensource.org/licenses/MIT)
+[![RuVector](https://img.shields.io/npm/v/ruvector?style=for-the-badge&logo=rust&color=orange&label=RuVector)](https://www.npmjs.com/package/ruvector)
+[![Agentic-Flow](https://img.shields.io/npm/v/agentic-flow?style=for-the-badge&logo=typescript&color=3178c6&label=Agentic-Flow)](https://www.npmjs.com/package/agentic-flow)
 
 **Production-ready multi-agent AI orchestration for Claude Code**
 
@@ -301,6 +303,18 @@ npx claude-flow@v3alpha --agent coder --task "Implement user authentication"
 npx claude-flow@v3alpha --list
 ```
 
+### Upgrading
+
+```bash
+# Update helpers and statusline (preserves your data)
+npx claude-flow@v3alpha init upgrade
+
+# Update AND add any missing skills/agents/commands
+npx claude-flow@v3alpha init upgrade --add-missing
+```
+
+The `--add-missing` flag automatically detects and installs new skills, agents, and commands that were added in newer versions, without overwriting your existing customizations.
+
 ### Claude Code MCP Integration
 
 Add claude-flow as an MCP server for seamless integration:
@@ -321,7 +335,7 @@ Once added, Claude Code can use all 175+ claude-flow tools directly:
 - And 170+ more tools...
 
 
-<summary><h3>🆚 Why Claude-Flow v3? </h3></summary>
+<summary>🆚 <strong>Why Claude-Flow v3?</strong></summary>
 
 Claude-Flow v3 introduces **self-learning neural capabilities** that no other agent orchestration framework offers. While competitors require manual agent configuration and static routing, Claude-Flow learns from every task execution, prevents catastrophic forgetting of successful patterns, and intelligently routes work to specialized experts.
 
@@ -671,8 +685,12 @@ flowchart TB
 
 ---
 
+## 🔌 Setup & Configuration
+
+Connect Claude-Flow to your development environment.
+
 <details>
-<summary><h2>🔌 MCP Setup — Connect Claude-Flow to Any AI Environment</h2></summary>
+<summary>🔌 <strong>MCP Setup</strong> — Connect Claude-Flow to Any AI Environment</summary>
 
 Claude-Flow runs as an MCP (Model Context Protocol) server, allowing you to connect it to any MCP-compatible AI client. This means you can use Claude-Flow's 54+ agents, swarm coordination, and self-learning capabilities from Claude Desktop, VS Code, Cursor, Windsurf, ChatGPT, and more.
 
@@ -682,8 +700,6 @@ Claude-Flow runs as an MCP (Model Context Protocol) server, allowing you to conn
 # Start Claude-Flow MCP server in any environment
 npx claude-flow@v3alpha mcp start
 ```
-
----
 
 <details open>
 <summary>🖥️ <strong>Claude Desktop</strong></summary>
@@ -953,8 +969,12 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env
 
 ---
 
+## 📦 Core Features
+
+Comprehensive capabilities for enterprise-grade AI agent orchestration.
+
 <details>
-<summary><h2>📦 Features — 54+ Agents, Swarm Topologies, MCP Tools & Security</h2></summary>
+<summary>📦 <strong>Features</strong> — 54+ Agents, Swarm Topologies, MCP Tools & Security</summary>
 
 Comprehensive feature set for enterprise-grade AI agent orchestration.
 
@@ -1343,7 +1363,7 @@ npx claude-flow@v3alpha worker status
 | `init` | 4 | Project initialization (wizard, check, skills, hooks) |
 | `agent` | 8 | Agent lifecycle (spawn, list, status, stop, metrics, pool, health, logs) |
 | `swarm` | 6 | Swarm coordination (init, start, status, stop, scale, coordinate) |
-| `memory` | 11 | Memory operations (store, retrieve, search, list, delete, stats, configure, cleanup, compress, export, import) |
+| `memory` | 12 | Memory operations (init, store, retrieve, search --build-hnsw, list, delete, stats, configure, cleanup, compress, export, import) |
 | `mcp` | 9 | MCP server (start, stop, status, health, restart, tools, toggle, exec, logs) |
 | `task` | 6 | Task management (create, list, status, cancel, assign, retry) |
 | `session` | 7 | Session management (list, save, restore, delete, export, import, current) |
@@ -1881,8 +1901,12 @@ Shell-based daemons for monitoring (Linux/macOS only):
 
 ---
 
+## 🎯 Use Cases & Workflows
+
+Real-world scenarios and pre-built workflows for common tasks.
+
 <details>
-<summary><h2>🎯 Use Cases — Real-world scenarios and how to solve them</h2></summary>
+<summary>🎯 <strong>Use Cases</strong> — Real-world scenarios and how to solve them</summary>
 
 ### 👨‍💻 Development & Code Quality
 
@@ -1946,8 +1970,12 @@ Shell-based daemons for monitoring (Linux/macOS only):
 
 ---
 
+## 🧠 Intelligence & Learning
+
+Self-learning hooks, pattern recognition, and intelligent task routing.
+
 <details>
-<summary><h2>🪝Hooks, Event Hooks, Workers & Pattern Intelligence</h2></summary>
+<summary>🪝 <strong>Hooks, Event Hooks, Workers & Pattern Intelligence</strong></summary>
 
 ### What Are Hooks?
 
@@ -2143,7 +2171,7 @@ npx claude-flow@v3alpha hooks worker dispatch --trigger audit
 ---
 
 <details>
-<summary><h2>📦 Pattern Store & Export — Share Patterns, Import Config </h2></summary>
+<summary>📦 <strong>Pattern Store & Export</strong> — Share Patterns, Import Config</summary>
 
 Share learned patterns across projects, teams, and the community via the decentralized pattern marketplace.
 
@@ -2279,8 +2307,12 @@ npx claude-flow@v3alpha transfer-store download --id "security-essentials" --app
 
 ---
 
+## 🛠️ Development Tools
+
+Scripts, coordination systems, and collaborative development features.
+
 <details>
-<summary><h2>🛠️ Helper Scripts — 30+ Development Automation Tools</h2></summary>
+<summary>🛠️ <strong>Helper Scripts</strong> — 30+ Development Automation Tools</summary>
 
 The `.claude/helpers/` directory contains **30+ automation scripts** for development, monitoring, learning, and swarm coordination. These scripts integrate with hooks and can be called directly or via the V3 master tool.
 
@@ -2419,7 +2451,7 @@ Helpers are configured in `.claude/settings.json`:
 ---
 
 <details>
-<summary><h2>🎓 Skills System — 42 Pre-Built Workflows for Any Task</h2></summary>
+<summary>🎓 <strong>Skills System</strong> — 42 Pre-Built Workflows for Any Task</summary>
 
 Skills are **reusable workflows** that combine agents, hooks, and patterns into ready-to-use solutions. Think of them as "recipes" for common development tasks.
 
@@ -2602,7 +2634,7 @@ Skills are defined in YAML with:
 ---
 
 <details>
-<summary><h2>🎫 Claims & Work Coordination — Human-Agent Task Management</h2></summary>
+<summary>🎫 <strong>Claims & Work Coordination</strong> — Human-Agent Task Management</summary>
 
 The Claims system manages **who is working on what** — whether human or agent. It prevents conflicts, enables handoffs, and balances work across your team.
 
@@ -2724,7 +2756,7 @@ npx claude-flow@v3alpha issues rebalance
 ---
 
 <details>
-<summary><h2>🧭 Intelligent Routing — Q-Learning Task Assignment</h2></summary>
+<summary>🧭 <strong>Intelligent Routing</strong> — Q-Learning Task Assignment</summary>
 
 The Route system uses **Q-Learning** to automatically assign tasks to the best agent based on learned performance patterns.
 
@@ -2828,8 +2860,12 @@ The system **remembers** what works and applies it to future similar tasks.
 
 ---
 
+## 💻 Programmatic Usage
+
+Use Claude-Flow packages directly in your applications.
+
 <details>
-<summary><h2>💻 Programmatic SDK — Use Claude-Flow in Your Code</h2></summary>
+<summary>💻 <strong>Programmatic SDK</strong> — Use Claude-Flow in Your Code</summary>
 
 Use Claude-Flow packages directly in your TypeScript/JavaScript applications.
 
@@ -2872,6 +2908,26 @@ const results = await db.search('how to authenticate users', {
 
 console.log(results);
 // [{ key: 'auth-pattern', similarity: 0.92, content: '...' }]
+```
+
+**CLI Commands:**
+```bash
+# Initialize memory database
+npx claude-flow@alpha memory init --force
+
+# Store patterns
+npx claude-flow@alpha memory store --key "pattern-auth" --value "JWT authentication with refresh tokens"
+npx claude-flow@alpha memory store --key "pattern-cache" --value "Redis caching for API responses"
+
+# Build HNSW index for 150x-12,500x faster search
+npx claude-flow@alpha memory search --query "authentication" --build-hnsw
+
+# Semantic search (uses HNSW if built)
+npx claude-flow@alpha memory search --query "how to cache data" --limit 5
+
+# List and manage entries
+npx claude-flow@alpha memory list --namespace patterns
+npx claude-flow@alpha memory stats
 ```
 
 </details>
@@ -3198,8 +3254,12 @@ await hooks.endTrajectory(trajectory, { success: true });
 
 ---
 
+## 🔗 Ecosystem & Integrations
+
+Core infrastructure packages powering Claude-Flow's intelligence layer.
+
 <details>
-<summary><h2>⚡ Agentic-Flow Integration — Core AI Infrastructure</h2></summary>
+<summary>⚡ <strong>Agentic-Flow Integration</strong> — Core AI Infrastructure</summary>
 
 [![npm version](https://img.shields.io/npm/v/agentic-flow?color=blue&label=npm)](https://www.npmjs.com/package/agentic-flow)
 [![npm downloads](https://img.shields.io/npm/dm/agentic-flow?color=green)](https://www.npmjs.com/package/agentic-flow)
@@ -3519,7 +3579,7 @@ const config = optimizer.getOptimalConfig(agentCount);
 ---
 
 <details>
-<summary><h2>🥋 Agentic-Jujutsu — Quantum-Ready AI Version Control</h2></summary>
+<summary>🥋 <strong>Agentic-Jujutsu</strong> — Quantum-Ready AI Version Control</summary>
 
 [![npm version](https://img.shields.io/npm/v/agentic-jujutsu?color=blue&label=npm)](https://www.npmjs.com/package/agentic-jujutsu)
 [![npm downloads](https://img.shields.io/npm/dm/agentic-jujutsu?color=green)](https://www.npmjs.com/package/agentic-jujutsu)
@@ -3753,14 +3813,36 @@ npx agentic-jujutsu examples        # Show usage examples
 ---
 
 <details>
-<summary><h2>🦀 RuVector — High-Performance Rust/WASM Intelligence</h2></summary>
+<summary>🦀 <strong>RuVector</strong> — High-Performance Rust/WASM Intelligence</summary>
 
 [![npm version](https://img.shields.io/npm/v/ruvector?color=blue&label=npm)](https://www.npmjs.com/package/ruvector)
 [![npm downloads](https://img.shields.io/npm/dm/ruvector?color=green)](https://www.npmjs.com/package/ruvector)
 [![GitHub](https://img.shields.io/badge/GitHub-ruvnet%2Fruvector-blue?logo=github)](https://github.com/ruvnet/ruvector)
 [![Docker](https://img.shields.io/badge/Docker-ruvector--postgres-blue?logo=docker)](https://hub.docker.com/r/ruvnet/ruvector-postgres)
 
-**RuVector** is a high-performance vector database and neural computing library written in Rust with Node.js/WASM bindings. It powers Claude-Flow's intelligence layer with native speed.
+**RuVector** is a high-performance distributed vector database combining vector search, graph queries, and self-learning neural networks. Written in Rust with Node.js/WASM bindings, it powers Claude-Flow's intelligence layer with native speed.
+
+### Key Capabilities
+
+| Capability | Description | Performance |
+|------------|-------------|-------------|
+| **Vector Search** | HNSW indexing with SIMD acceleration | **~61µs latency, 16,400 QPS** |
+| **Graph Queries** | Full Cypher syntax (MATCH, WHERE, CREATE) | Native graph traversal |
+| **Self-Learning** | GNN layers that improve search over time | Automatic optimization |
+| **Distributed** | Raft consensus, multi-master replication | Auto-sharding |
+| **Compression** | Adaptive tiered (hot/warm/cool/cold) | **2-32x memory reduction** |
+| **39 Attention Types** | Flash, linear, sparse, graph, hyperbolic | GPU-accelerated SQL |
+
+### Performance Benchmarks
+
+| Operation | Latency | Throughput |
+|-----------|---------|------------|
+| HNSW Search (k=10, 384-dim) | **61µs** | 16,400 QPS |
+| HNSW Search (k=100) | 164µs | 6,100 QPS |
+| Cosine Distance (1536-dim) | 143ns | 7M ops/sec |
+| Dot Product (384-dim) | 33ns | 30M ops/sec |
+| Batch Distance (1000 vectors) | 237µs | 4.2M/sec |
+| Memory (1M vectors with PQ8) | - | **200MB** |
 
 ### Quick Start
 
@@ -3775,16 +3857,44 @@ npx ruvector --help
 docker run -d -p 5432:5432 ruvnet/ruvector-postgres
 ```
 
+### Basic Usage
+
+```javascript
+import ruvector from 'ruvector';
+
+// Initialize vector database
+const db = new ruvector.VectorDB(384); // 384 dimensions
+
+// Insert vectors
+await db.insert('doc1', embedding1);
+await db.insert('doc2', embedding2);
+
+// Search (returns top-k similar)
+const results = await db.search(queryEmbedding, 10);
+
+// Graph queries with Cypher
+await db.execute("CREATE (a:Person {name: 'Alice'})-[:KNOWS]->(b:Person {name: 'Bob'})");
+const friends = await db.execute("MATCH (p:Person)-[:KNOWS]->(friend) RETURN friend.name");
+
+// GNN-enhanced search (self-learning)
+const layer = new ruvector.GNNLayer(384, 256, 4);
+const enhanced = layer.forward(query, neighbors, weights);
+
+// Compression (2-32x memory reduction)
+const compressed = ruvector.compress(embedding, 0.3); // 30% quality threshold
+```
+
 ### Package Ecosystem
 
 | Package | Description | Performance |
 |---------|-------------|-------------|
-| **[ruvector](https://www.npmjs.com/package/ruvector)** | Core vector database with HNSW | 150x-12,500x faster search |
+| **[ruvector](https://www.npmjs.com/package/ruvector)** | Core vector database with HNSW | **~61µs search, 16,400 QPS** |
 | **[@ruvector/attention](https://www.npmjs.com/package/@ruvector/attention)** | Flash Attention mechanisms | 2.49x-7.47x speedup |
 | **[@ruvector/sona](https://www.npmjs.com/package/@ruvector/sona)** | SONA adaptive learning (LoRA, EWC++) | <0.05ms adaptation |
-| **[@ruvector/gnn](https://www.npmjs.com/package/@ruvector/gnn)** | Graph Neural Networks | Native NAPI bindings |
+| **[@ruvector/gnn](https://www.npmjs.com/package/@ruvector/gnn)** | Graph Neural Networks (15 layer types) | Native NAPI bindings |
 | **[@ruvector/graph-node](https://www.npmjs.com/package/@ruvector/graph-node)** | Graph DB with Cypher queries | 10x faster than WASM |
 | **[@ruvector/rvlite](https://www.npmjs.com/package/@ruvector/rvlite)** | Standalone DB (SQL, SPARQL, Cypher) | All-in-one solution |
+| **[ruvector-wasm](https://www.npmjs.com/package/ruvector-wasm)** | Browser/Edge WASM build | Works everywhere |
 
 ### 🐘 RuVector PostgreSQL — Enterprise Vector Database
 
@@ -4017,8 +4127,12 @@ ruvector-postgres/
 
 ---
 
+## ☁️ Cloud & Deployment
+
+Cloud platform integration and deployment tools.
+
 <details>
-<summary><h2>☁️ Flow Nexus — Cloud Platform Integration</h2></summary>
+<summary>☁️ <strong>Flow Nexus</strong> — Cloud Platform Integration</summary>
 
 Flow Nexus is a **cloud platform** for deploying and scaling Claude-Flow beyond your local machine.
 
@@ -4128,7 +4242,7 @@ npx claude-flow@v3alpha nexus swarm deploy
 ---
 
 <details>
-<summary><h2>🔗 Stream-Chain — Multi-Agent Pipelines</h2></summary>
+<summary>🔗 <strong>Stream-Chain</strong> — Multi-Agent Pipelines</summary>
 
 Stream-Chain enables **sequential processing** where the output of one agent becomes the input of the next.
 
@@ -4217,7 +4331,7 @@ npx claude-flow@v3alpha stream-chain status feature-pipeline
 ---
 
 <details>
-<summary><h2>👥 Pair Programming — Collaborative AI Development</h2></summary>
+<summary>👥 <strong>Pair Programming</strong> — Collaborative AI Development</summary>
 
 The Pair Programming skill provides **human-AI collaborative coding** with role switching, TDD support, and real-time verification.
 
@@ -4296,8 +4410,12 @@ npx claude-flow@v3alpha pair end
 
 ---
 
+## 🛡️ Security
+
+AI manipulation defense, threat detection, and input validation.
+
 <details>
-<summary><h2>🛡️ AIDefence Security — Threat Detection, PII Scanning </h2></summary>
+<summary>🛡️ <strong>AIDefence Security</strong> — Threat Detection, PII Scanning</summary>
 
 **AI Manipulation Defense System (AIMDS)** — Protect AI applications from prompt injection, jailbreaks, and data exposure with sub-millisecond detection.
 
@@ -4475,8 +4593,12 @@ const consensus = calculateSecurityConsensus(assessments);
 
 ---
 
+## 🏗️ Architecture & Modules
+
+Domain-driven design, performance benchmarks, and testing framework.
+
 <details>
-<summary><h2>🏗️ Architecture — DDD Modules, Topology Benchmarks & Metrics</h2></summary>
+<summary>🏗️ <strong>Architecture</strong> — DDD Modules, Topology Benchmarks & Metrics</summary>
 
 Domain-Driven Design with bounded contexts, clean architecture, and measured performance across all topologies.
 
@@ -4494,6 +4616,7 @@ Domain-Driven Design with bounded contexts, clean architecture, and measured per
 | `@claude-flow/testing` | Quality assurance | London School TDD, Vitest, fixtures, mocks |
 | `@claude-flow/deployment` | Release automation | Versioning, changelogs, NPM publishing |
 | `@claude-flow/shared` | Common utilities | Types, validation schemas, constants |
+| `@claude-flow/browser` | Browser automation | 59 MCP tools, element refs, trajectory learning |
 
 ### Architecture Principles
 
@@ -4534,7 +4657,94 @@ Domain-Driven Design with bounded contexts, clean architecture, and measured per
 ---
 
 <details>
-<summary><h2>📦 Release Management — @claude-flow/deployment</h2></summary>
+<summary><strong>🌐 Browser Automation — @claude-flow/browser</strong></summary>
+
+[![npm version](https://img.shields.io/npm/v/@claude-flow/browser?color=blue&label=npm)](https://www.npmjs.com/package/@claude-flow/browser)
+
+AI-optimized browser automation integrating [agent-browser](https://github.com/AugmentCode/agent-browser) with claude-flow for intelligent web automation, trajectory learning, and multi-agent browser coordination.
+
+### Installation
+
+```bash
+npm install @claude-flow/browser
+
+# agent-browser CLI (auto-suggested on install, or install manually)
+npm install -g agent-browser@latest
+```
+
+### Quick Start
+
+```typescript
+import { createBrowserService } from '@claude-flow/browser';
+
+const browser = createBrowserService({
+  sessionId: 'my-session',
+  enableSecurity: true,  // URL/PII scanning
+  enableMemory: true,    // Trajectory learning
+});
+
+// Track actions for ReasoningBank/SONA learning
+browser.startTrajectory('Login to dashboard');
+
+await browser.open('https://example.com/login');
+
+// Use element refs (93% context reduction vs CSS selectors)
+const snapshot = await browser.snapshot({ interactive: true });
+await browser.fill('@e1', 'user@example.com');
+await browser.fill('@e2', 'password');
+await browser.click('@e3');
+
+await browser.endTrajectory(true, 'Login successful');
+await browser.close();
+```
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **59 MCP Tools** | Complete browser automation via MCP protocol |
+| **Element Refs** | 93% context reduction with `@e1`, `@e2` refs |
+| **Trajectory Learning** | Records actions for ReasoningBank/SONA |
+| **Security Scanning** | URL validation, PII detection, XSS/SQL injection prevention |
+| **9 Workflow Templates** | Login, OAuth, scraping, testing, monitoring |
+| **Swarm Coordination** | Multi-session parallel browser automation |
+
+### Security Integration
+
+```typescript
+import { getSecurityScanner, isUrlSafe, containsPII } from '@claude-flow/browser';
+
+// URL threat detection
+const scanner = getSecurityScanner({ requireHttps: true });
+const result = await scanner.scanUrl('https://example.com');
+// { safe: true, threats: [], score: 1.0 }
+
+// PII detection
+containsPII('SSN: 123-45-6789'); // true
+
+// Input validation (XSS, SQL injection)
+scanner.validateInput('<script>alert(1)</script>', 'comment');
+// { safe: false, threats: [{type: 'xss', ...}] }
+```
+
+### Workflow Templates
+
+```typescript
+import { listWorkflows, getWorkflow } from '@claude-flow/browser';
+
+listWorkflows(); // ['login-basic', 'login-oauth', 'scrape-table', ...]
+const template = getWorkflow('login-basic');
+// { steps: [{action: 'open'}, {action: 'fill'}, ...], variables: [...] }
+```
+
+📖 [Full Documentation](./v3/@claude-flow/browser/README.md)
+
+</details>
+
+---
+
+<details>
+<summary>📦 <strong>Release Management</strong> — @claude-flow/deployment</summary>
 
 Automated release management, versioning, and CI/CD for Claude Flow packages.
 
@@ -4673,7 +4883,7 @@ npx @claude-flow/deployment release --version 2.0.0 --dry-run
 ---
 
 <details>
-<summary><h2>📊 Performance Benchmarking — @claude-flow/performance</h2></summary>
+<summary>📊 <strong>Performance Benchmarking</strong> — @claude-flow/performance</summary>
 
 Statistical benchmarking, memory tracking, regression detection, and V3 performance target validation.
 
@@ -4861,7 +5071,7 @@ npx claude-flow@v3alpha performance benchmark --suite memory
 ---
 
 <details>
-<summary><h2>🧪 Testing Framework — @claude-flow/testing</h2></summary>
+<summary>🧪 <strong>Testing Framework</strong> — @claude-flow/testing</summary>
 
 Comprehensive TDD framework implementing **London School** patterns with behavior verification, shared fixtures, and mock services.
 
@@ -5127,8 +5337,12 @@ console.log(TEST_CONFIG.AGENTDB_SEARCH_IMPROVEMENT_MAX); // 12500
 
 ---
 
+## ⚙️ Configuration & Reference
+
+Environment setup, configuration options, and platform support.
+
 <details>
-<summary><h2>💻 Cross-Platform Support </h2></summary>
+<summary>💻 <strong>Cross-Platform Support</strong></summary>
 
 
 ### Windows (PowerShell)
@@ -5157,7 +5371,7 @@ export CLAUDE_FLOW_MEMORY_PATH="./data"
 ---
 
 <details>
-<summary><h2>⚙️ Environment Variables </h2></summary>
+<summary>⚙️ <strong>Environment Variables</strong></summary>
 
 ### Core Configuration
 
@@ -5297,7 +5511,7 @@ CLAUDE_FLOW_HNSW_EF=200
 ---
 
 <details>
-<summary><h2>📄 Configuration Reference </h2></summary>
+<summary>📄 <strong>Configuration Reference</strong></summary>
 
 ### Configuration File Location
 
@@ -5551,8 +5765,12 @@ npx claude-flow@v3alpha init --wizard
 
 ---
 
+## 📖 Help & Resources
+
+Troubleshooting, migration guides, and documentation links.
+
 <details>
-<summary><h2>🔧 Troubleshooting </h2></summary>
+<summary>🔧 <strong>Troubleshooting</strong></summary>
 
 
 ### Common Issues
@@ -5612,7 +5830,7 @@ export CLAUDE_FLOW_HNSW_EF=100
 ---
 
 <details>
-<summary><h2>🔄 Migration Guide (V2 → V3) </h2></summary>
+<summary>🔄 <strong>Migration Guide (V2 → V3)</strong></summary>
 
 ### Why Migrate to V3?
 
@@ -5762,7 +5980,7 @@ cp -r ./data-backup-v2 ./data
 ---
 
 <details>
-<summary><h2>📚 Documentation </h2></summary>
+<summary>📚 <strong>Documentation</strong></summary>
 
 
 ### V3 Module Documentation
@@ -5784,6 +6002,7 @@ cp -r ./data-backup-v2 ./data
 | `@claude-flow/performance` | Benchmarking & optimization | [Source](./v3/@claude-flow/performance/) |
 | `@claude-flow/deployment` | Release & CI/CD | [Source](./v3/@claude-flow/deployment/) |
 | `@claude-flow/shared` | Shared utilities, types & V3ProgressService | [Source](./v3/@claude-flow/shared/) |
+| `@claude-flow/browser` | AI-optimized browser automation with agent-browser | [README](./v3/@claude-flow/browser/README.md) |
 
 ### Additional Resources
 

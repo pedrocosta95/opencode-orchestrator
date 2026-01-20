@@ -11,6 +11,7 @@ import * as path from 'path';
 import {
   executeInit,
   executeUpgrade,
+  executeUpgradeWithMissing,
   DEFAULT_INIT_OPTIONS,
   MINIMAL_INIT_OPTIONS,
   FULL_INIT_OPTIONS,
@@ -584,6 +585,7 @@ const skillsCommand: Command = {
         agentdb: ctx.flags.agentdb as boolean,
         github: ctx.flags.github as boolean,
         flowNexus: false,
+        browser: false,
         v3: ctx.flags.v3 as boolean,
       },
     };
@@ -676,18 +678,33 @@ const upgradeCommand: Command = {
       type: 'boolean',
       default: false,
     },
+    {
+      name: 'add-missing',
+      short: 'a',
+      description: 'Add any new skills, agents, and commands that are missing',
+      type: 'boolean',
+      default: false,
+    },
   ],
   action: async (ctx: CommandContext): Promise<CommandResult> => {
+    const addMissing = (ctx.flags['add-missing'] || ctx.flags.addMissing) as boolean;
+
     output.writeln();
     output.writeln(output.bold('Upgrading Claude Flow'));
-    output.writeln(output.dim('Updates helpers while preserving your existing data'));
+    if (addMissing) {
+      output.writeln(output.dim('Updates helpers and adds any missing skills/agents/commands'));
+    } else {
+      output.writeln(output.dim('Updates helpers while preserving your existing data'));
+    }
     output.writeln();
 
-    const spinner = output.createSpinner({ text: 'Upgrading...' });
+    const spinner = output.createSpinner({ text: addMissing ? 'Upgrading and adding missing assets...' : 'Upgrading...' });
     spinner.start();
 
     try {
-      const result = await executeUpgrade(ctx.cwd);
+      const result = addMissing
+        ? await executeUpgradeWithMissing(ctx.cwd)
+        : await executeUpgrade(ctx.cwd);
 
       if (!result.success) {
         spinner.fail('Upgrade failed');
@@ -730,8 +747,43 @@ const upgradeCommand: Command = {
         output.writeln();
       }
 
+      // Show added assets (when --add-missing flag is used)
+      if (result.addedSkills && result.addedSkills.length > 0) {
+        output.printBox(
+          result.addedSkills.map(s => `+ ${s}`).join('\n'),
+          `Added Skills (${result.addedSkills.length} new)`
+        );
+        output.writeln();
+      }
+
+      if (result.addedAgents && result.addedAgents.length > 0) {
+        output.printBox(
+          result.addedAgents.map(a => `+ ${a}`).join('\n'),
+          `Added Agents (${result.addedAgents.length} new)`
+        );
+        output.writeln();
+      }
+
+      if (result.addedCommands && result.addedCommands.length > 0) {
+        output.printBox(
+          result.addedCommands.map(c => `+ ${c}`).join('\n'),
+          `Added Commands (${result.addedCommands.length} new)`
+        );
+        output.writeln();
+      }
+
       output.printSuccess('Your statusline helper has been updated to the latest version');
       output.printInfo('Existing metrics and learning data were preserved');
+
+      // Show summary for --add-missing
+      if (addMissing) {
+        const totalAdded = (result.addedSkills?.length || 0) + (result.addedAgents?.length || 0) + (result.addedCommands?.length || 0);
+        if (totalAdded > 0) {
+          output.printSuccess(`Added ${totalAdded} missing assets to your project`);
+        } else {
+          output.printInfo('All skills, agents, and commands are already up to date');
+        }
+      }
 
       if (ctx.flags.format === 'json') {
         output.printJson(result);

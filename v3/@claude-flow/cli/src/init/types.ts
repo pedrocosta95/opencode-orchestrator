@@ -66,6 +66,8 @@ export interface SkillsConfig {
   github: boolean;
   /** Include Flow Nexus skills */
   flowNexus: boolean;
+  /** Include browser automation skills (agent-browser) */
+  browser: boolean;
   /** Include V3 implementation skills */
   v3: boolean;
   /** Include all available skills */
@@ -112,6 +114,8 @@ export interface AgentsConfig {
   sparc: boolean;
   /** Include swarm coordinators */
   swarm: boolean;
+  /** Include browser automation agents (agent-browser) */
+  browser: boolean;
   /** Include V3-specific agents (security, memory, performance, etc.) */
   v3: boolean;
   /** Include optimization agents */
@@ -316,6 +320,7 @@ export const DEFAULT_INIT_OPTIONS: InitOptions = {
     agentdb: true,
     github: true,
     flowNexus: false,
+    browser: true,
     v3: true,
     all: false,
   },
@@ -337,6 +342,7 @@ export const DEFAULT_INIT_OPTIONS: InitOptions = {
     hiveMind: true,
     sparc: true,
     swarm: true,
+    browser: true,
     v3: true,
     optimization: true,
     testing: true,
@@ -403,6 +409,7 @@ export const MINIMAL_INIT_OPTIONS: InitOptions = {
     agentdb: false,
     github: false,
     flowNexus: false,
+    browser: false,
     v3: false,
     all: false,
   },
@@ -413,6 +420,7 @@ export const MINIMAL_INIT_OPTIONS: InitOptions = {
     hiveMind: false,
     sparc: false,
     swarm: false,
+    browser: false,
     v3: false,
     optimization: false,
     testing: false,
@@ -457,6 +465,7 @@ export const FULL_INIT_OPTIONS: InitOptions = {
     agentdb: true,
     github: true,
     flowNexus: true,
+    browser: true,
     v3: true,
     all: true,
   },

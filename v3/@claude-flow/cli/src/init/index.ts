@@ -58,5 +58,5 @@ export {
 } from './claudemd-generator.js';
 
 // Main executor
-export { executeInit, executeUpgrade, default } from './executor.js';
+export { executeInit, executeUpgrade, executeUpgradeWithMissing, default } from './executor.js';
 export type { UpgradeResult } from './executor.js';
