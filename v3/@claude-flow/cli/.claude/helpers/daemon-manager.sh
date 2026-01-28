@@ -126,8 +126,8 @@ stop_daemon() {
 # Start all daemons
 start_all() {
     log "Starting all Claude Flow daemons..."
-    start_swarm_monitor "${1:-3}"
-    start_metrics_daemon "${2:-5}"
+    start_swarm_monitor "${1:-30}"
+    start_metrics_daemon "${2:-60}"
 
     # Initial metrics update
     "$SCRIPT_DIR/swarm-monitor.sh" check > /dev/null 2>&1
