@@ -675,9 +675,10 @@ function extractSections(content: string): Array<{ level: number; title: string;
   const lines = content.split('\n');
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]!;
+    const line = lines[i];
+    if (!line) continue;
     const match = line.match(/^(#{1,6})\s+(.+)$/);
-    if (match) {
+    if (match && match[1] && match[2]) {
       sections.push({
         level: match[1].length,
         title: match[2].trim(),
