@@ -1824,6 +1824,7 @@ export async function storeEntry(options: {
   tags?: string[];
   ttl?: number;
   dbPath?: string;
+  upsert?: boolean;
 }): Promise<{
   success: boolean;
   id: string;
