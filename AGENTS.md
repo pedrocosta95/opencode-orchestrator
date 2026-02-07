@@ -46,15 +46,15 @@
 
 ## Concurrency: 1 MESSAGE = ALL RELATED OPERATIONS
 
-- All operations MUST be concurrent/parallel in a single message
-- Use Task tool for spawning agents, not just MCP
+- All operations MUST be concurrent/parallel when possible
+- Use CLI commands for spawning agents
 
 **Mandatory patterns:**
-- ALWAYS batch ALL todos in ONE call (5-10+ minimum)
-- ALWAYS spawn ALL agents in ONE message with full instructions via Task tool
-- ALWAYS batch ALL file reads/writes/edits in ONE message
-- ALWAYS batch ALL terminal operations in ONE message
-- ALWAYS batch ALL memory store/retrieve operations in ONE message
+- ALWAYS batch related operations together
+- Use `npx claude-flow agent spawn` for agent creation
+- ALWAYS batch file reads/writes/edits together
+- ALWAYS batch terminal operations together
+- ALWAYS batch memory store/retrieve operations together
 
 ---
 
