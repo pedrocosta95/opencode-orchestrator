@@ -198,6 +198,12 @@ const handlers = {
   },
 
   'post-task': () => {
+    // Implicit success feedback for intelligence
+    if (intelligence && intelligence.feedback) {
+      try {
+        intelligence.feedback(true);
+      } catch (e) { /* non-fatal */ }
+    }
     console.log('[OK] Task completed');
   },
 };
