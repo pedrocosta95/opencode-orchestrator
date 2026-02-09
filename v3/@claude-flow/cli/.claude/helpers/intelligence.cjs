@@ -639,6 +639,11 @@ function consolidate() {
   // 8. Persist updated store (with new insight entries)
   if (newEntries > 0) writeJSON(STORE_PATH, store);
 
+  // 9. Save snapshot for delta tracking
+  const updatedGraph = readJSON(GRAPH_PATH);
+  const updatedRanked = readJSON(RANKED_PATH);
+  saveSnapshot(updatedGraph, updatedRanked);
+
   return {
     entries: store.length,
     edges: edges.length,
