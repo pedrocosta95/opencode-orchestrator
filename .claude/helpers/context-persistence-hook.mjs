@@ -1894,6 +1894,7 @@ export {
   computeImportance,
   retrieveContextSmart,
   autoOptimize,
+  crossSessionSearch,
   storeChunks,
   retrieveContext,
   readStdin,
