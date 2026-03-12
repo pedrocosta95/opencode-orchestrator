@@ -594,8 +594,6 @@ export class HeadlessWorkerExecutor extends EventEmitter {
   private processPool: Map<string, PoolEntry> = new Map();
   private pendingQueue: QueueEntry[] = [];
   private contextCache: Map<string, CacheEntry> = new Map();
-  private claudeCodeAvailable: boolean | null = null;
-  private claudeCodeVersion: string | null = null;
 
   constructor(projectRoot: string, options?: HeadlessExecutorConfig) {
     super();
@@ -621,37 +619,18 @@ export class HeadlessWorkerExecutor extends EventEmitter {
   // ============================================
 
   /**
-   * Check if Claude Code CLI is available
+   * Check if headless execution is available
    */
   async isAvailable(): Promise<boolean> {
-    if (this.claudeCodeAvailable !== null) {
-      return this.claudeCodeAvailable;
-    }
-
-    try {
-      const output = execSync('claude --version', {
-        encoding: 'utf-8',
-        stdio: 'pipe',
-        timeout: 5000,
-        windowsHide: true, // Prevent phantom console windows on Windows
-      });
-      this.claudeCodeAvailable = true;
-      this.claudeCodeVersion = output.trim();
-      this.emit('status', { available: true, version: this.claudeCodeVersion });
-      return true;
-    } catch {
-      this.claudeCodeAvailable = false;
-      this.emit('status', { available: false });
-      return false;
-    }
+    // Headless worker executor is always available - it runs workers directly
+    return true;
   }
 
   /**
-   * Get Claude Code version
+   * Get executor version
    */
   async getVersion(): Promise<string | null> {
-    await this.isAvailable();
-    return this.claudeCodeVersion;
+    return 'headless-executor-v1';
   }
 
   /**
@@ -664,17 +643,6 @@ export class HeadlessWorkerExecutor extends EventEmitter {
     const baseConfig = HEADLESS_WORKER_CONFIGS[workerType];
     if (!baseConfig) {
       throw new Error(`Unknown headless worker type: ${workerType}`);
-    }
-
-    // Check availability
-    const available = await this.isAvailable();
-    if (!available) {
-      const result = this.createErrorResult(
-        workerType,
-        'Claude Code CLI not available. Install with: npm install -g @anthropic-ai/claude-code'
-      );
-      this.emit('error', result);
-      return result;
     }
 
     // Check concurrent limit

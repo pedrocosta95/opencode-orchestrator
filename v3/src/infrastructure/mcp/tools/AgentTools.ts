@@ -2,6 +2,7 @@
  * AgentTools
  *
  * MCP tools for agent management operations.
+ * Compatible with both Claude Code and OpenCode MCP clients.
  */
 
 import type {
@@ -27,7 +28,20 @@ export class AgentTools implements MCPToolProvider {
     return [
       {
         name: 'agent_spawn',
-        description: 'Spawn a new agent in the swarm',
+        description: 'Spawn a new agent in the swarm (OpenCode compatible)',
+        parameters: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'Unique agent identifier' },
+            type: { type: 'string', description: 'Agent type (coder, tester, reviewer, etc.)' },
+            capabilities: { type: 'array', items: { type: 'string' }, description: 'Agent capabilities' }
+          },
+          required: ['id', 'type']
+        }
+      },
+      {
+        name: 'opencode_agent_spawn',
+        description: 'Spawn a new agent (OpenCode MCP alias)',
         parameters: {
           type: 'object',
           properties: {
@@ -47,8 +61,27 @@ export class AgentTools implements MCPToolProvider {
         }
       },
       {
+        name: 'opencode_agent_list',
+        description: 'List all agents (OpenCode MCP alias)',
+        parameters: {
+          type: 'object',
+          properties: {}
+        }
+      },
+      {
         name: 'agent_terminate',
         description: 'Terminate an agent',
+        parameters: {
+          type: 'object',
+          properties: {
+            agentId: { type: 'string', description: 'ID of the agent to terminate' }
+          },
+          required: ['agentId']
+        }
+      },
+      {
+        name: 'opencode_agent_terminate',
+        description: 'Terminate an agent (OpenCode MCP alias)',
         parameters: {
           type: 'object',
           properties: {
@@ -67,6 +100,17 @@ export class AgentTools implements MCPToolProvider {
           },
           required: ['agentId']
         }
+      },
+      {
+        name: 'opencode_agent_metrics',
+        description: 'Get agent metrics (OpenCode MCP alias)',
+        parameters: {
+          type: 'object',
+          properties: {
+            agentId: { type: 'string', description: 'ID of the agent' }
+          },
+          required: ['agentId']
+        }
       }
     ];
   }
@@ -76,7 +120,10 @@ export class AgentTools implements MCPToolProvider {
    */
   async execute(toolName: string, params: Record<string, unknown>): Promise<MCPToolResult> {
     try {
-      switch (toolName) {
+      // Map OpenCode aliases to base tool names
+      const baseTool = toolName.replace(/^opencode_/, '');
+      
+      switch (baseTool) {
         case 'agent_spawn':
           return await this.spawnAgent(params as AgentConfig);
 

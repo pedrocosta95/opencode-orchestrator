@@ -50,8 +50,7 @@
             "MCP_GROUP_NEURAL",
             "MCP_GROUP_AGENTIC_FLOW",
             "MCP_GROUP_CLAUDE_CODE",
-            "MCP_GROUP_GEMINI",
-            "MCP_GROUP_CODEX"
+            "MCP_GROUP_GEMINI"
           ]
         },
         {
@@ -154,26 +153,12 @@
           "description": "agentic-flow alpha integration",
           "source": "agentic-flow"
         },
-        "claude-code": {
-          "enabled_by_default": false,
-          "display_name": "Claude Code",
-          "endpoint": "/mcp/claude-code",
-          "description": "Claude Code CLI tools",
-          "source": "claude-code"
-        },
         "gemini": {
           "enabled_by_default": false,
           "display_name": "Gemini",
           "endpoint": "/mcp/gemini",
           "description": "Google Gemini native tools",
           "source": "gemini"
-        },
-        "codex": {
-          "enabled_by_default": false,
-          "display_name": "Codex",
-          "endpoint": "/mcp/codex",
-          "description": "OpenAI Codex tools",
-          "source": "codex"
         }
       }
     },
@@ -247,7 +232,7 @@
     "ruvector_integration": true,
     "ruflo_integration": true,
     "agentic_flow_integration": true,
-    "external_mcp_backends": ["ruvector", "ruflo", "agentic-flow", "claude-code", "gemini", "codex"],
+    "external_mcp_backends": ["ruvector", "ruflo", "agentic-flow", "gemini"],
     "test_harness": true
   }
 }

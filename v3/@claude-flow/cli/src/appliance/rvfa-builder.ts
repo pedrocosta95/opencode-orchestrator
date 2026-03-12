@@ -190,8 +190,7 @@ export class RvfaBuilder {
     return jsonBuf({
       type: 'runtime',
       node: { version: nodeVersion, target: 'v22', variant: `linux-${this.opts.arch}-musl`, stripped: true, excludes: ['npm', 'corepack', 'debug-symbols'] },
-      claudeCode: { name: 'claude-code-cli', entrypoint: '/usr/local/bin/claude' },
-      paths: { node: '/usr/local/bin/node', claude: '/usr/local/bin/claude' },
+      paths: { node: '/usr/local/bin/node' },
     });
   }
 

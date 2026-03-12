@@ -351,44 +351,6 @@ async function checkVersionFreshness(): Promise<HealthCheck> {
   }
 }
 
-// Check Claude Code CLI (async with proper env inheritance)
-async function checkClaudeCode(): Promise<HealthCheck> {
-  try {
-    const version = await runCommand('claude --version');
-    // Parse version from output like "claude 1.0.0" or "Claude Code v1.0.0"
-    const versionMatch = version.match(/v?(\d+\.\d+\.\d+)/);
-    const versionStr = versionMatch ? `v${versionMatch[1]}` : version;
-    return { name: 'Claude Code CLI', status: 'pass', message: versionStr };
-  } catch {
-    return {
-      name: 'Claude Code CLI',
-      status: 'warn',
-      message: 'Not installed',
-      fix: 'npm install -g @anthropic-ai/claude-code'
-    };
-  }
-}
-
-// Install Claude Code CLI
-async function installClaudeCode(): Promise<boolean> {
-  try {
-    output.writeln();
-    output.writeln(output.bold('Installing Claude Code CLI...'));
-    execSync('npm install -g @anthropic-ai/claude-code', {
-      encoding: 'utf8',
-      stdio: 'inherit'
-    });
-    output.writeln(output.success('Claude Code CLI installed successfully!'));
-    return true;
-  } catch (error) {
-    output.writeln(output.error('Failed to install Claude Code CLI'));
-    if (error instanceof Error) {
-      output.writeln(output.dim(error.message));
-    }
-    return false;
-  }
-}
-
 // Check agentic-flow v3 integration (filesystem-based to avoid slow WASM/DB init)
 async function checkAgenticFlow(): Promise<HealthCheck> {
   try {
@@ -471,13 +433,10 @@ export const doctorCommand: Command = {
   examples: [
     { command: 'claude-flow doctor', description: 'Run full health check' },
     { command: 'claude-flow doctor --fix', description: 'Show fixes for issues' },
-    { command: 'claude-flow doctor --install', description: 'Auto-install missing dependencies' },
-    { command: 'claude-flow doctor -c version', description: 'Check for stale npx cache' },
-    { command: 'claude-flow doctor -c claude', description: 'Check Claude Code CLI only' }
+    { command: 'claude-flow doctor -c version', description: 'Check for stale npx cache' }
   ],
   action: async (ctx: CommandContext): Promise<CommandResult> => {
     const showFix = ctx.flags.fix as boolean;
-    const autoInstall = ctx.flags.install as boolean;
     const component = ctx.flags.component as string;
     const verbose = ctx.flags.verbose as boolean;
 
@@ -491,7 +450,6 @@ export const doctorCommand: Command = {
       checkVersionFreshness,
       checkNodeVersion,
       checkNpmVersion,
-      checkClaudeCode,
       checkGit,
       checkGitRepo,
       checkConfigFile,
@@ -509,7 +467,6 @@ export const doctorCommand: Command = {
       'freshness': checkVersionFreshness,
       'node': checkNodeVersion,
       'npm': checkNpmVersion,
-      'claude': checkClaudeCode,
       'config': checkConfigFile,
       'daemon': checkDaemonStatus,
       'memory': checkMemoryDatabase,
@@ -561,28 +518,6 @@ export const doctorCommand: Command = {
     } catch (error) {
       spinner.stop();
       output.writeln(output.error('Failed to run health checks'));
-    }
-
-    // Auto-install missing dependencies if requested
-    if (autoInstall) {
-      const claudeCodeResult = results.find(r => r.name === 'Claude Code CLI');
-      if (claudeCodeResult && claudeCodeResult.status !== 'pass') {
-        const installed = await installClaudeCode();
-        if (installed) {
-          // Re-check Claude Code after installation
-          const newCheck = await checkClaudeCode();
-          const idx = results.findIndex(r => r.name === 'Claude Code CLI');
-          if (idx !== -1) {
-            results[idx] = newCheck;
-            // Update fixes list
-            const fixIdx = fixes.findIndex(f => f.startsWith('Claude Code CLI:'));
-            if (fixIdx !== -1 && newCheck.status === 'pass') {
-              fixes.splice(fixIdx, 1);
-            }
-          }
-          output.writeln(formatCheck(newCheck));
-        }
-      }
     }
 
     // Summary

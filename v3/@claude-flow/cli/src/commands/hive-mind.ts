@@ -224,128 +224,32 @@ async function spawnClaudeCodeInstance(
     output.writeln();
     output.printSuccess(`Hive Mind prompt saved to: ${promptFile}`);
 
-    // Check if claude command exists
-    let claudeAvailable = false;
-    try {
-      execSync('which claude', { stdio: 'ignore' });
-      claudeAvailable = true;
-    } catch {
-      output.writeln();
-      output.printWarning('Claude Code CLI not found in PATH');
-      output.writeln(output.dim('Install it with: npm install -g @anthropic-ai/claude-code'));
-      output.writeln(output.dim('Falling back to displaying instructions...'));
-    }
+    // Hive Mind now coordinates via Claude Flow agents instead of Claude Code CLI
+    output.writeln();
+    output.writeln(output.bold('🧠 Hive Mind Ready'));
+    output.writeln(output.dim('─'.repeat(60)));
+    output.printList([
+      `Swarm ID: ${output.highlight(swarmId)}`,
+      `Prompt File: ${output.highlight(promptFile)}`,
+      `Workers: ${output.highlight(String(workers.length))}`
+    ]);
+    output.writeln();
+    output.printInfo('Use swarm commands to coordinate agents:');
+    output.writeln(output.dim(`  npx claude-flow swarm init --prompt-file ${promptFile}`));
 
     const dryRun = flags.dryRun || flags['dry-run'];
-
-    if (claudeAvailable && !dryRun) {
-      // Build arguments - flags first, then prompt
-      const claudeArgs: string[] = [];
-
-      // Check for non-interactive mode
-      const isNonInteractive = flags['non-interactive'] || flags.nonInteractive;
-      if (isNonInteractive) {
-        claudeArgs.push('-p'); // Print mode
-        claudeArgs.push('--output-format', 'stream-json');
-        claudeArgs.push('--verbose');
-        output.printInfo('Running in non-interactive mode');
-      }
-
-      // Add auto-permission flag unless explicitly disabled
-      const skipPermissions = flags['dangerously-skip-permissions'] !== false && !flags['no-auto-permissions'];
-      if (skipPermissions) {
-        claudeArgs.push('--dangerously-skip-permissions');
-        if (!isNonInteractive) {
-          output.printWarning('Using --dangerously-skip-permissions for seamless hive-mind execution');
-        }
-      }
-
-      // Add the prompt as the LAST argument
-      claudeArgs.push(hiveMindPrompt);
-
+    if (dryRun) {
       output.writeln();
-      output.printInfo('Launching Claude Code...');
-      output.writeln(output.dim('Press Ctrl+C to pause the session'));
-
-      // Spawn claude with properly ordered arguments
-      const claudeProcess = childSpawn('claude', claudeArgs, {
-        stdio: 'inherit',
-        shell: false,
-      });
-
-      // Set up SIGINT handler for session management
-      let isExiting = false;
-      const sigintHandler = () => {
-        if (isExiting) return;
-        isExiting = true;
-
-        output.writeln();
-        output.writeln();
-        output.printWarning('Pausing session and terminating Claude Code...');
-
-        if (claudeProcess && !claudeProcess.killed) {
-          claudeProcess.kill('SIGTERM');
-        }
-
-        output.writeln();
-        output.printSuccess('Session paused');
-        output.writeln(output.dim(`Prompt file saved at: ${promptFile}`));
-        output.writeln(output.dim('To resume, run claude with the saved prompt file'));
-
-        process.exit(0);
-      };
-
-      process.on('SIGINT', sigintHandler);
-      process.on('SIGTERM', sigintHandler);
-
-      // Handle process exit
-      claudeProcess.on('exit', (code) => {
-        // Clean up signal handlers
-        process.removeListener('SIGINT', sigintHandler);
-        process.removeListener('SIGTERM', sigintHandler);
-
-        if (code === 0) {
-          output.writeln();
-          output.printSuccess('Claude Code completed successfully');
-        } else if (code !== null) {
-          output.writeln();
-          output.printError(`Claude Code exited with code ${code}`);
-        }
-      });
-
-      output.writeln();
-      output.printSuccess('Claude Code launched with Hive Mind coordination');
-      output.printInfo('The Queen coordinator will orchestrate all worker agents');
-      output.writeln(output.dim(`Prompt file saved at: ${promptFile}`));
-
-      return { success: true, promptFile };
-    } else if (dryRun) {
-      output.writeln();
-      output.printInfo('Dry run - would execute Claude Code with prompt:');
+      output.printInfo('Dry run - prompt generated:');
       output.writeln(output.dim(`Prompt length: ${hiveMindPrompt.length} characters`));
       output.writeln();
-      output.writeln(output.dim('First 500 characters of prompt:'));
+      output.writeln(output.dim('First 500 characters:'));
       output.writeln(output.highlight(hiveMindPrompt.substring(0, 500) + '...'));
-      output.writeln();
-      output.writeln(output.dim(`Full prompt saved to: ${promptFile}`));
-
-      return { success: true, promptFile };
-    } else {
-      // Claude not available - show instructions
-      output.writeln();
-      output.writeln(output.bold('📋 Manual Execution Instructions:'));
-      output.writeln(output.dim('─'.repeat(50)));
-      output.printList([
-        'Install Claude Code: npm install -g @anthropic-ai/claude-code',
-        `Run with saved prompt: claude < ${promptFile}`,
-        `Or copy manually: cat ${promptFile} | claude`,
-        `With auto-permissions: claude --dangerously-skip-permissions < ${promptFile}`
-      ]);
-
-      return { success: true, promptFile };
     }
+
+    return { success: true, promptFile };
   } catch (error) {
-    spinner.fail('Failed to prepare Claude Code coordination');
+    spinner.fail('Failed to prepare Hive Mind coordination');
     const errorMessage = error instanceof Error ? error.message : String(error);
     output.printError(`Error: ${errorMessage}`);
 

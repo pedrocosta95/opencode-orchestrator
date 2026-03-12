@@ -1,7 +1,7 @@
 /**
  * V3 Statusline Generator
  *
- * Generates statusline data for Claude Code integration.
+ * Generates statusline data for Claude Code and OpenCode integration.
  * Provides real-time progress, metrics, and status information.
  *
  * Format matches the working .claude/statusline.sh output:
@@ -10,6 +10,12 @@
  * 🏗️  DDD Domains    [●●●●●]  5/5    ⚡ 1.0x → 2.49x-7.47x
  * 🤖 Swarm  ◉ [58/15]  👥 0    🟢 CVE 3/3    💾 22282MB    📂  47%    🧠  10%
  * 🔧 Architecture    DDD ● 98%  │  Security ●CLEAN  │  Memory ●AgentDB  │  Integration ●
+ *
+ * OpenCode format:
+ * ▊ CF-V3 ○ user  │  ⎇ main  │  OpenCode
+ * ─────────────────────────────────────────────────────
+ * 🏗️  DDD Domains    [●●●●●]  5/5    ⚡ 1.0x → 2.49x-7.47x
+ * 🔧 Tasks  ◉ [2/10]  ✓ 3 completed  💾 256MB    📂  45%
  */
 
 import type {
@@ -19,6 +25,16 @@ import type {
 import { execSync } from 'child_process';
 import { existsSync, readFileSync, statSync, readdirSync } from 'fs';
 import { join } from 'path';
+
+/**
+ * Detect if running in OpenCode environment
+ */
+export function detectOpenCodeEnvironment(): boolean {
+  return process.env.OPENCODE_SESSION_ID !== undefined ||
+         process.env.OPENCORE_SESSION_ID !== undefined ||
+         process.env.OPENCODE_HOOK_EVENT !== undefined ||
+         process.env.OPENCORE_HOOK_EVENT !== undefined;
+}
 
 /**
  * Extended statusline data with system metrics
@@ -366,6 +382,121 @@ export class StatuslineGenerator {
     );
 
     return lines.join('\n');
+  }
+
+  /**
+   * Generate OpenCode-compatible statusline
+   * Optimized for OpenCode's display format
+   */
+  generateOpenCodeStatusline(): string {
+    if (!this.config.enabled) {
+      return '';
+    }
+
+    const data = this.generateData();
+    const c = colors;
+    const lines: string[] = [];
+
+    // Header: V3 + OpenCode + User + Branch
+    let header = `${c.bold}${c.brightPurple}▊ CF-V3 ${c.reset}`;
+    header += `${c.brightCyan}○ ${c.brightCyan}${data.user.name}${c.reset}`;
+    if (data.user.gitBranch) {
+      header += `  ${c.dim}│${c.reset}  ${c.brightBlue}⎇ ${data.user.gitBranch}${c.reset}`;
+    }
+    header += `  ${c.dim}│${c.reset}  ${c.brightGreen}OpenCode${c.reset}`;
+    lines.push(header);
+
+    // Separator
+    lines.push(`${c.dim}─────────────────────────────────────────────────────${c.reset}`);
+
+    // Line 1: DDD Domain Progress
+    const progressBar = this.generateProgressBar(
+      data.v3Progress.domainsCompleted,
+      data.v3Progress.totalDomains
+    );
+    const domainsColor = data.v3Progress.domainsCompleted >= 3 ? c.brightGreen :
+                         data.v3Progress.domainsCompleted > 0 ? c.yellow : c.red;
+    const speedup = `${c.brightYellow}⚡ 1.0x${c.reset} ${c.dim}→${c.reset} ${c.brightYellow}${data.performance.flashAttentionTarget}${c.reset}`;
+    lines.push(
+      `${c.brightCyan}🏗️  DDD Domains${c.reset}    ${progressBar}  ` +
+      `${domainsColor}${data.v3Progress.domainsCompleted}${c.reset}/${c.brightWhite}${data.v3Progress.totalDomains}${c.reset}    ${speedup}`
+    );
+
+    // Line 2: OpenCode-specific: Tasks + Hooks + Context
+    const taskIndicator = data.swarm.activeAgents > 0 ? `${c.brightGreen}◉${c.reset}` : `${c.dim}○${c.reset}`;
+    const taskColor = data.swarm.activeAgents > 0 ? c.brightGreen : c.dim;
+    const taskDisplay = String(data.swarm.activeAgents).padStart(2);
+
+    // Hooks status
+    const hooksColor = data.hooks.status === 'ACTIVE' ? c.brightGreen : c.dim;
+    const hooksIcon = data.hooks.status === 'ACTIVE' ? '✓' : '○';
+
+    // Context color
+    let contextColor = c.brightGreen;
+    if (data.system.contextPct >= 75) contextColor = c.brightRed;
+    else if (data.system.contextPct >= 50) contextColor = c.brightYellow;
+    const contextDisplay = String(data.system.contextPct).padStart(3);
+
+    // Memory
+    const memoryColor = data.system.memoryMB > 0 ? c.brightCyan : c.dim;
+    const memoryDisplay = data.system.memoryMB > 0 ? `${data.system.memoryMB}MB` : '--';
+
+    lines.push(
+      `${c.brightYellow}🔧 Tasks${c.reset}  ${taskIndicator} [${taskColor}${taskDisplay}${c.reset}/${c.brightWhite}10${c.reset}]  ` +
+      `${hooksColor}${hooksIcon} Hooks ${data.hooks.status === 'ACTIVE' ? 'ACTIVE' : 'OFF'}${c.reset}    ` +
+      `${memoryColor}💾 ${memoryDisplay}${c.reset}    ` +
+      `${contextColor}📂 ${contextDisplay}%${c.reset}`
+    );
+
+    // Line 3: Architecture status
+    const dddColor = data.v3Progress.dddProgress >= 50 ? c.brightGreen :
+                     data.v3Progress.dddProgress > 0 ? c.yellow : c.red;
+    const dddDisplay = String(data.v3Progress.dddProgress).padStart(3);
+
+    // Security status
+    let securityIcon = '🔴';
+    let securityColor = c.brightRed;
+    if (data.security.status === 'CLEAN') {
+      securityIcon = '🟢';
+      securityColor = c.brightGreen;
+    } else if (data.security.cvesFixed > 0) {
+      securityIcon = '🟡';
+      securityColor = c.brightYellow;
+    }
+
+    lines.push(
+      `${c.brightPurple}🔧 Architecture${c.reset}    ` +
+      `${c.cyan}DDD${c.reset} ${dddColor}●${dddDisplay}%${c.reset}  ${c.dim}│${c.reset}  ` +
+      `${c.cyan}Security${c.reset} ${securityColor}●${data.security.status}${c.reset}  ${c.dim}│${c.reset}  ` +
+      `${c.cyan}Hooks${c.reset} ${hooksColor}●${data.hooks.status === 'ACTIVE' ? 'ACTIVE' : 'OFF'}${c.reset}`
+    );
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Generate single-line statusline for OpenCode
+   */
+  generateOpenCodeSingleLine(): string {
+    if (!this.config.enabled) {
+      return '';
+    }
+
+    const data = this.generateData();
+    const c = colors;
+
+    const taskIndicator = data.swarm.activeAgents > 0 ? '◉' : '○';
+    const securityStatus = data.security.status === 'CLEAN' ? '✓' :
+                          data.security.cvesFixed > 0 ? '~' : '✗';
+    const hooksStatus = data.hooks.status === 'ACTIVE' ? '✓' : '○';
+
+    // Single line format: CF-V3 | D:3/5 | T:◉2 | S:✓ | H:✓ | 🧠12%
+    return `${c.brightPurple}CF-V3${c.reset} ${c.dim}|${c.reset} ` +
+      `${c.cyan}D:${data.v3Progress.domainsCompleted}/${data.v3Progress.totalDomains}${c.reset} ${c.dim}|${c.reset} ` +
+      `${c.yellow}T:${taskIndicator}${data.swarm.activeAgents}${c.reset} ${c.dim}|${c.reset} ` +
+      `${data.security.status === 'CLEAN' ? c.green : c.red}S:${securityStatus}${c.reset} ${c.dim}|${c.reset} ` +
+      `${data.hooks.status === 'ACTIVE' ? c.green : c.dim}H:${hooksStatus}${c.reset} ${c.dim}|${c.reset} ` +
+      `${c.dim}🧠${data.system.intelligencePct}%${c.reset}`;
   }
 
   /**

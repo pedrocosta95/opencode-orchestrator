@@ -163,7 +163,6 @@ describe('Docker Compose Configuration', () => {
       'MCP_GROUP_SECURITY', 'MCP_GROUP_BROWSER',
       'MCP_GROUP_NEURAL', 'MCP_GROUP_AGENTIC_FLOW',
       'MCP_GROUP_CLAUDE_CODE', 'MCP_GROUP_GEMINI',
-      'MCP_GROUP_CODEX',
     ];
     for (const g of groups) {
       expect(composeContent).toContain(g);
@@ -529,7 +528,6 @@ describe('Environment Example (.env.example)', () => {
       'MCP_GROUP_SECURITY', 'MCP_GROUP_BROWSER',
       'MCP_GROUP_NEURAL', 'MCP_GROUP_AGENTIC_FLOW',
       'MCP_GROUP_CLAUDE_CODE', 'MCP_GROUP_GEMINI',
-      'MCP_GROUP_CODEX',
     ];
     for (const g of groups) {
       expect(envContent).toContain(g);

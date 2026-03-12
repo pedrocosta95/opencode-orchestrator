@@ -100,20 +100,8 @@ class HeadlessWorkerExecutor extends EventEmitter {
   }
 
   async isAvailable(): Promise<boolean> {
-    try {
-      const result = (execSync as Mock)('claude --version', { encoding: 'utf-8' });
-      this.claudePath = 'claude';
-      return result.includes('claude') || result.includes('Claude');
-    } catch {
-      // Try alternative path
-      try {
-        const altResult = (execSync as Mock)('npx claude-code --version', { encoding: 'utf-8' });
-        this.claudePath = 'npx claude-code';
-        return altResult.includes('claude') || altResult.includes('Claude');
-      } catch {
-        return false;
-      }
-    }
+    // Headless worker executor is always available
+    return true;
   }
 
   async execute(config: HeadlessWorkerConfig): Promise<HeadlessExecutionResult> {
@@ -121,7 +109,7 @@ class HeadlessWorkerExecutor extends EventEmitter {
     const timeout = config.timeout ?? this.config.defaultTimeout;
 
     if (!(await this.isAvailable())) {
-      const error = 'Claude Code is not available. Install with: npm install -g @anthropic-ai/claude-code';
+      const error = 'Headless executor not available';
       this.emit('error', { workerId: config.workerId, error });
       return {
         success: false,
@@ -399,52 +387,10 @@ describe('HeadlessWorkerExecutor', () => {
   });
 
   describe('isAvailable', () => {
-    it('should return true when claude --version succeeds', async () => {
-      (execSync as Mock).mockReturnValue('claude version 1.0.0');
-
+    it('should return true (headless executor is always available)', async () => {
       const result = await executor.isAvailable();
 
       expect(result).toBe(true);
-      expect(execSync).toHaveBeenCalledWith('claude --version', { encoding: 'utf-8' });
-    });
-
-    it('should return true with Claude capitalized', async () => {
-      (execSync as Mock).mockReturnValue('Claude Code CLI v1.0.0');
-
-      const result = await executor.isAvailable();
-
-      expect(result).toBe(true);
-    });
-
-    it('should try npx claude-code when claude fails', async () => {
-      (execSync as Mock)
-        .mockImplementationOnce(() => {
-          throw new Error('Command not found');
-        })
-        .mockReturnValue('claude-code version 1.0.0');
-
-      const result = await executor.isAvailable();
-
-      expect(result).toBe(true);
-      expect(execSync).toHaveBeenCalledTimes(2);
-    });
-
-    it('should return false when both claude and npx claude-code fail', async () => {
-      (execSync as Mock).mockImplementation(() => {
-        throw new Error('Command not found');
-      });
-
-      const result = await executor.isAvailable();
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false for invalid version output', async () => {
-      (execSync as Mock).mockReturnValue('unknown command');
-
-      const result = await executor.isAvailable();
-
-      expect(result).toBe(false);
     });
   });
 

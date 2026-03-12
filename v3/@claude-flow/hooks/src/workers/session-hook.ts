@@ -2,10 +2,15 @@
  * Session Start Hook Integration
  *
  * Auto-starts workers when Claude Code session begins.
+ * Supports both Claude Code and OpenCode environments.
  */
 
 import { WorkerManager, createWorkerManager } from './index.js';
 import * as path from 'path';
+
+// OpenCode environment detection
+const isOpenCode = process.env.OPENCODE_SESSION_ID !== undefined || 
+                   process.env.OPENCORE_SESSION_ID !== undefined;
 
 // ============================================================================
 // Types
@@ -217,4 +222,206 @@ export async function initializeGlobalManager(projectRoot?: string): Promise<Wor
 
   globalManager = result.manager;
   return globalManager;
+}
+
+// ============================================================================
+// OpenCode Session Hooks
+// ============================================================================
+
+/**
+ * OpenCode session hooks configuration interface
+ */
+export interface OpenCodeSessionConfig {
+  projectRoot?: string;
+  autoStartWorkers?: boolean;
+  runInitialScan?: boolean;
+  workers?: string[];
+  opencodeMode?: boolean;
+}
+
+/**
+ * OpenCode session hook result
+ */
+export interface OpenCodeSessionHookResult {
+  success: boolean;
+  sessionId?: string;
+  workingDirectory?: string;
+  manager?: WorkerManager;
+  initialResults?: Record<string, unknown>;
+  error?: string;
+  isOpenCode?: boolean;
+}
+
+/**
+ * Detect if running in OpenCode environment
+ */
+export function detectOpenCodeEnvironment(): boolean {
+  return isOpenCode || 
+         process.env.OPENCODE_HOOK_EVENT !== undefined ||
+         process.env.OPENCORE_HOOK_EVENT !== undefined;
+}
+
+/**
+ * Get OpenCode session configuration from environment
+ */
+export function getOpenCodeSessionConfig(): OpenCodeSessionConfig | null {
+  if (!detectOpenCodeEnvironment()) {
+    return null;
+  }
+
+  return {
+    projectRoot: process.env.OPENCODE_WORKING_DIR || process.cwd(),
+    autoStartWorkers: process.env.OPENCODE_AUTO_START_WORKERS !== 'false',
+    runInitialScan: process.env.OPENCODE_RUN_INITIAL_SCAN !== 'false',
+    workers: process.env.OPENCODE_WORKERS 
+      ? process.env.OPENCODE_WORKERS.split(',') 
+      : ['health', 'security', 'git'],
+    opencodeMode: true,
+  };
+}
+
+/**
+ * Initialize workers for OpenCode session
+ */
+export async function onOpenCodeSessionStart(
+  config: OpenCodeSessionConfig = {}
+): Promise<OpenCodeSessionHookResult> {
+  const opencodeConfig = getOpenCodeSessionConfig();
+  
+  const mergedConfig = {
+    projectRoot: opencodeConfig?.projectRoot || config.projectRoot || process.cwd(),
+    autoStart: opencodeConfig?.autoStartWorkers ?? config.autoStartWorkers ?? true,
+    runInitialScan: opencodeConfig?.runInitialScan ?? config.runInitialScan ?? true,
+    workers: opencodeConfig?.workers || config.workers || ['health', 'security', 'git'],
+  };
+
+  const sessionId = process.env.OPENCODE_SESSION_ID || 
+                   process.env.OPENCORE_SESSION_ID || 
+                   `opencode-${Date.now()}`;
+
+  try {
+    const manager = createWorkerManager(mergedConfig.projectRoot);
+    await manager.initialize();
+
+    let initialResults: Record<string, unknown> | undefined;
+
+    if (mergedConfig.runInitialScan && mergedConfig.workers.length > 0) {
+      initialResults = {};
+
+      for (const workerName of mergedConfig.workers) {
+        try {
+          const result = await manager.runWorker(workerName);
+          initialResults[workerName] = {
+            success: result.success,
+            data: result.data,
+            alerts: result.alerts,
+          };
+        } catch {
+          initialResults[workerName] = { success: false, error: 'Worker failed' };
+        }
+      }
+    }
+
+    if (mergedConfig.autoStart) {
+      await manager.start({
+        autoSave: true,
+        statuslineUpdate: true,
+      });
+    }
+
+    return {
+      success: true,
+      sessionId,
+      workingDirectory: mergedConfig.projectRoot,
+      manager,
+      initialResults,
+      isOpenCode: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      sessionId,
+      workingDirectory: mergedConfig.projectRoot,
+      error: error instanceof Error ? error.message : String(error),
+      isOpenCode: true,
+    };
+  }
+}
+
+/**
+ * Clean up workers on OpenCode session end
+ */
+export async function onOpenCodeSessionEnd(
+  manager?: WorkerManager
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (manager) {
+      await manager.stop();
+    } else if (globalManager) {
+      await globalManager.stop();
+    }
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Format session start output for OpenCode
+ */
+export function formatOpenCodeSessionOutput(
+  result: OpenCodeSessionHookResult
+): string {
+  if (!result.isOpenCode) {
+    return formatSessionStartOutput(result as SessionHookResult);
+  }
+
+  const lines: string[] = [];
+
+  if (result.success) {
+    lines.push(`[OpenCode Workers] Session ${result.sessionId} initialized`);
+
+    if (result.initialResults) {
+      for (const [workerName, workerResult] of Object.entries(result.initialResults)) {
+        const wr = workerResult as { success: boolean; data?: unknown; error?: string };
+        const icon = wr.success ? '✓' : '✗';
+        lines.push(`  ${icon} ${workerName}: ${wr.success ? 'OK' : wr.error || 'failed'}`);
+      }
+    }
+
+    lines.push('[OpenCode Workers] Background scheduling active');
+  } else {
+    lines.push(`[OpenCode Workers] Error: ${result.error}`);
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Detect environment and call appropriate session start handler
+ */
+export async function onSessionAuto(
+  config: SessionHookConfig = {}
+): Promise<SessionHookResult | OpenCodeSessionHookResult> {
+  if (detectOpenCodeEnvironment()) {
+    return onOpenCodeSessionStart(config as OpenCodeSessionConfig);
+  }
+  return onSessionStart(config);
+}
+
+/**
+ * Detect environment and call appropriate session end handler
+ */
+export async function onSessionEndAuto(
+  manager?: WorkerManager
+): Promise<void | { success: boolean; error?: string }> {
+  if (detectOpenCodeEnvironment()) {
+    return onOpenCodeSessionEnd(manager);
+  }
+  if (manager || globalManager) {
+    await onSessionEnd(manager || globalManager!);
+  }
 }

@@ -11,7 +11,6 @@ RUN npm install -g ruvector || true
 RUN npm install -g ruflo || true
 RUN npm install -g agentic-flow@alpha || true
 RUN npm install -g gemini-mcp-server || true
-RUN npm install -g @openai/codex || true
 
 COPY index.js ./
 COPY mcp-stdio-kernel.js ./
@@ -40,6 +39,5 @@ ENV MCP_GROUP_NEURAL=false
 ENV MCP_GROUP_AGENTIC_FLOW=false
 ENV MCP_GROUP_CLAUDE_CODE=false
 ENV MCP_GROUP_GEMINI=false
-ENV MCP_GROUP_CODEX=false
 
 CMD ["node", "index.js"]

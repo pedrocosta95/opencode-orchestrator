@@ -89,7 +89,7 @@ OPENAI_BASE_URL=${bridgeURL}`;
 const mcpGroups = config.mcpGroups || {
   core: true, intelligence: true, agents: true, memory: true, devtools: true,
   security: false, browser: false, neural: false,
-  "agentic-flow": false, "claude-code": false, gemini: false, codex: false,
+  "agentic-flow": false, gemini: false,
 };
 const groupDisplayNames = {
   core: "Core Tools",
@@ -101,9 +101,7 @@ const groupDisplayNames = {
   browser: "Browser Automation",
   neural: "Neural & DAA",
   "agentic-flow": "Agentic Flow",
-  "claude-code": "Claude Code",
   gemini: "Gemini",
-  codex: "Codex",
 };
 const mcpServers = Object.entries(mcpGroups)
   .filter(([, enabled]) => enabled)

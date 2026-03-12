@@ -2,6 +2,7 @@
  * MemoryTools
  *
  * MCP tools for memory management operations.
+ * Compatible with both Claude Code and OpenCode MCP clients.
  */
 
 import type {

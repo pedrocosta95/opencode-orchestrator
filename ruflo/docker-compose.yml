@@ -48,7 +48,6 @@ services:
       MCP_GROUP_AGENTIC_FLOW: ${MCP_GROUP_AGENTIC_FLOW:-false}
       MCP_GROUP_CLAUDE_CODE: ${MCP_GROUP_CLAUDE_CODE:-false}
       MCP_GROUP_GEMINI: ${MCP_GROUP_GEMINI:-false}
-      MCP_GROUP_CODEX: ${MCP_GROUP_CODEX:-false}
       # API keys for optional groups
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     healthcheck:

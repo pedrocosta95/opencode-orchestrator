@@ -1,9 +1,9 @@
 {
-  "name": "@claude-flow/v3-monorepo",
+  "name": "@opencode-orchestrator/v3-monorepo",
   "version": "3.0.0-alpha.1",
   "private": true,
   "type": "module",
-  "description": "Claude Flow V3 - Modular AI Agent Coordination System",
+  "description": "OpenCode Orchestrator V3 - Modular AI Agent Coordination System",
   "workspaces": [
     "@claude-flow/*",
     "claude-flow"

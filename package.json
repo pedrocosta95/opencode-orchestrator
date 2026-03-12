@@ -1,11 +1,12 @@
 {
-  "name": "claude-flow",
+  "name": "opencode-orchestrator",
   "version": "3.5.15",
-  "description": "Ruflo - Enterprise AI agent orchestration for Claude Code. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration",
+  "description": "OpenCode Orchestrator - Enterprise AI agent orchestration platform. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "claude-flow": "./bin/cli.js"
+    "opencode-orchestrator": "./bin/cli.js",
+    "opencode": "./bin/cli.js"
   },
   "homepage": "https://github.com/ruvnet/claude-flow#readme",
   "bugs": {
@@ -58,7 +59,6 @@
     "zod": "^3.22.4"
   },
   "optionalDependencies": {
-    "@claude-flow/codex": "^3.0.0-alpha.8",
     "@claude-flow/plugin-gastown-bridge": "^0.1.3",
     "@ruvector/attention": "^0.1.3",
     "@ruvector/core": "^0.1.30",
@@ -72,7 +72,6 @@
     "hono": ">=4.11.4"
   },
   "devDependencies": {
-    "@openai/codex": "^0.98.0",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.0.0",
     "eslint": "^8.0.0",
@@ -90,7 +89,6 @@
   "keywords": [
     "ruvflow",
     "claude",
-    "claude-code",
     "anthropic",
     "ai",
     "ai-agents",

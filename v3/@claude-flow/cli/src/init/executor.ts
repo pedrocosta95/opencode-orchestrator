@@ -44,7 +44,6 @@ const SKILLS_MAP: Record<string, string[]> = {
     'skill-builder',
   ],
   browser: ['browser'],  // agent-browser integration
-  dualMode: ['dual-mode'],  // Claude Code + Codex hybrid execution
   agentdb: [
     'agentdb-advanced',
     'agentdb-learning',
@@ -104,7 +103,6 @@ const AGENTS_MAP: Record<string, string[]> = {
   sparc: ['sparc'],
   swarm: ['swarm'],
   browser: ['browser'],  // agent-browser integration
-  dualMode: ['dual-mode'],  // Claude Code + Codex hybrid execution
   // V3-specific agents
   v3: ['v3'],
   optimization: ['optimization'],
@@ -779,7 +777,6 @@ async function copySkills(
     if (skillsConfig.flowNexus) skillsToCopy.push(...SKILLS_MAP.flowNexus);
     if (skillsConfig.browser) skillsToCopy.push(...SKILLS_MAP.browser);
     if (skillsConfig.v3) skillsToCopy.push(...SKILLS_MAP.v3);
-    if (skillsConfig.dualMode) skillsToCopy.push(...SKILLS_MAP.dualMode);
   }
 
   // Find source skills directory
@@ -889,8 +886,6 @@ async function copyAgents(
     if (agentsConfig.v3) agentsToCopy.push(...(AGENTS_MAP.v3 || []));
     if (agentsConfig.optimization) agentsToCopy.push(...(AGENTS_MAP.optimization || []));
     if (agentsConfig.testing) agentsToCopy.push(...(AGENTS_MAP.testing || []));
-    // Dual-mode agents (Claude Code + Codex hybrid)
-    if (agentsConfig.dualMode) agentsToCopy.push(...(AGENTS_MAP.dualMode || []));
   }
 
   // Find source agents directory

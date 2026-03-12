@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Claude Flow CLI - Umbrella entry point
+ * OpenCode Orchestrator CLI - Umbrella entry point
  * Proxies to @claude-flow/cli bin for cross-platform compatibility.
  */
 import { pathToFileURL, fileURLToPath } from 'node:url';

@@ -179,26 +179,6 @@ check_requirements() {
         exit 1
     fi
 
-    # Check Claude Code CLI
-    if command -v claude &> /dev/null; then
-        CLAUDE_VERSION=$(claude --version 2>/dev/null | head -1 || echo "installed")
-        print_substep "Claude Code ${GREEN}${CLAUDE_VERSION}${NC} ✓"
-    else
-        print_warning "Claude Code CLI not found"
-        print_substep "Installing Claude Code CLI via npm..."
-        if npm install -g @anthropic-ai/claude-code 2>/dev/null; then
-            if command -v claude &> /dev/null; then
-                CLAUDE_VERSION=$(claude --version 2>/dev/null | head -1 || echo "installed")
-                print_substep "Claude Code ${GREEN}${CLAUDE_VERSION}${NC} ✓"
-            else
-                print_substep "Installed. Restart terminal to use 'claude' command"
-            fi
-        else
-            print_warning "npm install failed. Try manually:"
-            print_substep "${BOLD}npm install -g @anthropic-ai/claude-code${NC}"
-        fi
-    fi
-
     echo ""
 }
 

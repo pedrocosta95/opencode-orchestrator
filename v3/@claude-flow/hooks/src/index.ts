@@ -94,6 +94,26 @@ export {
   type OfficialHookOutput,
 } from './bridge/official-hooks-bridge.js';
 
+// OpenCode Hooks Bridge
+export {
+  OpenCodeHooksBridge,
+  V3_TO_OPENCODE_HOOK_MAP,
+  OPENCODE_TO_V3_HOOK_MAP,
+  OPENCODE_TOOL_MATCHERS,
+  processOpenCodeHookInput,
+  outputOpenCodeHookResult,
+  executeWithOpenCodeBridge,
+  OPENCODETaskEvents,
+  OPENCODESessionEvents,
+  OPENCODEToolEvents,
+  type OpenCodeHookEvent,
+  type OpenCodeHookInput,
+  type OpenCodeHookOutput,
+  type OpenCodeSessionHooksConfig,
+  formatOpenCodeSessionStartOutput,
+  formatOpenCodeSessionEndOutput,
+} from './bridge/opencode-hooks-bridge.js';
+
 // Swarm Communication
 export {
   SwarmCommunication,
@@ -164,8 +184,18 @@ export {
   getGlobalManager,
   setGlobalManager,
   initializeGlobalManager,
+  // OpenCode Session Integration
+  detectOpenCodeEnvironment,
+  getOpenCodeSessionConfig,
+  onOpenCodeSessionStart,
+  onOpenCodeSessionEnd,
+  formatOpenCodeSessionOutput,
+  onSessionAuto,
+  onSessionEndAuto,
   type SessionHookConfig,
   type SessionHookResult,
+  type OpenCodeSessionConfig,
+  type OpenCodeSessionHookResult,
 } from './workers/session-hook.js';
 
 // Version

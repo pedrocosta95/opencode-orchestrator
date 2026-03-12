@@ -1,7 +1,7 @@
 {
   "name": "@claude-flow/teammate-plugin",
   "version": "1.0.0-alpha.1",
-  "description": "Native TeammateTool integration plugin for Claude Flow - bridges Claude Code v2.1.19+ multi-agent capabilities",
+  "description": "Native TeammateTool integration plugin for Claude Flow - bridges multi-agent capabilities",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -42,7 +42,6 @@
   },
   "keywords": [
     "claude",
-    "claude-code",
     "claude-flow",
     "teammate",
     "multi-agent",
@@ -64,14 +63,6 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "peerDependencies": {
-    "@anthropic-ai/claude-code": ">=2.1.19"
-  },
-  "peerDependenciesMeta": {
-    "@anthropic-ai/claude-code": {
-      "optional": true
-    }
-  },
   "dependencies": {
     "eventemitter3": "^5.0.1",
     "@ruvnet/bmssp": "^1.0.0"
@@ -84,18 +75,5 @@
     "eslint": "^8.55.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0"
-  },
-  "claude-code": {
-    "minimumVersion": "2.1.19",
-    "requiredFeatures": [
-      "TeammateTool",
-      "team_name",
-      "launchSwarm"
-    ],
-    "optionalFeatures": [
-      "pushToRemote",
-      "delegate_mode",
-      "teleport"
-    ]
   }
 }
