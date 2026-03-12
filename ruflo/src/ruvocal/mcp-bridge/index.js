@@ -91,13 +91,6 @@ const TOOL_GROUPS = {
     prefixes: ["agentic_flow_", "agent_booster_", "agentdb_"],
   },
 
-  // --- Claude Code ---
-  "claude-code": {
-    enabled: process.env.MCP_GROUP_CLAUDE_CODE === "true",
-    description: "Anthropic Claude Code — file editing, bash execution, code analysis (requires ANTHROPIC_API_KEY)",
-    source: "claude",
-  },
-
   // --- Gemini MCP ---
   gemini: {
     enabled: process.env.MCP_GROUP_GEMINI === "true",
@@ -254,7 +247,6 @@ const BACKEND_DEFS = [
   { name: "ruvector",       command: "npx", args: ["-y", "ruvector", "mcp", "start"],   groups: ["intelligence"] },
   { name: "ruflo",          command: "npx", args: ["-y", "ruflo", "mcp", "start"],      groups: ["agents", "memory", "devtools", "security", "browser", "neural"] },
   { name: "agentic-flow",   command: "npx", args: ["-y", "agentic-flow@alpha", "mcp", "start"], groups: ["agentic-flow"] },
-  { name: "claude",         command: "claude", args: ["mcp", "serve"],                  groups: ["claude-code"] },
   { name: "gemini-mcp",     command: "npx", args: ["-y", "gemini-mcp-server"],          groups: ["gemini"] },
   { name: "codex",          command: "npx", args: ["-y", "@openai/codex", "mcp", "serve"], groups: ["codex"] },
 ];
@@ -358,7 +350,7 @@ const BUILTIN_TOOLS = [
       properties: {
         topic: {
           type: "string",
-          enum: ["overview", "groups", "intelligence", "agents", "memory", "devtools", "security", "browser", "neural", "agentic-flow", "claude-code", "gemini", "codex", "tool"],
+          enum: ["overview", "groups", "intelligence", "agents", "memory", "devtools", "security", "browser", "neural", "agentic-flow", "gemini", "codex", "tool"],
           description: "What to get guidance on. Use 'overview' for capabilities summary, 'groups' to see all tool groups and their status, or a specific group name for detailed usage instructions.",
           default: "overview",
         },
@@ -566,23 +558,6 @@ Execute 66+ specialized agents with boosted code editing and AgentDB.
 - Complex code generation with specialized agents
 - Batch code refactoring across files
 - Agent selection when you need the right specialist`,
-
-    "claude-code": `# Claude Code Group
-
-Anthropic Claude Code MCP server — full coding agent capabilities.
-
-Requires: ANTHROPIC_API_KEY environment variable.
-
-## Capabilities
-- File reading and editing
-- Bash command execution
-- Code analysis and generation
-- Project exploration
-
-## When to Use
-- When you need a second AI perspective on code
-- Complex refactoring tasks
-- Code review and analysis`,
 
     gemini: `# Gemini MCP Group
 
@@ -983,7 +958,6 @@ const GROUP_DISPLAY_NAMES = {
   browser: "Browser Automation",
   neural: "Neural & DAA",
   "agentic-flow": "Agentic Flow",
-  "claude-code": "Claude Code",
   gemini: "Gemini",
   codex: "Codex",
 };

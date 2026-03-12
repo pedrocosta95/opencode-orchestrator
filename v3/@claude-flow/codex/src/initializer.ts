@@ -546,15 +546,13 @@ Skills are invoked using \`$skill-name\` syntax. Each skill has:
   }
 
   /**
-   * Generate dual-platform files (Claude Code + Codex)
+   * Generate Codex-only files (no Claude Code support)
    */
   private async generateDualPlatformFiles(): Promise<{ files: string[]; warnings?: string[] }> {
-    const files: string[] = [];
-    const warnings: string[] = [];
-
-    // Check if CLAUDE.md already exists
-    const claudeMdPath = path.join(this.projectPath, 'CLAUDE.md');
-    const claudeMdExists = await fs.pathExists(claudeMdPath);
+    // Claude Code support has been removed - only generate Codex files
+    // The main AGENTS.md is generated in initialize()
+    return { files: [] };
+  }
 
     if (claudeMdExists && !this.force) {
       warnings.push('CLAUDE.md already exists - not overwriting. Use --force to replace.');

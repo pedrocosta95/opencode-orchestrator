@@ -13,14 +13,13 @@
 [![Total Downloads](https://img.shields.io/npm/dt/claude-flow?style=for-the-badge&logo=npm&color=cyan&label=Total%20Downloads)](https://www.npmjs.com/package/claude-flow)
 [![ruv.io](https://img.shields.io/badge/ruv.io-AI%20Platform-green?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0wIDE4Yy00LjQyIDAtOC0zLjU4LTgtOHMzLjU4LTggOC04IDggMy41OCA4IDgtMy41OCA4LTggOHoiLz48L3N2Zz4=)](https://ruv.io)
 [![Agentics Foundation](https://img.shields.io/badge/Agentics-Foundation-crimson?style=for-the-badge&logo=openai)](https://discord.com/invite/dfxmpwkG2D)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-SDK%20Integrated-green?style=for-the-badge&logo=anthropic)](https://github.com/ruvnet/claude-flow)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative)](https://opensource.org/licenses/MIT)
 ---
 [![Follow @ruv](https://img.shields.io/badge/Follow%20%40ruv-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/ruv)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/reuvencohen/)
 [![YouTube](https://img.shields.io/badge/YouTube-Subscribe-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@ReuvenCohen)
 
-# **Production-ready multi-agent AI orchestration for Claude Code**
+# **Production-ready multi-agent AI orchestration platform**
 *Deploy 60+ specialized agents in coordinated swarms with self-learning capabilities, fault-tolerant consensus, and enterprise-grade security.*
 
 </div>
@@ -29,7 +28,7 @@
 
 ## Getting into the Flow
 
-Ruflo is a comprehensive AI agent orchestration framework that transforms Claude Code into a powerful multi-agent development platform. It enables teams to deploy, coordinate, and optimize specialized AI agents working together on complex software engineering tasks.
+Ruflo is a comprehensive AI agent orchestration framework that transforms OpenAI Codex into a powerful multi-agent development platform. It enables teams to deploy, coordinate, and optimize specialized AI agents working together on complex software engineering tasks.
 
 ### Self-Learning/Self-Optimizing Agent Architecture
 
@@ -172,7 +171,7 @@ npx ruflo@latest init --wizard
 
 🔌 **Works With Any LLM** - Switch between Claude, GPT, Gemini, Cohere, or local models like Llama. Automatic failover if one provider is unavailable. Smart routing picks the cheapest option that meets quality requirements.
 
-⚡ **Plugs Into Claude Code** - Native integration via MCP (Model Context Protocol). Use ruflo commands directly in your Claude Code sessions with full tool access.
+⚡ **Plugs Into OpenAI Codex** - Native integration via MCP (Model Context Protocol). Use ruflo commands directly in your Codex sessions with full tool access.
 
 🔒 **Production-Ready Security** - Built-in protection against prompt injection, input validation, path traversal prevention, command injection blocking, and safe credential handling.
 
@@ -189,7 +188,7 @@ Every request flows through four layers: from your CLI or Claude Code interface,
 
 | Layer | Components | What It Does |
 |-------|------------|--------------|
-| User | Claude Code, CLI | Your interface to control and run commands |
+| User | Codex, CLI | Your interface to control and run commands |
 | Orchestration | MCP Server, Router, Hooks | Routes requests to the right agents |
 | Agents | 60+ types | Specialized workers (coder, tester, reviewer...) |
 | Providers | Anthropic, OpenAI, Google, Ollama | AI models that power reasoning |
@@ -506,7 +505,7 @@ npm install -g ruflo@latest --omit=optional
 <details>
 <summary>🤖 <strong>OpenAI Codex CLI Support</strong> — Full Codex integration with self-learning</summary>
 
-Ruflo supports both **Claude Code** and **OpenAI Codex CLI** via the [@claude-flow/codex](https://www.npmjs.com/package/@claude-flow/codex) package, following the [Agentics Foundation](https://agentics.org) standard.
+Ruflo supports **OpenAI Codex CLI** via the [@claude-flow/codex](https://www.npmjs.com/package/@claude-flow/codex) package, following the [Agentics Foundation](https://agentics.org) standard.
 
 ### Quick Start for Codex
 

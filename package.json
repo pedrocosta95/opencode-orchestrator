@@ -1,7 +1,7 @@
 {
   "name": "claude-flow",
   "version": "3.5.15",
-  "description": "Ruflo - Enterprise AI agent orchestration for Claude Code. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration",
+  "description": "Ruflo - Enterprise AI agent orchestration. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
@@ -90,7 +90,6 @@
   "keywords": [
     "ruvflow",
     "claude",
-    "claude-code",
     "anthropic",
     "ai",
     "ai-agents",

@@ -243,7 +243,7 @@ async function testGuidanceTool() {
   console.log("\n── Guidance Tool ──");
 
   const topics = ["overview", "groups", "intelligence", "agents", "memory", "devtools",
-    "security", "browser", "neural", "agentic-flow", "claude-code", "gemini", "codex"];
+    "security", "browser", "neural", "agentic-flow", "gemini", "codex"];
 
   for (const topic of topics) {
     await test(`guidance(topic="${topic}")`, async () => {

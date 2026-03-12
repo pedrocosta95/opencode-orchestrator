@@ -37,7 +37,6 @@ NC='\033[0m' # No Color
 VERSION="${RUFLO_VERSION:-${CLAUDE_FLOW_VERSION:-latest}}"
 MINIMAL="${CLAUDE_FLOW_MINIMAL:-0}"
 GLOBAL="${CLAUDE_FLOW_GLOBAL:-0}"
-SETUP_MCP="${CLAUDE_FLOW_SETUP_MCP:-0}"
 RUN_DOCTOR="${CLAUDE_FLOW_DOCTOR:-0}"
 RUN_INIT="${CLAUDE_FLOW_INIT:-1}"
 
@@ -50,10 +49,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --minimal|-m)
             MINIMAL="1"
-            shift
-            ;;
-        --setup-mcp|--mcp)
-            SETUP_MCP="1"
             shift
             ;;
         --doctor|-d)
@@ -87,7 +82,6 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --global, -g     Install globally (npm install -g ruflo)"
             echo "  --minimal, -m    Minimal install (skip optional deps)"
-            echo "  --setup-mcp      Auto-configure MCP server for Claude Code"
             echo "  --doctor, -d     Run diagnostics after install"
             echo "  --no-init        Skip project initialization (enabled by default)"
             echo "  --full, -f       Full setup (global + mcp + doctor + init)"
@@ -115,7 +109,7 @@ spinner() {
 print_banner() {
     echo ""
     echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${BOLD}Ruflo${NC} — AI Agent Orchestration for Claude Code     ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}  ${BOLD}Ruflo${NC} — AI Agent Orchestration Platform              ${CYAN}║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -177,26 +171,6 @@ check_requirements() {
     else
         print_error "npm not found"
         exit 1
-    fi
-
-    # Check Claude Code CLI
-    if command -v claude &> /dev/null; then
-        CLAUDE_VERSION=$(claude --version 2>/dev/null | head -1 || echo "installed")
-        print_substep "Claude Code ${GREEN}${CLAUDE_VERSION}${NC} ✓"
-    else
-        print_warning "Claude Code CLI not found"
-        print_substep "Installing Claude Code CLI via npm..."
-        if npm install -g @anthropic-ai/claude-code 2>/dev/null; then
-            if command -v claude &> /dev/null; then
-                CLAUDE_VERSION=$(claude --version 2>/dev/null | head -1 || echo "installed")
-                print_substep "Claude Code ${GREEN}${CLAUDE_VERSION}${NC} ✓"
-            else
-                print_substep "Installed. Restart terminal to use 'claude' command"
-            fi
-        else
-            print_warning "npm install failed. Try manually:"
-            print_substep "${BOLD}npm install -g @anthropic-ai/claude-code${NC}"
-        fi
     fi
 
     echo ""
@@ -289,18 +263,12 @@ show_quickstart() {
         echo ""
         echo -e "  ${DIM}# Run system diagnostics${NC}"
         echo -e "  ${BOLD}ruflo doctor${NC}"
-        echo ""
-        echo -e "  ${DIM}# Add as MCP server to Claude Code${NC}"
-        echo -e "  ${BOLD}claude mcp add ruflo -- ruflo mcp start${NC}"
     else
         echo -e "  ${DIM}# Initialize project${NC}"
         echo -e "  ${BOLD}npx ruflo@latest init --wizard${NC}"
         echo ""
         echo -e "  ${DIM}# Run system diagnostics${NC}"
         echo -e "  ${BOLD}npx ruflo@latest doctor${NC}"
-        echo ""
-        echo -e "  ${DIM}# Add as MCP server to Claude Code${NC}"
-        echo -e "  ${BOLD}claude mcp add ruflo -- npx -y ruflo@latest mcp start${NC}"
     fi
 
     echo ""
@@ -309,38 +277,10 @@ show_quickstart() {
     echo ""
 }
 
-setup_mcp_server() {
-    if [ "$SETUP_MCP" != "1" ]; then
-        return 0
-    fi
+# Note: MCP server setup is now handled by Codex CLI
+# Run: codex mcp add ruflo -- npx ruflo mcp start
 
-    print_step "Setting up MCP server..."
-
-    if ! command -v claude &> /dev/null; then
-        print_warning "Claude CLI not found, skipping MCP setup"
-        return 0
-    fi
-
-    # Check if already configured
-    if claude mcp list 2>/dev/null | grep -q "ruflo\|claude-flow"; then
-        print_substep "MCP server already configured ✓"
-        return 0
-    fi
-
-    # Add MCP server
-    if [ "$GLOBAL" = "1" ]; then
-        claude mcp add ruflo -- ruflo mcp start 2>/dev/null && \
-            print_substep "MCP server configured ✓" || \
-            print_warning "MCP setup failed - run manually: claude mcp add ruflo -- ruflo mcp start"
-    else
-        claude mcp add ruflo -- npx -y ruflo@${VERSION} mcp start 2>/dev/null && \
-            print_substep "MCP server configured ✓" || \
-            print_warning "MCP setup failed - run manually: claude mcp add ruflo -- npx -y ruflo@latest mcp start"
-    fi
-    echo ""
-}
-
-run_doctor() {
+run_installation() {
     if [ "$RUN_DOCTOR" != "1" ]; then
         return 0
     fi
@@ -379,7 +319,6 @@ main() {
     show_install_options
     install_package
     verify_installation
-    setup_mcp_server
     run_doctor
     run_init
     show_quickstart
