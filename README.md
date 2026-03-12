@@ -162,13 +162,13 @@ npm install
 npm run build
 
 # Add as MCP server to OpenCode
-opencode mcp add opencode-orchestrator "npx opencode-orchestrator@latest mcp serve"
+opencode mcp add cloudpftc-orchestrator "npx @cloudpftc/opencode-orchestrator@latest mcp serve"
 
 # Or link locally for development
-opencode mcp add opencode-orchestrator "node $(pwd)/v3/@claude-flow/cli/dist/index.js mcp serve"
+opencode mcp add cloudpftc-orchestrator "node $(pwd)/bin/cli.js mcp serve"
 
 # Initialize a new project
-npx opencode-orchestrator@latest init --wizard
+npx @cloudpftc/opencode-orchestrator@latest init --wizard
 ```
 
 ---
@@ -446,10 +446,10 @@ opencode --version
 
 ```bash
 # Install globally via npm
-npm install -g opencode-orchestrator@latest
+npm install -g @cloudpftc/opencode-orchestrator@latest
 
 # Or use npx (no install needed)
-npx opencode-orchestrator@latest --help
+npx @cloudpftc/opencode-orchestrator@latest --help
 ```
 
 <details>

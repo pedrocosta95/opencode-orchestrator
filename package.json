@@ -1,12 +1,12 @@
 {
-  "name": "opencode-orchestrator",
+  "name": "@cloudpftc/opencode-orchestrator",
   "version": "3.5.15",
   "description": "OpenCode Orchestrator - Enterprise AI agent orchestration platform. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "opencode-orchestrator": "./bin/cli.js",
-    "opencode": "./bin/cli.js"
+    "cloudpftc-orchestrator": "./bin/cli.js",
+    "opencode-orchestrator": "./bin/cli.js"
   },
   "homepage": "https://github.com/pedrocosta95/opencode-orchestrator#readme",
   "bugs": {
