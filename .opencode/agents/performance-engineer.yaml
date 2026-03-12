@@ -1,0 +1,33 @@
+# performance-engineer agent configuration
+name: performance-engineer
+type: performance-engineer
+version: "3.0.0"
+description: Performance optimization and benchmarking specialist
+color: "#E67E22"
+priority: high
+capabilities:
+  - benchmarking
+  - profiling
+  - optimization
+  - bottleneck-analysis
+  - memory-optimization
+tools:
+  - read
+  - glob
+  - grep
+  - bash
+  - lsp_diagnostics
+  - memory_create_entities
+model:
+  default: sonnet
+  fallback: haiku
+optimizations:
+  - algorithm-selection
+  - caching-strategies
+  - batch-processing
+hooks:
+  pre: |
+    echo "⚡ Performance engineer optimizing: $TASK"
+  post: |
+    echo "🚀 Optimization complete"
+createdAt: "2026-02-27T00:00:00.000Z"

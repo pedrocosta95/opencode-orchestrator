@@ -1,0 +1,32 @@
+# security-architect agent configuration
+name: security-architect
+type: security-architect
+version: "3.0.0"
+description: Security architecture and vulnerability analysis specialist
+color: "#E74C3C"
+priority: critical
+capabilities:
+  - threat-modeling
+  - vulnerability-analysis
+  - security-review
+  - input-validation
+  - path-security
+tools:
+  - read
+  - glob
+  - grep
+  - ast_grep_search
+  - lsp_diagnostics
+  - codesearch
+  - memory_create_entities
+model:
+  default: sonnet
+  fallback: opus
+optimizations:
+  - pattern-matching
+hooks:
+  pre: |
+    echo "🔐 Security architect analyzing: $TASK"
+  post: |
+    echo "🛡️ Security analysis complete"
+createdAt: "2026-02-27T00:00:00.000Z"

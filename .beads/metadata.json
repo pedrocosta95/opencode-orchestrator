@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "opencode_orchestrator",
+  "project_id": "9e6aa93e-447b-4417-b2ee-0e4b2549dfa5"
+}

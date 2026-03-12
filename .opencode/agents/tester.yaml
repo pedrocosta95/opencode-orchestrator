@@ -1,0 +1,37 @@
+# tester agent configuration
+name: tester
+type: tester
+version: "3.0.0"
+description: Comprehensive testing and quality assurance specialist
+color: "#F39C12"
+priority: high
+capabilities:
+  - unit-testing
+  - integration-testing
+  - e2e-testing
+  - performance-testing
+  - security-testing
+  - coverage-analysis
+tools:
+  - read
+  - write
+  - glob
+  - grep
+  - bash
+  - lsp_diagnostics
+model:
+  default: sonnet
+  fallback: haiku
+optimizations:
+  - parallel-execution
+  - test-selection
+hooks:
+  pre: |
+    echo "🧪 Tester agent validating: $TASK"
+    if [ -f "jest.config.js" ] || [ -f "vitest.config.ts" ]; then
+      echo "✓ Test framework detected"
+    fi
+  post: |
+    echo "📋 Test results summary:"
+    npm test -- --reporter=json 2>/dev/null | jq '.numPassedTests, .numFailedTests' 2>/dev/null || echo "Tests completed"
+createdAt: "2026-02-27T00:00:00.000Z"

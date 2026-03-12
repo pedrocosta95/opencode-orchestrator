@@ -1,0 +1,45 @@
+# coder agent configuration
+name: coder
+type: coder
+version: "3.0.0"
+description: Implementation specialist for writing clean, efficient code
+color: "#FF6B35"
+priority: high
+capabilities:
+  - code-generation
+  - refactoring
+  - debugging
+  - api-design
+  - error-handling
+  - optimization
+tools:
+  - read
+  - write
+  - edit
+  - glob
+  - grep
+  - ast_grep_search
+  - ast_grep_replace
+  - bash
+  - lsp_goto_definition
+  - lsp_find_references
+  - lsp_rename
+model:
+  default: sonnet
+  fallback: haiku
+optimizations:
+  - flash-attention
+  - token-reduction
+  - context-caching
+hooks:
+  pre: |
+    echo "💻 Coder agent implementing: $TASK"
+    if grep -q "test\|spec" <<< "$TASK"; then
+      echo "⚠️  Remember: Write tests first (TDD)"
+    fi
+  post: |
+    echo "✨ Implementation complete"
+    if [ -f "package.json" ]; then
+      npm run lint --if-present 2>/dev/null || true
+    fi
+createdAt: "2026-02-27T00:00:00.000Z"

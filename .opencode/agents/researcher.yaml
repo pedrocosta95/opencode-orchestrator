@@ -1,0 +1,32 @@
+# researcher agent configuration
+name: researcher
+type: researcher
+version: "3.0.0"
+description: Deep research and information gathering specialist
+color: "#1ABC9C"
+priority: high
+capabilities:
+  - code-analysis
+  - pattern-recognition
+  - documentation-research
+  - dependency-tracking
+  - knowledge-synthesis
+tools:
+  - read
+  - glob
+  - grep
+  - mgrep
+  - codesearch
+  - websearch
+  - webfetch
+  - memory_create_entities
+  - memory_create_relations
+model:
+  default: sonnet
+  fallback: haiku
+hooks:
+  pre: |
+    echo "🔍 Research agent investigating: $TASK"
+  post: |
+    echo "📊 Research findings documented"
+createdAt: "2026-02-27T00:00:00.000Z"

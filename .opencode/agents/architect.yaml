@@ -1,0 +1,33 @@
+# architect agent configuration
+name: architect
+type: architect
+version: "3.0.0"
+description: System design and architecture planning specialist
+color: "#9B59B6"
+priority: high
+capabilities:
+  - system-design
+  - api-design
+  - documentation
+  - pattern-selection
+  - technology-selection
+tools:
+  - read
+  - glob
+  - grep
+  - mgrep
+  - write
+  - memory_create_entities
+  - memory_create_relations
+model:
+  default: sonnet
+  fallback: opus
+optimizations:
+  - context-caching
+  - memory-persistence
+hooks:
+  pre: |
+    echo "🏗️ Architect designing: $TASK"
+  post: |
+    echo "📐 Architecture documented"
+createdAt: "2026-02-27T00:00:00.000Z"

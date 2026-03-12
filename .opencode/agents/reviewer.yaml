@@ -1,0 +1,32 @@
+# reviewer agent configuration
+name: reviewer
+type: reviewer
+version: "3.0.0"
+description: Code review and quality analysis specialist
+color: "#2ECC71"
+priority: high
+capabilities:
+  - code-review
+  - quality-analysis
+  - best-practices
+  - security-review
+  - performance-analysis
+tools:
+  - read
+  - glob
+  - grep
+  - lsp_diagnostics
+  - ast_grep_search
+  - bash
+model:
+  default: sonnet
+  fallback: haiku
+optimizations:
+  - incremental-analysis
+  - diff-targeting
+hooks:
+  pre: |
+    echo "🔍 Reviewer analyzing: $TASK"
+  post: |
+    echo "📝 Review complete"
+createdAt: "2026-2-27T00:00:00.000Z"

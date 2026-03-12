@@ -1,0 +1,38 @@
+# coordinator agent configuration
+name: coordinator
+type: coordinator
+version: "3.0.0"
+description: Swarm coordination and task orchestration specialist
+color: "#3498DB"
+priority: critical
+capabilities:
+  - task-coordination
+  - agent-spawning
+  - memory-management
+  - status-tracking
+  - handoff-management
+tools:
+  - task
+  - todowrite
+  - memory_create_entities
+  - memory_create_relations
+  - memory_search_nodes
+  - memory_open_nodes
+  - background_task
+  - background_output
+  - background_cancel
+model:
+  default: sonnet
+  fallback: haiku
+behaviors:
+  topology: hierarchical
+  strategy: specialized
+  consensus: raft
+hooks:
+  pre: |
+    echo "🎯 Coordinator orchestrating: $TASK"
+    memory_create_entities -name "coordination-session" -entityType "session"
+  post: |
+    echo "✨ Coordination complete"
+    memory_search_nodes -query "coordination status"
+createdAt: "2026-02-27T00:00:00.000Z"
