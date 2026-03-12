@@ -163,3 +163,4 @@ hive-mind-prompt-*.txt
 
 # Dolt database files (added by bd init)
 .dolt/
+.worktrees/
