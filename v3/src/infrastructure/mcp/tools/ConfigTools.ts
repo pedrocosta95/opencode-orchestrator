@@ -2,6 +2,7 @@
  * ConfigTools
  *
  * MCP tools for configuration management operations.
+ * Compatible with both Claude Code and OpenCode MCP clients.
  */
 
 import type {
@@ -57,8 +58,31 @@ export class ConfigTools implements MCPToolProvider {
         }
       },
       {
+        name: 'opencode_config_load',
+        description: 'Load configuration (OpenCode MCP alias)',
+        parameters: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'Configuration file path' }
+          },
+          required: ['path']
+        }
+      },
+      {
         name: 'config_save',
         description: 'Save configuration to a path',
+        parameters: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'Configuration file path' },
+            config: { type: 'object', description: 'Configuration to save' }
+          },
+          required: ['path', 'config']
+        }
+      },
+      {
+        name: 'opencode_config_save',
+        description: 'Save configuration (OpenCode MCP alias)',
         parameters: {
           type: 'object',
           properties: {
@@ -80,8 +104,29 @@ export class ConfigTools implements MCPToolProvider {
         }
       },
       {
+        name: 'opencode_config_validate',
+        description: 'Validate configuration (OpenCode MCP alias)',
+        parameters: {
+          type: 'object',
+          properties: {
+            config: { type: 'object', description: 'Configuration to validate' }
+          },
+          required: ['config']
+        }
+      },
+      {
         name: 'config_get',
         description: 'Get current configuration',
+        parameters: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'Configuration path' }
+          }
+        }
+      },
+      {
+        name: 'opencode_config_get',
+        description: 'Get configuration (OpenCode MCP alias)',
         parameters: {
           type: 'object',
           properties: {
@@ -97,7 +142,10 @@ export class ConfigTools implements MCPToolProvider {
    */
   async execute(toolName: string, params: Record<string, unknown>): Promise<MCPToolResult> {
     try {
-      switch (toolName) {
+      // Map OpenCode aliases to base tool names
+      const baseTool = toolName.replace(/^opencode_/, '');
+      
+      switch (baseTool) {
         case 'config_load':
           return await this.loadConfigTool(params.path as string);
 

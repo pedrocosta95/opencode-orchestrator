@@ -191,7 +191,12 @@ async function checkMcpServers(): Promise<HealthCheck> {
         if (hasClaudeFlow) {
           return { name: 'MCP Servers', status: 'pass', message: `${count} servers (claude-flow configured)` };
         } else {
-          return { name: 'MCP Servers', status: 'warn', message: `${count} servers (claude-flow not found)`, fix: 'claude mcp add claude-flow npx @claude-flow/cli@v3alpha mcp start' };
+          return { 
+            name: 'MCP Servers', 
+            status: 'warn', 
+            message: `${count} servers (claude-flow not found)`, 
+            fix: 'claude mcp add claude-flow npx @claude-flow/cli@v3alpha mcp start\n# For OpenCode: opencode mcp add claude-flow npx @claude-flow/cli@v3alpha mcp start'
+          };
         }
       } catch {
         // continue to next path
@@ -199,7 +204,12 @@ async function checkMcpServers(): Promise<HealthCheck> {
     }
   }
 
-  return { name: 'MCP Servers', status: 'warn', message: 'No MCP config found', fix: 'claude mcp add claude-flow npx @claude-flow/cli@v3alpha mcp start' };
+  return { 
+    name: 'MCP Servers', 
+    status: 'warn', 
+    message: 'No MCP config found', 
+    fix: 'claude mcp add claude-flow npx @claude-flow/cli@v3alpha mcp start\n# For OpenCode: opencode mcp add claude-flow npx @claude-flow/cli@v3alpha mcp start'
+  };
 }
 
 // Check disk space (async with proper env inheritance)
