@@ -8,14 +8,13 @@
     "opencode-orchestrator": "./bin/cli.js",
     "opencode": "./bin/cli.js"
   },
-  "homepage": "https://github.com/ruvnet/claude-flow#readme",
+  "homepage": "https://github.com/pedrocosta95/opencode-orchestrator#readme",
   "bugs": {
-    "url": "https://github.com/ruvnet/claude-flow/issues",
-    "email": "support@ruv.io"
+    "url": "https://github.com/pedrocosta95/opencode-orchestrator/issues"
   },
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/sponsors/ruvnet"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedrocosta95/opencode-orchestrator.git"
   },
   "files": [
     "bin/**",
@@ -32,10 +31,8 @@
     "v3/@claude-flow/guidance/dist/**/*.d.ts",
     "!v3/@claude-flow/guidance/dist/**/*.map",
     "v3/@claude-flow/guidance/package.json",
-    ".claude-plugin/**",
-    ".claude/**",
-    "!.claude/**/*.db",
-    "!.claude/**/*.map",
+    ".opencode/**",
+    "opencode.json",
     "README.md",
     "LICENSE"
   ],

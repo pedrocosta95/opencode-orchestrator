@@ -6,9 +6,9 @@
 
 
 
-[![GitHub Project of the Day](https://img.shields.io/badge/GitHub-Project%20of%20the%20Day-ff6600?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ruvnet/claude-flow)
+[![GitHub Project](https://img.shields.io/badge/GitHub-OpenCode%20Orchestrator-ff6600?style=for-the-badge&logo=github&logoColor=white)](https://github.com/pedrocosta95/opencode-orchestrator)
 
-[![Star on GitHub](https://img.shields.io/github/stars/ruvnet/claude-flow?style=for-the-badge&logo=github&color=gold)](https://github.com/ruvnet/claude-flow)
+[![Star on GitHub](https://img.shields.io/github/stars/pedrocosta95/opencode-orchestrator?style=for-the-badge&logo=github&color=gold)](https://github.com/pedrocosta95/opencode-orchestrator)
 [![Monthly Downloads](https://img.shields.io/npm/dm/claude-flow?style=for-the-badge&logo=npm&color=blue&label=Monthly%20Downloads)](https://www.npmjs.com/package/claude-flow)
 [![Total Downloads](https://img.shields.io/npm/dt/claude-flow?style=for-the-badge&logo=npm&color=cyan&label=Total%20Downloads)](https://www.npmjs.com/package/claude-flow)
 [![ruv.io](https://img.shields.io/badge/ruv.io-AI%20Platform-green?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0wIDE4Yy00LjQyIDAtOC0zLjU4LTgtOHMzLjU4LTggOC04IDggMy41OCA4IDgtMy41OCA4LTggOHoiLz48L3N2Zz4=)](https://ruv.io)
@@ -151,13 +151,23 @@ npx opencode-orchestrator@latest hooks intelligence --status
 ### Get Started Fast
 
 ```bash
-# One-line install (recommended)
-curl -fsSL https://cdn.jsdelivr.net/gh/ruvnet/claude-flow@main/scripts/install.sh | bash
+# Clone the repository
+git clone https://github.com/pedrocosta95/opencode-orchestrator.git
+cd opencode-orchestrator
 
-# Or full setup with MCP + diagnostics
-curl -fsSL https://cdn.jsdelivr.net/gh/ruvnet/claude-flow@main/scripts/install.sh | bash -s -- --full
+# Install dependencies
+npm install
 
-# Or via npx
+# Build the project (if needed)
+npm run build
+
+# Add as MCP server to OpenCode
+opencode mcp add opencode-orchestrator "npx opencode-orchestrator@latest mcp serve"
+
+# Or link locally for development
+opencode mcp add opencode-orchestrator "node $(pwd)/v3/@claude-flow/cli/dist/index.js mcp serve"
+
+# Initialize a new project
 npx opencode-orchestrator@latest init --wizard
 ```
 
@@ -435,11 +445,11 @@ opencode --version
 #### One-Line Install (Recommended)
 
 ```bash
-# curl-style installer with progress display
-curl -fsSL https://cdn.jsdelivr.net/gh/ruvnet/claude-flow@main/scripts/install.sh | bash
+# Install globally via npm
+npm install -g opencode-orchestrator@latest
 
-# Full setup (global + MCP + diagnostics)
-curl -fsSL https://cdn.jsdelivr.net/gh/ruvnet/claude-flow@main/scripts/install.sh | bash -s -- --full
+# Or use npx (no install needed)
+npx opencode-orchestrator@latest --help
 ```
 
 <details>
@@ -458,10 +468,10 @@ curl -fsSL https://cdn.jsdelivr.net/gh/ruvnet/claude-flow@main/scripts/install.s
 **Examples:**
 ```bash
 # Minimal global install (fastest)
-curl ... | bash -s -- --global --minimal
+npm install -g opencode-orchestrator@latest --omit=optional
 
 # With MCP auto-setup
-curl ... | bash -s -- --global --setup-mcp
+opencode-orchestrator init --setup-mcp
 
 # Full setup with diagnostics
 curl ... | bash -s -- --full
@@ -7367,14 +7377,13 @@ cp -r ./data-backup-v2 ./data
 
 | Resource | Link |
 |----------|------|
-| 📚 Documentation | [github.com/ruvnet/claude-flow](https://github.com/ruvnet/claude-flow) |
-| 🐛 Issues & Bugs | [github.com/ruvnet/claude-flow/issues](https://github.com/ruvnet/claude-flow/issues) |
-| 💼 Professional Implementation | [ruv.io](https://ruv.io) — Enterprise consulting, custom integrations, and production deployment |
+| 📚 Documentation | [github.com/pedrocosta95/opencode-orchestrator](https://github.com/pedrocosta95/opencode-orchestrator) |
+| 🐛 Issues & Bugs | [github.com/pedrocosta95/opencode-orchestrator/issues](https://github.com/pedrocosta95/opencode-orchestrator/issues) |
 | 💬 Discord Community | [Agentics Foundation](https://discord.com/invite/dfxmpwkG2D) |
 
 ## License
 
-MIT - [RuvNet](https://github.com/ruvnet)
+MIT - [pedrocosta95](https://github.com/pedrocosta95)
 
 
 [![RuVector](https://img.shields.io/npm/v/ruvector?style=for-the-badge&logo=rust&color=orange&label=RuVector)](https://www.npmjs.com/package/ruvector)
