@@ -44,8 +44,38 @@ export class MemoryTools implements MCPToolProvider {
         }
       },
       {
+        name: 'opencode_memory_store',
+        description: 'Store a memory entry (OpenCode MCP alias)',
+        parameters: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'Unique memory identifier' },
+            agentId: { type: 'string', description: 'Agent that owns this memory' },
+            content: { type: 'string', description: 'Memory content' },
+            type: { type: 'string', description: 'Memory type' },
+            timestamp: { type: 'number', description: 'Timestamp' },
+            embedding: { type: 'array', items: { type: 'number' }, description: 'Vector embedding' },
+            metadata: { type: 'object', description: 'Additional metadata' }
+          },
+          required: ['id', 'agentId', 'content', 'type']
+        }
+      },
+      {
         name: 'memory_search',
         description: 'Search memories with filters',
+        parameters: {
+          type: 'object',
+          properties: {
+            agentId: { type: 'string', description: 'Filter by agent ID' },
+            type: { type: 'string', description: 'Filter by memory type' },
+            limit: { type: 'number', description: 'Maximum results' },
+            offset: { type: 'number', description: 'Offset for pagination' }
+          }
+        }
+      },
+      {
+        name: 'opencode_memory_search',
+        description: 'Search memories (OpenCode MCP alias)',
         parameters: {
           type: 'object',
           properties: {
@@ -69,8 +99,31 @@ export class MemoryTools implements MCPToolProvider {
         }
       },
       {
+        name: 'opencode_memory_vector_search',
+        description: 'Vector search memories (OpenCode MCP alias)',
+        parameters: {
+          type: 'object',
+          properties: {
+            embedding: { type: 'array', items: { type: 'number' }, description: 'Query embedding' },
+            k: { type: 'number', description: 'Number of results' }
+          },
+          required: ['embedding']
+        }
+      },
+      {
         name: 'memory_retrieve',
         description: 'Retrieve a memory by ID',
+        parameters: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'Memory ID' }
+          },
+          required: ['id']
+        }
+      },
+      {
+        name: 'opencode_memory_retrieve',
+        description: 'Retrieve memory by ID (OpenCode MCP alias)',
         parameters: {
           type: 'object',
           properties: {
@@ -89,6 +142,17 @@ export class MemoryTools implements MCPToolProvider {
           },
           required: ['id']
         }
+      },
+      {
+        name: 'opencode_memory_delete',
+        description: 'Delete a memory (OpenCode MCP alias)',
+        parameters: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'Memory ID' }
+          },
+          required: ['id']
+        }
       }
     ];
   }
@@ -98,7 +162,10 @@ export class MemoryTools implements MCPToolProvider {
    */
   async execute(toolName: string, params: Record<string, unknown>): Promise<MCPToolResult> {
     try {
-      switch (toolName) {
+      // Map OpenCode aliases to base tool names
+      const baseTool = toolName.replace(/^opencode_/, '');
+      
+      switch (baseTool) {
         case 'memory_store':
           return await this.storeMemory(params as Memory);
 

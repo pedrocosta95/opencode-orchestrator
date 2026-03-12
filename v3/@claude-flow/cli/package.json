@@ -1,15 +1,15 @@
 {
-  "name": "@claude-flow/cli",
+  "name": "@opencode-orchestrator/cli",
   "version": "3.5.15",
   "type": "module",
-  "description": "Ruflo CLI - Enterprise AI agent orchestration with 60+ specialized agents, swarm coordination, MCP server, self-learning hooks, and vector memory for Claude Code",
+  "description": "OpenCode Orchestrator CLI - Enterprise AI agent orchestration with 60+ specialized agents, swarm coordination, MCP server, self-learning hooks, and vector memory",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "sideEffects": false,
   "bin": {
     "cli": "./bin/cli.js",
-    "claude-flow": "./bin/cli.js",
-    "claude-flow-mcp": "./bin/mcp-server.js"
+    "opencode-orchestrator": "./bin/cli.js",
+    "opencode": "./bin/cli.js"
   },
   "homepage": "https://github.com/ruvnet/claude-flow#readme",
   "bugs": {

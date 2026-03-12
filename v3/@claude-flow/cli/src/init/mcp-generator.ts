@@ -1,6 +1,6 @@
 /**
  * MCP Configuration Generator
- * Creates .mcp.json for Claude Code MCP server integration
+ * Creates .mcp.json for Claude Code and OpenCode MCP server integration
  * Handles cross-platform compatibility (Windows requires cmd /c wrapper)
  */
 
@@ -123,6 +123,39 @@ export function generateMCPCommands(options: InitOptions): string[] {
     }
     if (config.flowNexus) {
       commands.push("claude mcp add flow-nexus -- npx -y flow-nexus@latest mcp start");
+    }
+  }
+
+  return commands;
+}
+
+/**
+ * Generate OpenCode MCP server add commands
+ * OpenCode uses the same MCP protocol but with 'opencode' CLI
+ */
+export function generateOpenCodeMCPCommands(options: InitOptions): string[] {
+  const commands: string[] = [];
+  const config = options.mcp;
+
+  if (isWindows()) {
+    if (config.claudeFlow) {
+      commands.push('opencode mcp add claude-flow -- cmd /c npx -y @claude-flow/cli@latest mcp start');
+    }
+    if (config.ruvSwarm) {
+      commands.push('opencode mcp add ruv-swarm -- cmd /c npx -y ruv-swarm mcp start');
+    }
+    if (config.flowNexus) {
+      commands.push('opencode mcp add flow-nexus -- cmd /c npx -y flow-nexus@latest mcp start');
+    }
+  } else {
+    if (config.claudeFlow) {
+      commands.push("opencode mcp add claude-flow -- npx -y @claude-flow/cli@latest mcp start");
+    }
+    if (config.ruvSwarm) {
+      commands.push("opencode mcp add ruv-swarm -- npx -y ruv-swarm mcp start");
+    }
+    if (config.flowNexus) {
+      commands.push("opencode mcp add flow-nexus -- npx -y flow-nexus@latest mcp start");
     }
   }
 
