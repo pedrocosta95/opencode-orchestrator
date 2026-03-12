@@ -172,7 +172,7 @@ npx opencode-orchestrator@latest init --wizard
 
 🔌 **Works With Any LLM** - Switch between Claude, GPT, Gemini, Cohere, or local models like Llama. Automatic failover if one provider is unavailable. Smart routing picks the cheapest option that meets quality requirements.
 
-⚡ **Plugs Into Claude Code** - Native integration via MCP (Model Context Protocol). Use opencode-orchestrator commands directly in your Claude Code sessions with full tool access.
+⚡ **Plugs Into OpenCode** - Native integration via MCP (Model Context Protocol). Use opencode-orchestrator commands directly in your OpenCode sessions with full tool access.
 
 🔒 **Production-Ready Security** - Built-in protection against prompt injection, input validation, path traversal prevention, command injection blocking, and safe credential handling.
 
@@ -185,11 +185,11 @@ npx opencode-orchestrator@latest init --wizard
 <details>
 <summary>🔄 <strong>Core Flow</strong> — How requests move through the system</summary>
 
-Every request flows through four layers: from your CLI or Claude Code interface, through intelligent routing, to specialized agents, and finally to LLM providers for reasoning.
+Every request flows through four layers: from your CLI or OpenCode interface, through intelligent routing, to specialized agents, and finally to LLM providers for reasoning.
 
 | Layer | Components | What It Does |
 |-------|------------|--------------|
-| User | Claude Code, CLI | Your interface to control and run commands |
+| User | OpenCode, CLI | Your interface to control and run commands |
 | Orchestration | MCP Server, Router, Hooks | Routes requests to the right agents |
 | Agents | 60+ types | Specialized workers (coder, tester, reviewer...) |
 | Providers | Anthropic, OpenAI, Google, Ollama | AI models that power reasoning |
@@ -262,9 +262,9 @@ Background daemons handle security audits, performance optimization, and session
 </details>
 
 <details>
-<summary>🎯 <strong>Task Routing</strong> — Extend your Claude Code subscription by 250%</summary>
+<summary>🎯 <strong>Task Routing</strong> — Extend your OpenCode subscription by 250%</summary>
 
-Smart routing skips expensive LLM calls when possible. Simple edits use WASM (free), medium tasks use cheaper models. This can extend your Claude Code usage by 250% or save significantly on direct API costs.
+Smart routing skips expensive LLM calls when possible. Simple edits use WASM (free), medium tasks use cheaper models. This can extend your OpenCode usage by 250% or save significantly on direct API costs.
 
 | Complexity | Handler | Speed |
 |------------|---------|-------|
@@ -392,9 +392,9 @@ swarm_init({
 
 </details>
 
-### Claude Code: With vs Without OpenCode Orchestrator
+### OpenCode: With vs Without OpenCode Orchestrator
 
-| Capability | Claude Code Alone | Claude Code + OpenCode Orchestrator |
+| Capability | OpenCode Alone | OpenCode + OpenCode Orchestrator |
 |------------|-------------------|---------------------------|
 | **Agent Collaboration** | Agents work in isolation, no shared context | Agents collaborate via swarms with shared memory and consensus |
 | **Coordination** | Manual orchestration between tasks | Queen-led hierarchy with 5 consensus algorithms (Raft, Byzantine, Gossip) |
@@ -449,7 +449,7 @@ curl -fsSL https://cdn.jsdelivr.net/gh/ruvnet/claude-flow@main/scripts/install.s
 |--------|-------------|
 | `--global`, `-g` | Install globally (`npm install -g`) |
 | `--minimal`, `-m` | Skip optional deps (faster, ~15s) |
-| `--setup-mcp` | Auto-configure MCP server for Claude Code |
+| `--setup-mcp` | Auto-configure MCP server for OpenCode |
 | `--doctor`, `-d` | Run diagnostics after install |
 | `--no-init` | Skip project initialization (init runs by default) |
 | `--full`, `-f` | Full setup: global + MCP + doctor |
@@ -511,7 +511,7 @@ npm install -g opencode-orchestrator@latest --omit=optional
 # Initialize project
 npx opencode-orchestrator@latest init
 
-# Start MCP server for Claude Code integration
+# Start MCP server for OpenCode integration
 npx opencode-orchestrator@latest mcp start
 
 # Run a task with agents
@@ -533,19 +533,19 @@ npx opencode-orchestrator@v3alpha init upgrade --add-missing
 
 The `--add-missing` flag automatically detects and installs new skills, agents, and commands that were added in newer versions, without overwriting your existing customizations.
 
-### Claude Code MCP Integration
+### OpenCode MCP Integration
 
 Add opencode-orchestrator as an MCP server for seamless integration:
 
 ```bash
-# Add opencode-orchestrator MCP server to Claude Code
-claude mcp add opencode-orchestrator -- npx -y opencode-orchestrator@latest mcp start
+# Add opencode-orchestrator MCP server to OpenCode
+opencode mcp add opencode-orchestrator -- npx -y opencode-orchestrator@latest mcp start
 
 # Verify installation
-claude mcp list
+opencode mcp list
 ```
 
-Once added, Claude Code can use all 175+ opencode-orchestrator MCP tools directly:
+Once added, OpenCode can use all 175+ opencode-orchestrator MCP tools directly:
 - `swarm_init` - Initialize agent swarms
 - `agent_spawn` - Spawn specialized agents
 - `memory_search` - Search patterns with HNSW vector search
@@ -711,7 +711,7 @@ Complex projects fail when implementation drifts from the original plan. OpenCod
 - **ADR-008**: Vitest testing framework (10x faster than Jest)
 - **ADR-009**: Hybrid Memory Backend (SQLite + HNSW)
 - **ADR-026**: Intelligent 3-tier model routing
-- **ADR-048**: Auto Memory Bridge (Claude Code ↔ AgentDB bidirectional sync)
+- **ADR-048**: Auto Memory Bridge (OpenCode ↔ AgentDB bidirectional sync)
 - **ADR-049**: Self-Learning Memory with GNN (LearningBridge, MemoryGraph, AgentMemoryScope)
 
 </details>
@@ -726,7 +726,7 @@ Complex projects fail when implementation drifts from the original plan. OpenCod
 ```mermaid
 flowchart TB
     subgraph User["👤 User Layer"]
-        CC[Claude Code]
+        CC[OpenCode]
         CLI[CLI Commands]
     end
 
@@ -860,7 +860,7 @@ flowchart LR
 | **LearningBridge** | Connects insights to SONA/ReasoningBank neural pipeline | 0.12 ms/insight |
 | **MemoryGraph** | PageRank + label propagation knowledge graph | 2.78 ms build (1k nodes) |
 | **AgentMemoryScope** | 3-scope agent memory (project/local/user) with cross-agent transfer | 1.25 ms transfer |
-| **AutoMemoryBridge** | Bidirectional sync: Claude Code auto memory files ↔ AgentDB | ADR-048 |
+| **AutoMemoryBridge** | Bidirectional sync: OpenCode auto memory files ↔ AgentDB | ADR-048 |
 
 </details>
 
@@ -1062,22 +1062,22 @@ Restart Claude Desktop after saving. Look for the MCP indicator (hammer icon) in
 </details>
 
 <details>
-<summary>⌨️ <strong>Claude Code (CLI)</strong></summary>
+<summary>⌨️ <strong>OpenCode (CLI)</strong></summary>
 
 ```bash
 # Add via CLI (recommended)
-claude mcp add opencode-orchestrator -- npx opencode-orchestrator@v3alpha mcp start
+opencode mcp add opencode-orchestrator -- npx opencode-orchestrator@latest mcp start
 
 # Or add with environment variables
-claude mcp add opencode-orchestrator \
+opencode mcp add opencode-orchestrator \
   --env ANTHROPIC_API_KEY=sk-ant-... \
-  -- npx opencode-orchestrator@v3alpha mcp start
+  -- npx opencode-orchestrator@latest mcp start
 
 # Verify installation
-claude mcp list
+opencode mcp list
 ```
 
-*Sources: [Claude Code MCP Docs](https://code.claude.com/docs/en/mcp)*
+*Sources: [OpenCode MCP Docs](https://opencode.ai/docs)*
 
 </details>
 
