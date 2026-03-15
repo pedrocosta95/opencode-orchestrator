@@ -85,7 +85,7 @@ const initAction = async (ctx: CommandContext): Promise<CommandResult> => {
     options.components.helpers = false;
     options.components.statusline = false;
     options.components.mcp = false;
-    options.components.claudeMd = false;
+    options.components.opencodeMd = false;
   }
 
   if (onlyClaude) {
@@ -130,10 +130,10 @@ const initAction = async (ctx: CommandContext): Promise<CommandResult> => {
     output.writeln();
 
     // Show what was created
-    if (options.components.claudeMd || options.components.settings || options.components.skills || options.components.commands || options.components.agents) {
+    if (options.components.opencodeMd || options.components.settings || options.components.skills || options.components.commands || options.components.agents) {
       output.printBox(
         [
-          options.components.claudeMd ? `CLAUDE.md:   Swarm guidance & configuration` : '',
+          options.components.opencodeMd ? `CLAUDE.md:   Swarm guidance & configuration` : '',
           options.components.settings ? `Settings:    .claude/settings.json` : '',
           options.components.skills ? `Skills:      .claude/skills/ (${result.summary.skillsCount} skills)` : '',
           options.components.commands ? `Commands:    .claude/commands/ (${result.summary.commandsCount} commands)` : '',
@@ -309,7 +309,7 @@ const wizardCommand: Command = {
         const components = await multiSelect({
           message: 'Select components to initialize:',
           options: [
-            { value: 'claudeMd', label: 'CLAUDE.md', hint: 'Swarm guidance and project configuration', selected: true },
+            { value: 'opencodeMd', label: 'CLAUDE.md', hint: 'Swarm guidance and project configuration', selected: true },
             { value: 'settings', label: 'settings.json', hint: 'Claude Code hooks configuration', selected: true },
             { value: 'skills', label: 'Skills', hint: 'Claude Code skills in .claude/skills/', selected: true },
             { value: 'commands', label: 'Commands', hint: 'Claude Code commands in .claude/commands/', selected: true },
@@ -321,7 +321,7 @@ const wizardCommand: Command = {
           ],
         });
 
-        options.components.claudeMd = components.includes('claudeMd');
+        options.components.opencodeMd = components.includes('opencodeMd');
         options.components.settings = components.includes('settings');
         options.components.skills = components.includes('skills');
         options.components.commands = components.includes('commands');
@@ -593,7 +593,7 @@ const skillsCommand: Command = {
         statusline: false,
         mcp: false,
         runtime: false,
-        claudeMd: false,
+        opencodeMd: false,
       },
       skills: {
         all: ctx.flags.all as boolean,
@@ -648,7 +648,7 @@ const hooksCommand: Command = {
         statusline: false,
         mcp: false,
         runtime: false,
-        claudeMd: false,
+        opencodeMd: false,
       },
       hooks: minimal
         ? {

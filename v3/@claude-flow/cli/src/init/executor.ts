@@ -27,7 +27,7 @@ import {
   generateIntelligenceStub,
   generateAutoMemoryHook,
 } from './helpers-generator.js';
-import { generateClaudeMd } from './claudemd-generator.js';
+import { generateSkillMd } from './skillmd-generator.js';
 
 /**
  * Skills to copy based on configuration
@@ -125,23 +125,24 @@ const AGENTS_MAP: Record<string, string[]> = {
 
 /**
  * Directory structure to create
+ * OpenCode uses .opencode/ instead of .opencode/
  */
 const DIRECTORIES = {
-  claude: [
-    '.claude',
-    '.claude/skills',
-    '.claude/commands',
-    '.claude/agents',
-    '.claude/helpers',
+  opencode: [
+    '.opencode',
+    '.opencode/skills',
+    '.opencode/commands',
+    '.opencode/agents',
+    '.opencode/helpers',
   ],
   runtime: [
-    '.claude-flow',
-    '.claude-flow/data',
-    '.claude-flow/logs',
-    '.claude-flow/sessions',
-    '.claude-flow/hooks',
-    '.claude-flow/agents',
-    '.claude-flow/workflows',
+    '.opencode-flow',
+    '.opencode-flow/data',
+    '.opencode-flow/logs',
+    '.opencode-flow/sessions',
+    '.opencode-flow/hooks',
+    '.opencode-flow/agents',
+    '.opencode-flow/workflows',
   ],
 };
 
@@ -220,9 +221,9 @@ export async function executeInit(options: InitOptions): Promise<InitResult> {
       await writeInitialMetrics(targetDir, options, result);
     }
 
-    // Generate CLAUDE.md
-    if (options.components.claudeMd) {
-      await writeClaudeMd(targetDir, options, result);
+    // Generate SKILL.md
+    if (options.components.opencodeMd) {
+      await writeSkillMd(targetDir, options, result);
     }
 
     // Count enabled hooks
@@ -288,7 +289,7 @@ function mergeSettingsForUpgrade(existing: Record<string, unknown>): Record<stri
   const gitRootResolver = "var c=require('child_process'),p=require('path'),u=require('url'),r;"
     + "try{r=c.execSync('git rev-parse --show-toplevel',{encoding:'utf8'}).trim()}"
     + 'catch(e){r=process.cwd()}';
-  const autoMemoryScript = '.claude/helpers/auto-memory-hook.mjs';
+  const autoMemoryScript = '.opencode/helpers/auto-memory-hook.mjs';
   const autoMemoryImportCmd = `node -e "${gitRootResolver}var f=p.join(r,'${autoMemoryScript}');import(u.pathToFileURL(f).href)" import`;
   const autoMemorySyncCmd = `node -e "${gitRootResolver}var f=p.join(r,'${autoMemoryScript}');import(u.pathToFileURL(f).href)" sync`;
 
@@ -344,15 +345,15 @@ function mergeSettingsForUpgrade(existing: Record<string, unknown>): Record<stri
   if (existingStatusLine) {
     merged.statusLine = {
       type: 'command',
-      command: existingStatusLine.command || `node -e "var c=require('child_process'),p=require('path'),r;try{r=c.execSync('git rev-parse --show-toplevel',{encoding:'utf8'}).trim()}catch(e){r=process.cwd()}var s=p.join(r,'.claude/helpers/statusline.cjs');process.argv.splice(1,0,s);require(s)"`,
+      command: existingStatusLine.command || `node -e "var c=require('child_process'),p=require('path'),r;try{r=c.execSync('git rev-parse --show-toplevel',{encoding:'utf8'}).trim()}catch(e){r=process.cwd()}var s=p.join(r,'.opencode/helpers/statusline.cjs');process.argv.splice(1,0,s);require(s)"`,
       // Remove invalid fields: refreshMs, enabled (not supported by Claude Code)
     };
   }
 
   // 4. Merge claudeFlow settings (preserve existing, add agentTeams + memory)
-  const existingClaudeFlow = (existing.claudeFlow as Record<string, unknown>) || {};
+  const existingClaudeFlow = (existing.opencodeFlow as Record<string, unknown>) || {};
   const existingMemory = (existingClaudeFlow.memory as Record<string, unknown>) || {};
-  merged.claudeFlow = {
+  merged.opencodeFlow = {
     ...existingClaudeFlow,
     version: existingClaudeFlow.version || '3.0.0',
     enabled: existingClaudeFlow.enabled !== false,
@@ -402,10 +403,10 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
   try {
     // Ensure required directories exist
     const dirs = [
-      '.claude/helpers',
-      '.claude-flow/metrics',
-      '.claude-flow/security',
-      '.claude-flow/learning',
+      '.opencode/helpers',
+      '.opencode-flow/metrics',
+      '.opencode-flow/security',
+      '.opencode-flow/learning',
     ];
 
     for (const dir of dirs) {
@@ -420,13 +421,13 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
     if (sourceHelpersForUpgrade) {
       const criticalHelpers = ['auto-memory-hook.mjs', 'hook-handler.cjs', 'intelligence.cjs'];
       for (const helperName of criticalHelpers) {
-        const targetPath = path.join(targetDir, '.claude', 'helpers', helperName);
+        const targetPath = path.join(targetDir, '.opencode', 'helpers', helperName);
         const sourcePath = path.join(sourceHelpersForUpgrade, helperName);
         if (fs.existsSync(sourcePath)) {
           if (fs.existsSync(targetPath)) {
-            result.updated.push(`.claude/helpers/${helperName}`);
+            result.updated.push(`.opencode/helpers/${helperName}`);
           } else {
-            result.created.push(`.claude/helpers/${helperName}`);
+            result.created.push(`.opencode/helpers/${helperName}`);
           }
           fs.copyFileSync(sourcePath, targetPath);
           try { fs.chmodSync(targetPath, '755'); } catch {}
@@ -440,11 +441,11 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
         'auto-memory-hook.mjs': generateAutoMemoryHook(),
       };
       for (const [helperName, content] of Object.entries(generatedCritical)) {
-        const targetPath = path.join(targetDir, '.claude', 'helpers', helperName);
+        const targetPath = path.join(targetDir, '.opencode', 'helpers', helperName);
         if (fs.existsSync(targetPath)) {
-          result.updated.push(`.claude/helpers/${helperName}`);
+          result.updated.push(`.opencode/helpers/${helperName}`);
         } else {
-          result.created.push(`.claude/helpers/${helperName}`);
+          result.created.push(`.opencode/helpers/${helperName}`);
         }
         fs.writeFileSync(targetPath, content, 'utf-8');
         try { fs.chmodSync(targetPath, '755'); } catch {}
@@ -452,7 +453,7 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
     }
 
     // 1. ALWAYS update statusline helper (force overwrite)
-    const statuslinePath = path.join(targetDir, '.claude', 'helpers', 'statusline.cjs');
+    const statuslinePath = path.join(targetDir, '.opencode', 'helpers', 'statusline.cjs');
     // Use default options with statusline config
     const upgradeOptions: InitOptions = {
       ...DEFAULT_INIT_OPTIONS,
@@ -466,15 +467,15 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
     const statuslineContent = generateStatuslineScript(upgradeOptions);
 
     if (fs.existsSync(statuslinePath)) {
-      result.updated.push('.claude/helpers/statusline.cjs');
+      result.updated.push('.opencode/helpers/statusline.cjs');
     } else {
-      result.created.push('.claude/helpers/statusline.cjs');
+      result.created.push('.opencode/helpers/statusline.cjs');
     }
     fs.writeFileSync(statuslinePath, statuslineContent, 'utf-8');
 
     // 2. Create MISSING metrics files only (preserve existing data)
-    const metricsDir = path.join(targetDir, '.claude-flow', 'metrics');
-    const securityDir = path.join(targetDir, '.claude-flow', 'security');
+    const metricsDir = path.join(targetDir, '.opencode-flow', 'metrics');
+    const securityDir = path.join(targetDir, '.opencode-flow', 'security');
 
     // v3-progress.json
     const progressPath = path.join(metricsDir, 'v3-progress.json');
@@ -489,9 +490,9 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
         _note: 'Metrics will update as you use Claude Flow'
       };
       fs.writeFileSync(progressPath, JSON.stringify(progress, null, 2), 'utf-8');
-      result.created.push('.claude-flow/metrics/v3-progress.json');
+      result.created.push('.opencode-flow/metrics/v3-progress.json');
     } else {
-      result.preserved.push('.claude-flow/metrics/v3-progress.json');
+      result.preserved.push('.opencode-flow/metrics/v3-progress.json');
     }
 
     // swarm-activity.json
@@ -505,9 +506,9 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
         _initialized: true
       };
       fs.writeFileSync(activityPath, JSON.stringify(activity, null, 2), 'utf-8');
-      result.created.push('.claude-flow/metrics/swarm-activity.json');
+      result.created.push('.opencode-flow/metrics/swarm-activity.json');
     } else {
-      result.preserved.push('.claude-flow/metrics/swarm-activity.json');
+      result.preserved.push('.opencode-flow/metrics/swarm-activity.json');
     }
 
     // learning.json
@@ -521,9 +522,9 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
         _note: 'Intelligence grows as you use Claude Flow'
       };
       fs.writeFileSync(learningPath, JSON.stringify(learning, null, 2), 'utf-8');
-      result.created.push('.claude-flow/metrics/learning.json');
+      result.created.push('.opencode-flow/metrics/learning.json');
     } else {
-      result.preserved.push('.claude-flow/metrics/learning.json');
+      result.preserved.push('.opencode-flow/metrics/learning.json');
     }
 
     // audit-status.json
@@ -538,20 +539,20 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
         _note: 'Run: npx @claude-flow/cli@latest security scan'
       };
       fs.writeFileSync(auditPath, JSON.stringify(audit, null, 2), 'utf-8');
-      result.created.push('.claude-flow/security/audit-status.json');
+      result.created.push('.opencode-flow/security/audit-status.json');
     } else {
-      result.preserved.push('.claude-flow/security/audit-status.json');
+      result.preserved.push('.opencode-flow/security/audit-status.json');
     }
 
     // 3. Merge settings if requested
     if (upgradeSettings) {
-      const settingsPath = path.join(targetDir, '.claude', 'settings.json');
+      const settingsPath = path.join(targetDir, '.opencode', 'settings.json');
       if (fs.existsSync(settingsPath)) {
         try {
           const existingSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
           const mergedSettings = mergeSettingsForUpgrade(existingSettings);
           fs.writeFileSync(settingsPath, JSON.stringify(mergedSettings, null, 2), 'utf-8');
-          result.updated.push('.claude/settings.json');
+          result.updated.push('.opencode/settings.json');
           result.settingsUpdated = [
             'env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS',
             'hooks.SessionStart (auto-memory import)',
@@ -568,7 +569,7 @@ export async function executeUpgrade(targetDir: string, upgradeSettings = false)
         // Create new settings.json with defaults
         const defaultSettings = generateSettings(DEFAULT_INIT_OPTIONS);
         fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2), 'utf-8');
-        result.created.push('.claude/settings.json');
+        result.created.push('.opencode/settings.json');
         result.settingsUpdated = ['Created new settings.json with Agent Teams'];
       }
     }
@@ -602,9 +603,9 @@ export async function executeUpgradeWithMissing(targetDir: string, upgradeSettin
 
   try {
     // Ensure target directories exist
-    const skillsDir = path.join(targetDir, '.claude', 'skills');
-    const agentsDir = path.join(targetDir, '.claude', 'agents');
-    const commandsDir = path.join(targetDir, '.claude', 'commands');
+    const skillsDir = path.join(targetDir, '.opencode', 'skills');
+    const agentsDir = path.join(targetDir, '.opencode', 'agents');
+    const commandsDir = path.join(targetDir, '.opencode', 'commands');
 
     for (const dir of [skillsDir, agentsDir, commandsDir]) {
       if (!fs.existsSync(dir)) {
@@ -645,7 +646,7 @@ export async function executeUpgradeWithMissing(targetDir: string, upgradeSettin
         if (sourceExists && !targetExists) {
           copyDirRecursive(sourcePath, targetPath);
           result.addedSkills.push(skillName);
-          result.created.push(`.claude/skills/${skillName}`);
+          result.created.push(`.opencode/skills/${skillName}`);
         }
       }
     }
@@ -660,7 +661,7 @@ export async function executeUpgradeWithMissing(targetDir: string, upgradeSettin
         if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
           copyDirRecursive(sourcePath, targetPath);
           result.addedAgents.push(agentCategory);
-          result.created.push(`.claude/agents/${agentCategory}`);
+          result.created.push(`.opencode/agents/${agentCategory}`);
         }
       }
     }
@@ -679,7 +680,7 @@ export async function executeUpgradeWithMissing(targetDir: string, upgradeSettin
             fs.copyFileSync(sourcePath, targetPath);
           }
           result.addedCommands.push(cmdName);
-          result.created.push(`.claude/commands/${cmdName}`);
+          result.created.push(`.opencode/commands/${cmdName}`);
         }
       }
     }
@@ -700,7 +701,7 @@ async function createDirectories(
   result: InitResult
 ): Promise<void> {
   const dirs = [
-    ...DIRECTORIES.claude,
+    ...DIRECTORIES.opencode,
     ...(options.components.runtime ? DIRECTORIES.runtime : []),
   ];
 
@@ -721,16 +722,16 @@ async function writeSettings(
   options: InitOptions,
   result: InitResult
 ): Promise<void> {
-  const settingsPath = path.join(targetDir, '.claude', 'settings.json');
+  const settingsPath = path.join(targetDir, '.opencode', 'settings.json');
 
   if (fs.existsSync(settingsPath) && !options.force) {
-    result.skipped.push('.claude/settings.json');
+    result.skipped.push('.opencode/settings.json');
     return;
   }
 
   const content = generateSettingsJson(options);
   fs.writeFileSync(settingsPath, content, 'utf-8');
-  result.created.files.push('.claude/settings.json');
+  result.created.files.push('.opencode/settings.json');
 }
 
 /**
@@ -762,7 +763,7 @@ async function copySkills(
   result: InitResult
 ): Promise<void> {
   const skillsConfig = options.skills;
-  const targetSkillsDir = path.join(targetDir, '.claude', 'skills');
+  const targetSkillsDir = path.join(targetDir, '.opencode', 'skills');
 
   // Determine which skills to copy
   const skillsToCopy: string[] = [];
@@ -794,10 +795,10 @@ async function copySkills(
     if (fs.existsSync(sourcePath)) {
       if (!fs.existsSync(targetPath) || options.force) {
         copyDirRecursive(sourcePath, targetPath);
-        result.created.files.push(`.claude/skills/${skillName}`);
+        result.created.files.push(`.opencode/skills/${skillName}`);
         result.summary.skillsCount++;
       } else {
-        result.skipped.push(`.claude/skills/${skillName}`);
+        result.skipped.push(`.opencode/skills/${skillName}`);
       }
     }
   }
@@ -812,7 +813,7 @@ async function copyCommands(
   result: InitResult
 ): Promise<void> {
   const commandsConfig = options.commands;
-  const targetCommandsDir = path.join(targetDir, '.claude', 'commands');
+  const targetCommandsDir = path.join(targetDir, '.opencode', 'commands');
 
   // Determine which commands to copy
   const commandsToCopy: string[] = [];
@@ -849,10 +850,10 @@ async function copyCommands(
         } else {
           fs.copyFileSync(sourcePath, targetPath);
         }
-        result.created.files.push(`.claude/commands/${cmdName}`);
+        result.created.files.push(`.opencode/commands/${cmdName}`);
         result.summary.commandsCount++;
       } else {
-        result.skipped.push(`.claude/commands/${cmdName}`);
+        result.skipped.push(`.opencode/commands/${cmdName}`);
       }
     }
   }
@@ -867,7 +868,7 @@ async function copyAgents(
   result: InitResult
 ): Promise<void> {
   const agentsConfig = options.agents;
-  const targetAgentsDir = path.join(targetDir, '.claude', 'agents');
+  const targetAgentsDir = path.join(targetDir, '.opencode', 'agents');
 
   // Determine which agents to copy
   const agentsToCopy: string[] = [];
@@ -907,9 +908,9 @@ async function copyAgents(
         const yamlFiles = countFiles(sourcePath, '.yaml');
         const mdFiles = countFiles(sourcePath, '.md');
         result.summary.agentsCount += yamlFiles + mdFiles;
-        result.created.files.push(`.claude/agents/${agentCategory}`);
+        result.created.files.push(`.opencode/agents/${agentCategory}`);
       } else {
-        result.skipped.push(`.claude/agents/${agentCategory}`);
+        result.skipped.push(`.opencode/agents/${agentCategory}`);
       }
     }
   }
@@ -926,7 +927,7 @@ function findSourceHelpersDir(sourceBaseDir?: string): string | null {
 
   // If explicit source base directory is provided, check it first
   if (sourceBaseDir) {
-    possiblePaths.push(path.join(sourceBaseDir, '.claude', 'helpers'));
+    possiblePaths.push(path.join(sourceBaseDir, '.opencode', 'helpers'));
   }
 
   // Strategy 1: require.resolve to find package root (most reliable for npx)
@@ -934,14 +935,14 @@ function findSourceHelpersDir(sourceBaseDir?: string): string | null {
     const esmRequire = createRequire(import.meta.url);
     const pkgJsonPath = esmRequire.resolve('@claude-flow/cli/package.json');
     const pkgRoot = path.dirname(pkgJsonPath);
-    possiblePaths.push(path.join(pkgRoot, '.claude', 'helpers'));
+    possiblePaths.push(path.join(pkgRoot, '.opencode', 'helpers'));
   } catch {
     // Not installed as a package — skip
   }
 
   // Strategy 2: __dirname-based (dist/src/init -> package root)
   const packageRoot = path.resolve(__dirname, '..', '..', '..');
-  const packageHelpers = path.join(packageRoot, '.claude', 'helpers');
+  const packageHelpers = path.join(packageRoot, '.opencode', 'helpers');
   possiblePaths.push(packageHelpers);
 
   // Strategy 3: Walk up from __dirname looking for package root
@@ -949,16 +950,16 @@ function findSourceHelpersDir(sourceBaseDir?: string): string | null {
   for (let i = 0; i < 10; i++) {
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir) break; // hit filesystem root
-    const helpersPath = path.join(parentDir, '.claude', 'helpers');
+    const helpersPath = path.join(parentDir, '.opencode', 'helpers');
     possiblePaths.push(helpersPath);
     currentDir = parentDir;
   }
 
   // Strategy 4: Check cwd-relative paths (for local dev)
   const cwdBased = [
-    path.join(process.cwd(), '.claude', 'helpers'),
-    path.join(process.cwd(), '..', '.claude', 'helpers'),
-    path.join(process.cwd(), '..', '..', '.claude', 'helpers'),
+    path.join(process.cwd(), '.opencode', 'helpers'),
+    path.join(process.cwd(), '..', '.opencode', 'helpers'),
+    path.join(process.cwd(), '..', '..', '.opencode', 'helpers'),
   ];
   possiblePaths.push(...cwdBased);
 
@@ -980,7 +981,7 @@ async function writeHelpers(
   options: InitOptions,
   result: InitResult
 ): Promise<void> {
-  const helpersDir = path.join(targetDir, '.claude', 'helpers');
+  const helpersDir = path.join(targetDir, '.opencode', 'helpers');
 
   // Find source helpers directory (works for npm package and local dev)
   const sourceHelpersDir = findSourceHelpersDir(options.sourceBaseDir);
@@ -1005,10 +1006,10 @@ async function writeHelpers(
           fs.chmodSync(destPath, '755');
         }
 
-        result.created.files.push(`.claude/helpers/${file}`);
+        result.created.files.push(`.opencode/helpers/${file}`);
         copiedCount++;
       } else {
-        result.skipped.push(`.claude/helpers/${file}`);
+        result.skipped.push(`.opencode/helpers/${file}`);
       }
     }
 
@@ -1040,28 +1041,28 @@ async function writeHelpers(
         fs.chmodSync(filePath, '755');
       }
 
-      result.created.files.push(`.claude/helpers/${name}`);
+      result.created.files.push(`.opencode/helpers/${name}`);
     } else {
-      result.skipped.push(`.claude/helpers/${name}`);
+      result.skipped.push(`.opencode/helpers/${name}`);
     }
   }
 }
 
 /**
- * Find source .claude directory for statusline files
+ * Find source .opencode directory for statusline files
  */
 function findSourceClaudeDir(sourceBaseDir?: string): string | null {
   const possiblePaths: string[] = [];
 
   // If explicit source base directory is provided, check it first
   if (sourceBaseDir) {
-    possiblePaths.push(path.join(sourceBaseDir, '.claude'));
+    possiblePaths.push(path.join(sourceBaseDir, '.opencode'));
   }
 
-  // IMPORTANT: Check the package's own .claude directory
+  // IMPORTANT: Check the package's own .opencode directory
   // Go up 3 levels: dist/src/init -> dist/src -> dist -> root
   const packageRoot = path.resolve(__dirname, '..', '..', '..');
-  const packageClaude = path.join(packageRoot, '.claude');
+  const packageClaude = path.join(packageRoot, '.opencode');
   if (fs.existsSync(packageClaude)) {
     possiblePaths.unshift(packageClaude); // Add to beginning (highest priority)
   }
@@ -1070,7 +1071,7 @@ function findSourceClaudeDir(sourceBaseDir?: string): string | null {
   let currentDir = __dirname;
   for (let i = 0; i < 10; i++) {
     const parentDir = path.dirname(currentDir);
-    const claudePath = path.join(parentDir, '.claude');
+    const claudePath = path.join(parentDir, '.opencode');
     if (fs.existsSync(claudePath)) {
       possiblePaths.push(claudePath);
     }
@@ -1094,10 +1095,10 @@ async function writeStatusline(
   options: InitOptions,
   result: InitResult
 ): Promise<void> {
-  const claudeDir = path.join(targetDir, '.claude');
-  const helpersDir = path.join(targetDir, '.claude', 'helpers');
+  const claudeDir = path.join(targetDir, '.opencode');
+  const helpersDir = path.join(targetDir, '.opencode', 'helpers');
 
-  // Find source .claude directory (works for npm package and local dev)
+  // Find source .opencode directory (works for npm package and local dev)
   const sourceClaudeDir = findSourceClaudeDir(options.sourceBaseDir);
 
   // Try to copy existing advanced statusline files from source
@@ -1118,9 +1119,9 @@ async function writeStatusline(
           if (file.src.endsWith('.sh') || file.src.endsWith('.mjs')) {
             fs.chmodSync(destPath, '755');
           }
-          result.created.files.push(`.claude/${file.dest}`);
+          result.created.files.push(`.opencode/${file.dest}`);
         } else {
-          result.skipped.push(`.claude/${file.dest}`);
+          result.skipped.push(`.opencode/${file.dest}`);
         }
       }
     }
@@ -1133,24 +1134,24 @@ async function writeStatusline(
 
   if (!fs.existsSync(statuslinePath) || options.force) {
     fs.writeFileSync(statuslinePath, statuslineScript, 'utf-8');
-    result.created.files.push('.claude/helpers/statusline.cjs');
+    result.created.files.push('.opencode/helpers/statusline.cjs');
   } else {
-    result.skipped.push('.claude/helpers/statusline.cjs');
+    result.skipped.push('.opencode/helpers/statusline.cjs');
   }
 }
 
 /**
- * Write runtime configuration (.claude-flow/)
+ * Write runtime configuration (.opencode-flow/)
  */
 async function writeRuntimeConfig(
   targetDir: string,
   options: InitOptions,
   result: InitResult
 ): Promise<void> {
-  const configPath = path.join(targetDir, '.claude-flow', 'config.yaml');
+  const configPath = path.join(targetDir, '.opencode-flow', 'config.yaml');
 
   if (fs.existsSync(configPath) && !options.force) {
-    result.skipped.push('.claude-flow/config.yaml');
+    result.skipped.push('.opencode-flow/config.yaml');
     return;
   }
 
@@ -1168,7 +1169,7 @@ swarm:
 memory:
   backend: ${options.runtime.memoryBackend}
   enableHNSW: ${options.runtime.enableHNSW}
-  persistPath: .claude-flow/data
+  persistPath: .opencode-flow/data
   cacheSize: 100
   # ADR-049: Self-Learning Memory
   learningBridge:
@@ -1188,7 +1189,7 @@ memory:
 
 neural:
   enabled: ${options.runtime.enableNeural}
-  modelPath: .claude-flow/neural
+  modelPath: .opencode-flow/neural
 
 hooks:
   enabled: true
@@ -1200,10 +1201,10 @@ mcp:
 `;
 
   fs.writeFileSync(configPath, config, 'utf-8');
-  result.created.files.push('.claude-flow/config.yaml');
+  result.created.files.push('.opencode-flow/config.yaml');
 
   // Write .gitignore
-  const gitignorePath = path.join(targetDir, '.claude-flow', '.gitignore');
+  const gitignorePath = path.join(targetDir, '.opencode-flow', '.gitignore');
   const gitignore = `# Claude Flow runtime files
 data/
 logs/
@@ -1215,7 +1216,7 @@ neural/
 
   if (!fs.existsSync(gitignorePath) || options.force) {
     fs.writeFileSync(gitignorePath, gitignore, 'utf-8');
-    result.created.files.push('.claude-flow/.gitignore');
+    result.created.files.push('.opencode-flow/.gitignore');
   }
 
   // Write CAPABILITIES.md with full system overview
@@ -1231,9 +1232,9 @@ async function writeInitialMetrics(
   options: InitOptions,
   result: InitResult
 ): Promise<void> {
-  const metricsDir = path.join(targetDir, '.claude-flow', 'metrics');
-  const learningDir = path.join(targetDir, '.claude-flow', 'learning');
-  const securityDir = path.join(targetDir, '.claude-flow', 'security');
+  const metricsDir = path.join(targetDir, '.opencode-flow', 'metrics');
+  const learningDir = path.join(targetDir, '.opencode-flow', 'learning');
+  const securityDir = path.join(targetDir, '.opencode-flow', 'security');
 
   // Ensure directories exist
   for (const dir of [metricsDir, learningDir, securityDir]) {
@@ -1272,7 +1273,7 @@ async function writeInitialMetrics(
       _note: 'Metrics will update as you use Claude Flow. Run: npx @claude-flow/cli@latest daemon start'
     };
     fs.writeFileSync(progressPath, JSON.stringify(progress, null, 2), 'utf-8');
-    result.created.files.push('.claude-flow/metrics/v3-progress.json');
+    result.created.files.push('.opencode-flow/metrics/v3-progress.json');
   }
 
   // Create initial swarm-activity.json
@@ -1297,7 +1298,7 @@ async function writeInitialMetrics(
       _initialized: true
     };
     fs.writeFileSync(activityPath, JSON.stringify(activity, null, 2), 'utf-8');
-    result.created.files.push('.claude-flow/metrics/swarm-activity.json');
+    result.created.files.push('.opencode-flow/metrics/swarm-activity.json');
   }
 
   // Create initial learning.json
@@ -1321,7 +1322,7 @@ async function writeInitialMetrics(
       _note: 'Intelligence grows as you use Claude Flow'
     };
     fs.writeFileSync(learningPath, JSON.stringify(learning, null, 2), 'utf-8');
-    result.created.files.push('.claude-flow/metrics/learning.json');
+    result.created.files.push('.opencode-flow/metrics/learning.json');
   }
 
   // Create initial audit-status.json
@@ -1336,7 +1337,7 @@ async function writeInitialMetrics(
       _note: 'Run: npx @claude-flow/cli@latest security scan'
     };
     fs.writeFileSync(auditPath, JSON.stringify(audit, null, 2), 'utf-8');
-    result.created.files.push('.claude-flow/security/audit-status.json');
+    result.created.files.push('.opencode-flow/security/audit-status.json');
   }
 }
 
@@ -1348,10 +1349,10 @@ async function writeCapabilitiesDoc(
   options: InitOptions,
   result: InitResult
 ): Promise<void> {
-  const capabilitiesPath = path.join(targetDir, '.claude-flow', 'CAPABILITIES.md');
+  const capabilitiesPath = path.join(targetDir, '.opencode-flow', 'CAPABILITIES.md');
 
   if (fs.existsSync(capabilitiesPath) && !options.force) {
-    result.skipped.push('.claude-flow/CAPABILITIES.md');
+    result.skipped.push('.opencode-flow/CAPABILITIES.md');
     return;
   }
 
@@ -1607,9 +1608,9 @@ npx @claude-flow/cli@latest doctor --fix
 **MemoryGraph** - Builds a knowledge graph from entry references. PageRank identifies influential insights. Communities group related knowledge. Graph-aware ranking blends vector + structural scores.
 
 **AgentMemoryScope** - Maps Claude Code 3-scope directories:
-- \`project\`: \`<gitRoot>/.claude/agent-memory/<agent>/\`
-- \`local\`: \`<gitRoot>/.claude/agent-memory-local/<agent>/\`
-- \`user\`: \`~/.claude/agent-memory/<agent>/\`
+- \`project\`: \`<gitRoot>/.opencode/agent-memory/<agent>/\`
+- \`local\`: \`<gitRoot>/.opencode/agent-memory-local/<agent>/\`
+- \`user\`: \`~/.opencode/agent-memory/<agent>/\`
 
 High-confidence insights (>0.8) can transfer between agents.
 
@@ -1743,7 +1744,7 @@ npx @claude-flow/cli@latest hooks worker dispatch --trigger optimize
 
 ### File Structure
 \`\`\`
-.claude-flow/
+.opencode-flow/
 ├── config.yaml      # Runtime configuration
 ├── CAPABILITIES.md  # This file
 ├── data/            # Memory storage
@@ -1761,30 +1762,30 @@ npx @claude-flow/cli@latest hooks worker dispatch --trigger optimize
 `;
 
   fs.writeFileSync(capabilitiesPath, capabilities, 'utf-8');
-  result.created.files.push('.claude-flow/CAPABILITIES.md');
+  result.created.files.push('.opencode-flow/CAPABILITIES.md');
 }
 
 /**
- * Write CLAUDE.md with swarm guidance
+ * Write SKILL.md with swarm guidance
  */
-async function writeClaudeMd(
+async function writeSkillMd(
   targetDir: string,
   options: InitOptions,
   result: InitResult
 ): Promise<void> {
-  const claudeMdPath = path.join(targetDir, 'CLAUDE.md');
+  const skillMdPath = path.join(targetDir, 'SKILL.md');
 
-  if (fs.existsSync(claudeMdPath) && !options.force) {
-    result.skipped.push('CLAUDE.md');
+  if (fs.existsSync(skillMdPath) && !options.force) {
+    result.skipped.push('SKILL.md');
     return;
   }
 
   // Determine template: explicit option > infer from components > 'standard'
   const inferredTemplate = (!options.components.commands && !options.components.agents) ? 'minimal' : undefined;
-  const content = generateClaudeMd(options, inferredTemplate);
+  const content = generateSkillMd(options, inferredTemplate);
 
-  fs.writeFileSync(claudeMdPath, content, 'utf-8');
-  result.created.files.push('CLAUDE.md');
+  fs.writeFileSync(skillMdPath, content, 'utf-8');
+  result.created.files.push('SKILL.md');
 }
 
 /**
@@ -1796,15 +1797,15 @@ function findSourceDir(type: 'skills' | 'commands' | 'agents', sourceBaseDir?: s
 
   // If explicit source base directory is provided, use it first
   if (sourceBaseDir) {
-    possiblePaths.push(path.join(sourceBaseDir, '.claude', type));
+    possiblePaths.push(path.join(sourceBaseDir, '.opencode', type));
   }
 
-  // IMPORTANT: Check the package's own .claude directory first
+  // IMPORTANT: Check the package's own .opencode directory first
   // This is the primary path when running as an npm package
   // __dirname is typically /path/to/node_modules/@claude-flow/cli/dist/src/init
   // We need to go up 3 levels to reach the package root (dist/src/init -> dist/src -> dist -> root)
   const packageRoot = path.resolve(__dirname, '..', '..', '..');
-  const packageDotClaude = path.join(packageRoot, '.claude', type);
+  const packageDotClaude = path.join(packageRoot, '.opencode', type);
   if (fs.existsSync(packageDotClaude)) {
     possiblePaths.unshift(packageDotClaude); // Add to beginning (highest priority)
   }
@@ -1812,11 +1813,11 @@ function findSourceDir(type: 'skills' | 'commands' | 'agents', sourceBaseDir?: s
   // From dist/src/init -> go up to project root
   const distPath = __dirname;
 
-  // Try to find the project root by looking for .claude directory
+  // Try to find the project root by looking for .opencode directory
   let currentDir = distPath;
   for (let i = 0; i < 10; i++) {
     const parentDir = path.dirname(currentDir);
-    const dotClaudePath = path.join(parentDir, '.claude', type);
+    const dotClaudePath = path.join(parentDir, '.opencode', type);
     if (fs.existsSync(dotClaudePath)) {
       possiblePaths.push(dotClaudePath);
     }
@@ -1825,17 +1826,17 @@ function findSourceDir(type: 'skills' | 'commands' | 'agents', sourceBaseDir?: s
 
   // Also check relative to process.cwd() for development
   const cwdBased = [
-    path.join(process.cwd(), '.claude', type),
-    path.join(process.cwd(), '..', '.claude', type),
-    path.join(process.cwd(), '..', '..', '.claude', type),
+    path.join(process.cwd(), '.opencode', type),
+    path.join(process.cwd(), '..', '.opencode', type),
+    path.join(process.cwd(), '..', '..', '.opencode', type),
   ];
   possiblePaths.push(...cwdBased);
 
   // Check v2 directory for agents
   if (type === 'agents') {
     possiblePaths.push(
-      path.join(process.cwd(), 'v2', '.claude', type),
-      path.join(process.cwd(), '..', 'v2', '.claude', type),
+      path.join(process.cwd(), 'v2', '.opencode', type),
+      path.join(process.cwd(), '..', 'v2', '.opencode', type),
     );
   }
 

@@ -53,10 +53,10 @@ export {
 } from './helpers-generator.js';
 
 export {
-  generateClaudeMd,
-  generateMinimalClaudeMd,
-  CLAUDE_MD_TEMPLATES,
-} from './claudemd-generator.js';
+  generateSkillMd,
+  generateMinimalSkillMd,
+  SKILL_MD_TEMPLATES,
+} from './skillmd-generator.js';
 
 // Main executor
 export { executeInit, executeUpgrade, executeUpgradeWithMissing, default } from './executor.js';

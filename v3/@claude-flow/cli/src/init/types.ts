@@ -10,15 +10,15 @@ import path from 'path';
  * Components that can be initialized
  */
 export interface InitComponents {
-  /** Create .claude/settings.json with hooks */
+  /** Create .opencode/settings.json with hooks */
   settings: boolean;
-  /** Copy skills to .claude/skills/ */
+  /** Copy skills to .opencode/skills/ */
   skills: boolean;
-  /** Copy commands to .claude/commands/ */
+  /** Copy commands to .opencode/commands/ */
   commands: boolean;
-  /** Copy agents to .claude/agents/ */
+  /** Copy agents to .opencode/agents/ */
   agents: boolean;
-  /** Create helper scripts in .claude/helpers/ */
+  /** Create helper scripts in .opencode/helpers/ */
   helpers: boolean;
   /** Configure statusline */
   statusline: boolean;
@@ -26,8 +26,8 @@ export interface InitComponents {
   mcp: boolean;
   /** Create .claude-flow/ directory (V3 runtime) */
   runtime: boolean;
-  /** Create CLAUDE.md with swarm guidance */
-  claudeMd: boolean;
+  /** Create SKILL.md with swarm guidance */
+  opencodeMd: boolean;
 }
 
 /**
@@ -185,11 +185,11 @@ export interface RuntimeConfig {
   /** Enable AgentMemoryScope (ADR-049) - 3-scope agent memory */
   enableAgentScopes?: boolean;
   /** CLAUDE.md template variant */
-  claudeMdTemplate?: ClaudeMdTemplate;
+  opencodeMdTemplate?: SkillMdTemplate;
 }
 
 /** Template variants for generated CLAUDE.md files */
-export type ClaudeMdTemplate = 'minimal' | 'standard' | 'full' | 'security' | 'performance' | 'solo';
+export type SkillMdTemplate = 'minimal' | 'standard' | 'full' | 'security' | 'performance' | 'solo';
 
 /**
  * Embeddings configuration
@@ -316,7 +316,7 @@ export const DEFAULT_INIT_OPTIONS: InitOptions = {
     statusline: true,
     mcp: true,
     runtime: true,
-    claudeMd: true,
+    opencodeMd: true,
   },
   hooks: {
     preToolUse: true,
@@ -413,7 +413,7 @@ export const MINIMAL_INIT_OPTIONS: InitOptions = {
     statusline: false,
     mcp: true,
     runtime: true,
-    claudeMd: true,
+    opencodeMd: true,
   },
   hooks: {
     ...DEFAULT_INIT_OPTIONS.hooks,
@@ -478,7 +478,7 @@ export const FULL_INIT_OPTIONS: InitOptions = {
     statusline: true,
     mcp: true,
     runtime: true,
-    claudeMd: true,
+    opencodeMd: true,
   },
   skills: {
     core: true,

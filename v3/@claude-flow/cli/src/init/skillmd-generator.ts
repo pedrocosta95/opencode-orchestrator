@@ -7,7 +7,7 @@
  * All templates use bullet-format rules with imperative keywords for enforceability.
  */
 
-import type { InitOptions, ClaudeMdTemplate } from './types.js';
+import type { InitOptions, SkillMdTemplate } from './types.js';
 
 // --- Section Generators (each returns enforceable markdown) ---
 
@@ -387,7 +387,7 @@ npx @claude-flow/cli@latest doctor --fix
 /**
  * Template section map — defines which sections are included per template.
  */
-const TEMPLATE_SECTIONS: Record<ClaudeMdTemplate, Array<(opts: InitOptions) => string>> = {
+const TEMPLATE_SECTIONS: Record<SkillMdTemplate, Array<(opts: InitOptions) => string>> = {
   minimal: [
     behavioralRules,
     fileOrganization,
@@ -485,10 +485,10 @@ const TEMPLATE_SECTIONS: Record<ClaudeMdTemplate, Array<(opts: InitOptions) => s
 
 /**
  * Generate CLAUDE.md content based on init options and template.
- * Template is determined by: options.runtime.claudeMdTemplate > explicit param > 'standard'
+ * Template is determined by: options.runtime.opencodeMdTemplate > explicit param > 'standard'
  */
-export function generateClaudeMd(options: InitOptions, template?: ClaudeMdTemplate): string {
-  const tmpl = template ?? options.runtime.claudeMdTemplate ?? 'standard';
+export function generateSkillMd(options: InitOptions, template?: SkillMdTemplate): string {
+  const tmpl = template ?? options.runtime.opencodeMdTemplate ?? 'standard';
   const sections = TEMPLATE_SECTIONS[tmpl] ?? TEMPLATE_SECTIONS.standard;
 
   const header = `# Claude Code Configuration - RuFlo V3\n`;
@@ -500,12 +500,12 @@ export function generateClaudeMd(options: InitOptions, template?: ClaudeMdTempla
 /**
  * Generate minimal CLAUDE.md content (backward-compatible alias).
  */
-export function generateMinimalClaudeMd(options: InitOptions): string {
-  return generateClaudeMd(options, 'minimal');
+export function generateMinimalSkillMd(options: InitOptions): string {
+  return generateSkillMd(options, 'minimal');
 }
 
 /** Available template names for CLI wizard */
-export const CLAUDE_MD_TEMPLATES: Array<{ name: ClaudeMdTemplate; description: string }> = [
+export const SKILL_MD_TEMPLATES: Array<{ name: SkillMdTemplate; description: string }> = [
   { name: 'minimal', description: 'Quick start — behavioral rules, anti-drift config, CLI reference (~120 lines)' },
   { name: 'standard', description: 'Recommended — swarm orchestration, agents, memory commands (~250 lines)' },
   { name: 'full', description: 'Everything — hooks, learning protocol, intelligence system (~400 lines)' },
@@ -514,4 +514,4 @@ export const CLAUDE_MD_TEMPLATES: Array<{ name: ClaudeMdTemplate; description: s
   { name: 'solo', description: 'Solo developer — no swarm, simple agent usage, memory commands (~150 lines)' },
 ];
 
-export default generateClaudeMd;
+export default generateSkillMd;
