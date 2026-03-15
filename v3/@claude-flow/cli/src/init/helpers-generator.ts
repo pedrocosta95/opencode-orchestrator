@@ -919,7 +919,7 @@ try {
  * Generate Windows PowerShell daemon manager
  */
 export function generateWindowsDaemonManager(): string {
-  return `# RuFlo V3 Daemon Manager for Windows
+  return `# OpenCode Orchestrator Daemon Manager for Windows
 # PowerShell script for managing background processes
 
 param(

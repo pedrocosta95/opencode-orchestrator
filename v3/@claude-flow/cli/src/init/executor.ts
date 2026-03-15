@@ -173,6 +173,9 @@ export async function executeInit(options: InitOptions): Promise<InitResult> {
   const targetDir = options.targetDir;
 
   try {
+    // Clean up old Claude Code files if they exist
+    await cleanupOldClaudeFiles(targetDir, result);
+
     // Create directory structure
     await createDirectories(targetDir, options, result);
 
@@ -693,6 +696,54 @@ export async function executeUpgradeWithMissing(targetDir: string, upgradeSettin
 }
 
 /**
+ * Clean up old Claude Code files (migration from previous versions)
+ */
+async function cleanupOldClaudeFiles(
+  targetDir: string,
+  result: InitResult
+): Promise<void> {
+  const oldPaths = [
+    '.claude',
+    '.claude/skills',
+    '.claude/commands',
+    '.claude/agents',
+    '.claude/helpers',
+    '.claude/settings.json',
+    'CLAUDE.md',
+    '.mcp.json',
+    '.claude-flow',
+    '.claude-flow/data',
+    '.claude-flow/logs',
+    '.claude-flow/sessions',
+    '.claude-flow/hooks',
+    '.claude-flow/agents',
+    '.claude-flow/workflows',
+    '.claude-flow/config.yaml',
+    '.claude-flow/CAPABILITIES.md',
+    '.claude-flow/memory.db',
+    '.claude-flow/hnsw.index',
+    '.claude-flow/session.json',
+  ];
+
+  for (const oldPath of oldPaths) {
+    const fullPath = path.join(targetDir, oldPath);
+    if (fs.existsSync(fullPath)) {
+      try {
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+          fs.rmSync(fullPath, { recursive: true, force: true });
+        } else {
+          fs.unlinkSync(fullPath);
+        }
+        result.skipped.push(`Cleaned up old: ${oldPath}`);
+      } catch (error) {
+        // Ignore errors during cleanup - files might be in use
+      }
+    }
+  }
+}
+
+/**
  * Create directory structure
  */
 async function createDirectories(
@@ -1155,7 +1206,7 @@ async function writeRuntimeConfig(
     return;
   }
 
-  const config = `# RuFlo V3 Runtime Configuration
+  const config = `# OpenCode Orchestrator Runtime Configuration
 # Generated: ${new Date().toISOString()}
 
 version: "3.0.0"
@@ -1356,9 +1407,9 @@ async function writeCapabilitiesDoc(
     return;
   }
 
-  const capabilities = `# RuFlo V3 - Complete Capabilities Reference
+  const capabilities = `# OpenCode Orchestrator - Complete Capabilities Reference
 > Generated: ${new Date().toISOString()}
-> Full documentation: https://github.com/ruvnet/claude-flow
+> Full documentation: https://github.com/pedrocosta95/opencode-orchestrator
 
 ## 📋 Table of Contents
 
@@ -1376,7 +1427,7 @@ async function writeCapabilitiesDoc(
 
 ## Overview
 
-RuFlo V3 is a domain-driven design architecture for multi-agent AI coordination with:
+OpenCode Orchestrator is a domain-driven design architecture for multi-agent AI coordination with:
 
 - **15-Agent Swarm Coordination** with hierarchical and mesh topologies
 - **HNSW Vector Search** - 150x-12,500x faster pattern retrieval

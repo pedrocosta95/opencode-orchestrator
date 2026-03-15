@@ -491,7 +491,7 @@ export function generateSkillMd(options: InitOptions, template?: SkillMdTemplate
   const tmpl = template ?? options.runtime.opencodeMdTemplate ?? 'standard';
   const sections = TEMPLATE_SECTIONS[tmpl] ?? TEMPLATE_SECTIONS.standard;
 
-  const header = `# Claude Code Configuration - RuFlo V3\n`;
+  const header = `# Claude Code Configuration - OpenCode Orchestrator\n`;
   const body = sections.map(fn => fn(options)).join('\n\n');
 
   return `${header}\n${body}\n`;

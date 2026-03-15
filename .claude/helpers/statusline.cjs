@@ -1,33 +1,6 @@
+#!/usr/bin/env node
 /**
- * Statusline Configuration Generator (Optimized)
- * Creates fast, reliable statusline for V3 progress display
- *
- * Performance:
- * - Single combined git execSync call (not 8+ separate ones)
- * - process.memoryUsage() instead of ps aux
- * - No recursive test file content reading
- * - Shared settings cache
- * - Strict 2s timeouts on all shell calls
- */
-
-import type { InitOptions } from './types.js';
-
-/**
- * Generate optimized statusline script
- * Output format:
- * ▊ OpenCode Orchestrator ● user  │  ⎇ branch  │  Opus 4.6
- * ─────────────────────────────────────────────────────
- * 🏗️  DDD Domains    [●●○○○]  2/5    ⚡ HNSW 150x
- * 🤖 Swarm  ◉ [ 5/15]  👥 2    🪝 10/17    🟢 CVE 3/3    💾 4MB    🧠  63%
- * 🔧 Architecture    ADRs ●71%  │  DDD ● 13%  │  Security ●CLEAN
- * 📊 AgentDB    Vectors ●3104⚡  │  Size 216KB  │  Tests ●6 (~24 cases)  │  MCP ●1/1
- */
-export function generateStatuslineScript(options: InitOptions): string {
-  const maxAgents = options.runtime.maxAgents;
-
-  return `#!/usr/bin/env node
-/**
- * OpenCode Orchestrator Statusline Generator (Optimized)
+ * RuFlo V3 Statusline Generator (Optimized)
  * Displays real-time V3 implementation progress and system status
  *
  * Usage: node statusline.cjs [--json] [--compact]
@@ -48,29 +21,29 @@ const os = require('os');
 
 // Configuration
 const CONFIG = {
-  maxAgents: ${maxAgents},
+  maxAgents: 15,
 };
 
 const CWD = process.cwd();
 
 // ANSI colors
 const c = {
-  reset: '\\x1b[0m',
-  bold: '\\x1b[1m',
-  dim: '\\x1b[2m',
-  red: '\\x1b[0;31m',
-  green: '\\x1b[0;32m',
-  yellow: '\\x1b[0;33m',
-  blue: '\\x1b[0;34m',
-  purple: '\\x1b[0;35m',
-  cyan: '\\x1b[0;36m',
-  brightRed: '\\x1b[1;31m',
-  brightGreen: '\\x1b[1;32m',
-  brightYellow: '\\x1b[1;33m',
-  brightBlue: '\\x1b[1;34m',
-  brightPurple: '\\x1b[1;35m',
-  brightCyan: '\\x1b[1;36m',
-  brightWhite: '\\x1b[1;37m',
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  dim: '\x1b[2m',
+  red: '\x1b[0;31m',
+  green: '\x1b[0;32m',
+  yellow: '\x1b[0;33m',
+  blue: '\x1b[0;34m',
+  purple: '\x1b[0;35m',
+  cyan: '\x1b[0;36m',
+  brightRed: '\x1b[1;31m',
+  brightGreen: '\x1b[1;32m',
+  brightYellow: '\x1b[1;33m',
+  brightBlue: '\x1b[1;34m',
+  brightPurple: '\x1b[1;35m',
+  brightCyan: '\x1b[1;36m',
+  brightWhite: '\x1b[1;37m',
 };
 
 // Safe execSync with strict timeout (returns empty string on failure)
@@ -108,9 +81,7 @@ function safeStat(filePath) {
 let _settingsCache = undefined;
 function getSettings() {
   if (_settingsCache !== undefined) return _settingsCache;
-  _settingsCache = readJSON(path.join(CWD, 'opencode.json'))
-                || readJSON(path.join(CWD, '.opencode', 'settings.json'))
-                || readJSON(path.join(CWD, '.claude', 'settings.json'))
+  _settingsCache = readJSON(path.join(CWD, '.claude', 'settings.json'))
                 || readJSON(path.join(CWD, '.claude', 'settings.local.json'))
                 || null;
   return _settingsCache;
@@ -146,7 +117,7 @@ function getGitInfo() {
 
     // Parse porcelain status
     if (parts[2]) {
-      for (const line of parts[2].split('\\n')) {
+      for (const line of parts[2].split('\n')) {
         if (!line || line.length < 2) continue;
         const x = line[0], y = line[1];
         if (x === '?' && y === '?') { result.untracked++; continue; }
@@ -156,7 +127,7 @@ function getGitInfo() {
     }
 
     // Parse ahead/behind
-    const ab = (parts[3] || '0 0').split(/\\s+/);
+    const ab = (parts[3] || '0 0').split(/\s+/);
     result.ahead = parseInt(ab[0]) || 0;
     result.behind = parseInt(ab[1]) || 0;
   }
@@ -208,7 +179,6 @@ function getModelName() {
 function getLearningStats() {
   const memoryPaths = [
     path.join(CWD, '.swarm', 'memory.db'),
-    path.join(CWD, '.opencode', 'memory.db'),
     path.join(CWD, '.claude-flow', 'memory.db'),
     path.join(CWD, '.claude', 'memory.db'),
     path.join(CWD, 'data', 'memory.db'),
@@ -244,8 +214,7 @@ function getV3Progress() {
   const learning = getLearningStats();
   const totalDomains = 5;
 
-  const dddData = readJSON(path.join(CWD, '.opencode', 'metrics', 'ddd-progress.json'))
-                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'ddd-progress.json'));
+  const dddData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'ddd-progress.json'));
   let dddProgress = dddData ? (dddData.progress || 0) : 0;
   let domainsCompleted = Math.min(5, Math.floor(dddProgress / 20));
 
@@ -268,8 +237,7 @@ function getV3Progress() {
 // Security status (pure file reads)
 function getSecurityStatus() {
   const totalCves = 3;
-  const auditData = readJSON(path.join(CWD, '.opencode', 'security', 'audit-status.json'))
-                || readJSON(path.join(CWD, '.claude-flow', 'security', 'audit-status.json'));
+  const auditData = readJSON(path.join(CWD, '.claude-flow', 'security', 'audit-status.json'));
   if (auditData) {
     return {
       status: auditData.status || 'PENDING',
@@ -295,8 +263,7 @@ function getSecurityStatus() {
 
 // Swarm status (pure file reads, NO ps aux)
 function getSwarmStatus() {
-  const activityData = readJSON(path.join(CWD, '.opencode', 'metrics', 'swarm-activity.json'))
-                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
+  const activityData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
   if (activityData && activityData.swarm) {
     return {
       activeAgents: activityData.swarm.agent_count || 0,
@@ -305,8 +272,7 @@ function getSwarmStatus() {
     };
   }
 
-  const progressData = readJSON(path.join(CWD, '.opencode', 'metrics', 'v3-progress.json'))
-                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'v3-progress.json'));
+  const progressData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'v3-progress.json'));
   if (progressData && progressData.swarm) {
     return {
       activeAgents: progressData.swarm.activeAgents || progressData.swarm.agent_count || 0,
@@ -325,8 +291,7 @@ function getSystemMetrics() {
   const agentdb = getAgentDBStats();
 
   // Intelligence from learning.json
-  const learningData = readJSON(path.join(CWD, '.opencode', 'metrics', 'learning.json'))
-                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'learning.json'));
+  const learningData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'learning.json'));
   let intelligencePct = 0;
   let contextPct = 0;
 
@@ -359,8 +324,7 @@ function getSystemMetrics() {
 
   // Sub-agents from file metrics (no ps aux)
   let subAgents = 0;
-  const activityData = readJSON(path.join(CWD, '.opencode', 'metrics', 'swarm-activity.json'))
-                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
+  const activityData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
   if (activityData && activityData.processes && activityData.processes.estimated_agents) {
     subAgents = activityData.processes.estimated_agents;
   }
@@ -370,8 +334,7 @@ function getSystemMetrics() {
 
 // ADR status (count files only — don't read contents)
 function getADRStatus() {
-  const complianceData = readJSON(path.join(CWD, '.opencode', 'metrics', 'adr-compliance.json'))
-                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'adr-compliance.json'));
+  const complianceData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'adr-compliance.json'));
   if (complianceData) {
     const checks = complianceData.checks || {};
     const total = Object.keys(checks).length;
@@ -383,7 +346,6 @@ function getADRStatus() {
   const adrPaths = [
     path.join(CWD, 'v3', 'implementation', 'adrs'),
     path.join(CWD, 'docs', 'adrs'),
-    path.join(CWD, '.opencode', 'adrs'),
     path.join(CWD, '.claude-flow', 'adrs'),
   ];
 
@@ -391,7 +353,7 @@ function getADRStatus() {
     try {
       if (fs.existsSync(adrPath)) {
         const files = fs.readdirSync(adrPath).filter(f =>
-          f.endsWith('.md') && (f.startsWith('ADR-') || f.startsWith('adr-') || /^\\d{4}-/.test(f))
+          f.endsWith('.md') && (f.startsWith('ADR-') || f.startsWith('adr-') || /^\d{4}-/.test(f))
         );
         const implemented = Math.floor(files.length * 0.7);
         const compliance = files.length > 0 ? Math.floor((implemented / files.length) * 100) : 0;
@@ -417,7 +379,7 @@ function getHooksStatus() {
   }
 
   try {
-    const hooksDir = path.join(CWD, '.opencode', 'hooks');
+    const hooksDir = path.join(CWD, '.claude', 'hooks');
     if (fs.existsSync(hooksDir)) {
       const hookFiles = fs.readdirSync(hooksDir).filter(f => f.endsWith('.js') || f.endsWith('.sh')).length;
       enabled = Math.max(enabled, hookFiles);
@@ -436,7 +398,6 @@ function getAgentDBStats() {
 
   const dbFiles = [
     path.join(CWD, '.swarm', 'memory.db'),
-    path.join(CWD, '.opencode', 'memory.db'),
     path.join(CWD, '.claude-flow', 'memory.db'),
     path.join(CWD, '.claude', 'memory.db'),
     path.join(CWD, 'data', 'memory.db'),
@@ -454,7 +415,6 @@ function getAgentDBStats() {
 
   if (vectorCount === 0) {
     const dbDirs = [
-      path.join(CWD, '.opencode', 'agentdb'),
       path.join(CWD, '.claude-flow', 'agentdb'),
       path.join(CWD, '.swarm', 'agentdb'),
       path.join(CWD, '.agentdb'),
@@ -476,7 +436,6 @@ function getAgentDBStats() {
   }
 
   const hnswPaths = [
-    path.join(CWD, '.opencode', 'hnsw.index'),
     path.join(CWD, '.swarm', 'hnsw.index'),
     path.join(CWD, '.claude-flow', 'hnsw.index'),
   ];
@@ -538,9 +497,7 @@ function getIntegrationStatus() {
   }
 
   if (mcpServers.total === 0) {
-    const mcpConfig = readJSON(path.join(CWD, 'opencode.json'))
-                   || readJSON(path.join(CWD, '.mcp.json'))
-                   || readJSON(path.join(os.homedir(), '.opencode', 'mcp.json'))
+    const mcpConfig = readJSON(path.join(CWD, '.mcp.json'))
                    || readJSON(path.join(os.homedir(), '.claude', 'mcp.json'));
     if (mcpConfig && mcpConfig.mcpServers) {
       const s = Object.keys(mcpConfig.mcpServers);
@@ -549,7 +506,7 @@ function getIntegrationStatus() {
     }
   }
 
-  const hasDatabase = ['.opencode/memory.db', '.swarm/memory.db', '.claude-flow/memory.db', 'data/memory.db']
+  const hasDatabase = ['.swarm/memory.db', '.claude-flow/memory.db', 'data/memory.db']
     .some(p => fs.existsSync(path.join(CWD, p)));
   const hasApi = !!(process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY);
 
@@ -558,7 +515,7 @@ function getIntegrationStatus() {
 
 // Session stats (pure file reads)
 function getSessionStats() {
-  var sessionPaths = ['.opencode/session.json', '.claude-flow/session.json', '.claude/session.json'];
+  var sessionPaths = ['.claude-flow/session.json', '.claude/session.json'];
   for (var i = 0; i < sessionPaths.length; i++) {
     const data = readJSON(path.join(CWD, sessionPaths[i]));
     if (data && data.startTime) {
@@ -576,7 +533,7 @@ function getSessionStats() {
 function progressBar(current, total) {
   const width = 5;
   const filled = Math.round((current / total) * width);
-  return '[' + '\\u25CF'.repeat(filled) + '\\u25CB'.repeat(width - filled) + ']';
+  return '[' + '\u25CF'.repeat(filled) + '\u25CB'.repeat(width - filled) + ']';
 }
 
 function generateStatusline() {
@@ -598,10 +555,10 @@ function generateStatusline() {
   const lines = [];
 
   // Header
-  let header = c.bold + c.brightPurple + '\\u258A OpenCode V3 ' + c.reset;
-  header += (swarm.coordinationActive ? c.brightCyan : c.dim) + '\\u25CF ' + c.brightCyan + git.name + c.reset;
+  let header = c.bold + c.brightPurple + '\u258A RuFlo V3 ' + c.reset;
+  header += (swarm.coordinationActive ? c.brightCyan : c.dim) + '\u25CF ' + c.brightCyan + git.name + c.reset;
   if (git.gitBranch) {
-    header += '  ' + c.dim + '\\u2502' + c.reset + '  ' + c.brightBlue + '\\u23C7 ' + git.gitBranch + c.reset;
+    header += '  ' + c.dim + '\u2502' + c.reset + '  ' + c.brightBlue + '\u23C7 ' + git.gitBranch + c.reset;
     const changes = git.modified + git.staged + git.untracked;
     if (changes > 0) {
       let ind = '';
@@ -610,75 +567,75 @@ function generateStatusline() {
       if (git.untracked > 0) ind += c.dim + '?' + git.untracked + c.reset;
       header += ' ' + ind;
     }
-    if (git.ahead > 0) header += ' ' + c.brightGreen + '\\u2191' + git.ahead + c.reset;
-    if (git.behind > 0) header += ' ' + c.brightRed + '\\u2193' + git.behind + c.reset;
+    if (git.ahead > 0) header += ' ' + c.brightGreen + '\u2191' + git.ahead + c.reset;
+    if (git.behind > 0) header += ' ' + c.brightRed + '\u2193' + git.behind + c.reset;
   }
-  header += '  ' + c.dim + '\\u2502' + c.reset + '  ' + c.purple + modelName + c.reset;
+  header += '  ' + c.dim + '\u2502' + c.reset + '  ' + c.purple + modelName + c.reset;
   // Show session duration from Claude Code stdin if available, else from local files
   const duration = costInfo ? costInfo.duration : session.duration;
-  if (duration) header += '  ' + c.dim + '\\u2502' + c.reset + '  ' + c.cyan + '\\u23F1 ' + duration + c.reset;
+  if (duration) header += '  ' + c.dim + '\u2502' + c.reset + '  ' + c.cyan + '\u23F1 ' + duration + c.reset;
   // Show context usage from Claude Code stdin if available
   if (ctxInfo && ctxInfo.usedPct > 0) {
     const ctxColor = ctxInfo.usedPct >= 90 ? c.brightRed : ctxInfo.usedPct >= 70 ? c.brightYellow : c.brightGreen;
-    header += '  ' + c.dim + '\\u2502' + c.reset + '  ' + ctxColor + '\\u25CF ' + ctxInfo.usedPct + '% ctx' + c.reset;
+    header += '  ' + c.dim + '\u2502' + c.reset + '  ' + ctxColor + '\u25CF ' + ctxInfo.usedPct + '% ctx' + c.reset;
   }
   // Show cost from Claude Code stdin if available
   if (costInfo && costInfo.costUsd > 0) {
-    header += '  ' + c.dim + '\\u2502' + c.reset + '  ' + c.brightYellow + '$' + costInfo.costUsd.toFixed(2) + c.reset;
+    header += '  ' + c.dim + '\u2502' + c.reset + '  ' + c.brightYellow + '$' + costInfo.costUsd.toFixed(2) + c.reset;
   }
   lines.push(header);
 
   // Separator
-  lines.push(c.dim + '\\u2500'.repeat(53) + c.reset);
+  lines.push(c.dim + '\u2500'.repeat(53) + c.reset);
 
   // Line 1: DDD Domains
   const domainsColor = progress.domainsCompleted >= 3 ? c.brightGreen : progress.domainsCompleted > 0 ? c.yellow : c.red;
   let perfIndicator;
   if (agentdb.hasHnsw && agentdb.vectorCount > 0) {
     const speedup = agentdb.vectorCount > 10000 ? '12500x' : agentdb.vectorCount > 1000 ? '150x' : '10x';
-    perfIndicator = c.brightGreen + '\\u26A1 HNSW ' + speedup + c.reset;
+    perfIndicator = c.brightGreen + '\u26A1 HNSW ' + speedup + c.reset;
   } else if (progress.patternsLearned > 0) {
     const pk = progress.patternsLearned >= 1000 ? (progress.patternsLearned / 1000).toFixed(1) + 'k' : String(progress.patternsLearned);
-    perfIndicator = c.brightYellow + '\\uD83D\\uDCDA ' + pk + ' patterns' + c.reset;
+    perfIndicator = c.brightYellow + '\uD83D\uDCDA ' + pk + ' patterns' + c.reset;
   } else {
-    perfIndicator = c.dim + '\\u26A1 target: 150x-12500x' + c.reset;
+    perfIndicator = c.dim + '\u26A1 target: 150x-12500x' + c.reset;
   }
   lines.push(
-    c.brightCyan + '\\uD83C\\uDFD7\\uFE0F  DDD Domains' + c.reset + '    ' + progressBar(progress.domainsCompleted, progress.totalDomains) + '  ' +
+    c.brightCyan + '\uD83C\uDFD7\uFE0F  DDD Domains' + c.reset + '    ' + progressBar(progress.domainsCompleted, progress.totalDomains) + '  ' +
     domainsColor + progress.domainsCompleted + c.reset + '/' + c.brightWhite + progress.totalDomains + c.reset + '    ' + perfIndicator
   );
 
   // Line 2: Swarm + Hooks + CVE + Memory + Intelligence
-  const swarmInd = swarm.coordinationActive ? c.brightGreen + '\\u25C9' + c.reset : c.dim + '\\u25CB' + c.reset;
+  const swarmInd = swarm.coordinationActive ? c.brightGreen + '\u25C9' + c.reset : c.dim + '\u25CB' + c.reset;
   const agentsColor = swarm.activeAgents > 0 ? c.brightGreen : c.red;
-  const secIcon = security.status === 'CLEAN' ? '\\uD83D\\uDFE2' : security.status === 'IN_PROGRESS' ? '\\uD83D\\uDFE1' : '\\uD83D\\uDD34';
+  const secIcon = security.status === 'CLEAN' ? '\uD83D\uDFE2' : security.status === 'IN_PROGRESS' ? '\uD83D\uDFE1' : '\uD83D\uDD34';
   const secColor = security.status === 'CLEAN' ? c.brightGreen : security.status === 'IN_PROGRESS' ? c.brightYellow : c.brightRed;
   const hooksColor = hooks.enabled > 0 ? c.brightGreen : c.dim;
   const intellColor = system.intelligencePct >= 80 ? c.brightGreen : system.intelligencePct >= 40 ? c.brightYellow : c.dim;
 
   lines.push(
-    c.brightYellow + '\\uD83E\\uDD16 Swarm' + c.reset + '  ' + swarmInd + ' [' + agentsColor + String(swarm.activeAgents).padStart(2) + c.reset + '/' + c.brightWhite + swarm.maxAgents + c.reset + ']  ' +
-    c.brightPurple + '\\uD83D\\uDC65 ' + system.subAgents + c.reset + '    ' +
-    c.brightBlue + '\\uD83E\\uDE9D ' + hooksColor + hooks.enabled + c.reset + '/' + c.brightWhite + hooks.total + c.reset + '    ' +
+    c.brightYellow + '\uD83E\uDD16 Swarm' + c.reset + '  ' + swarmInd + ' [' + agentsColor + String(swarm.activeAgents).padStart(2) + c.reset + '/' + c.brightWhite + swarm.maxAgents + c.reset + ']  ' +
+    c.brightPurple + '\uD83D\uDC65 ' + system.subAgents + c.reset + '    ' +
+    c.brightBlue + '\uD83E\uDE9D ' + hooksColor + hooks.enabled + c.reset + '/' + c.brightWhite + hooks.total + c.reset + '    ' +
     secIcon + ' ' + secColor + 'CVE ' + security.cvesFixed + c.reset + '/' + c.brightWhite + security.totalCves + c.reset + '    ' +
-    c.brightCyan + '\\uD83D\\uDCBE ' + system.memoryMB + 'MB' + c.reset + '    ' +
-    intellColor + '\\uD83E\\uDDE0 ' + String(system.intelligencePct).padStart(3) + '%' + c.reset
+    c.brightCyan + '\uD83D\uDCBE ' + system.memoryMB + 'MB' + c.reset + '    ' +
+    intellColor + '\uD83E\uDDE0 ' + String(system.intelligencePct).padStart(3) + '%' + c.reset
   );
 
   // Line 3: Architecture
   const dddColor = progress.dddProgress >= 50 ? c.brightGreen : progress.dddProgress > 0 ? c.yellow : c.red;
   const adrColor = adrs.count > 0 ? (adrs.implemented === adrs.count ? c.brightGreen : c.yellow) : c.dim;
-  const adrDisplay = adrs.compliance > 0 ? adrColor + '\\u25CF' + adrs.compliance + '%' + c.reset : adrColor + '\\u25CF' + adrs.implemented + '/' + adrs.count + c.reset;
+  const adrDisplay = adrs.compliance > 0 ? adrColor + '\u25CF' + adrs.compliance + '%' + c.reset : adrColor + '\u25CF' + adrs.implemented + '/' + adrs.count + c.reset;
 
   lines.push(
-    c.brightPurple + '\\uD83D\\uDD27 Architecture' + c.reset + '    ' +
-    c.cyan + 'ADRs' + c.reset + ' ' + adrDisplay + '  ' + c.dim + '\\u2502' + c.reset + '  ' +
-    c.cyan + 'DDD' + c.reset + ' ' + dddColor + '\\u25CF' + String(progress.dddProgress).padStart(3) + '%' + c.reset + '  ' + c.dim + '\\u2502' + c.reset + '  ' +
-    c.cyan + 'Security' + c.reset + ' ' + secColor + '\\u25CF' + security.status + c.reset
+    c.brightPurple + '\uD83D\uDD27 Architecture' + c.reset + '    ' +
+    c.cyan + 'ADRs' + c.reset + ' ' + adrDisplay + '  ' + c.dim + '\u2502' + c.reset + '  ' +
+    c.cyan + 'DDD' + c.reset + ' ' + dddColor + '\u25CF' + String(progress.dddProgress).padStart(3) + '%' + c.reset + '  ' + c.dim + '\u2502' + c.reset + '  ' +
+    c.cyan + 'Security' + c.reset + ' ' + secColor + '\u25CF' + security.status + c.reset
   );
 
   // Line 4: AgentDB, Tests, Integration
-  const hnswInd = agentdb.hasHnsw ? c.brightGreen + '\\u26A1' + c.reset : '';
+  const hnswInd = agentdb.hasHnsw ? c.brightGreen + '\u26A1' + c.reset : '';
   const sizeDisp = agentdb.dbSizeKB >= 1024 ? (agentdb.dbSizeKB / 1024).toFixed(1) + 'MB' : agentdb.dbSizeKB + 'KB';
   const vectorColor = agentdb.vectorCount > 0 ? c.brightGreen : c.dim;
   const testColor = tests.testFiles > 0 ? c.brightGreen : c.dim;
@@ -687,21 +644,21 @@ function generateStatusline() {
   if (integration.mcpServers.total > 0) {
     const mcpCol = integration.mcpServers.enabled === integration.mcpServers.total ? c.brightGreen :
                    integration.mcpServers.enabled > 0 ? c.brightYellow : c.red;
-    integStr += c.cyan + 'MCP' + c.reset + ' ' + mcpCol + '\\u25CF' + integration.mcpServers.enabled + '/' + integration.mcpServers.total + c.reset;
+    integStr += c.cyan + 'MCP' + c.reset + ' ' + mcpCol + '\u25CF' + integration.mcpServers.enabled + '/' + integration.mcpServers.total + c.reset;
   }
-  if (integration.hasDatabase) integStr += (integStr ? '  ' : '') + c.brightGreen + '\\u25C6' + c.reset + 'DB';
-  if (integration.hasApi) integStr += (integStr ? '  ' : '') + c.brightGreen + '\\u25C6' + c.reset + 'API';
-  if (!integStr) integStr = c.dim + '\\u25CF none' + c.reset;
+  if (integration.hasDatabase) integStr += (integStr ? '  ' : '') + c.brightGreen + '\u25C6' + c.reset + 'DB';
+  if (integration.hasApi) integStr += (integStr ? '  ' : '') + c.brightGreen + '\u25C6' + c.reset + 'API';
+  if (!integStr) integStr = c.dim + '\u25CF none' + c.reset;
 
   lines.push(
-    c.brightCyan + '\\uD83D\\uDCCA AgentDB' + c.reset + '    ' +
-    c.cyan + 'Vectors' + c.reset + ' ' + vectorColor + '\\u25CF' + agentdb.vectorCount + hnswInd + c.reset + '  ' + c.dim + '\\u2502' + c.reset + '  ' +
-    c.cyan + 'Size' + c.reset + ' ' + c.brightWhite + sizeDisp + c.reset + '  ' + c.dim + '\\u2502' + c.reset + '  ' +
-    c.cyan + 'Tests' + c.reset + ' ' + testColor + '\\u25CF' + tests.testFiles + c.reset + ' ' + c.dim + '(~' + tests.testCases + ' cases)' + c.reset + '  ' + c.dim + '\\u2502' + c.reset + '  ' +
+    c.brightCyan + '\uD83D\uDCCA AgentDB' + c.reset + '    ' +
+    c.cyan + 'Vectors' + c.reset + ' ' + vectorColor + '\u25CF' + agentdb.vectorCount + hnswInd + c.reset + '  ' + c.dim + '\u2502' + c.reset + '  ' +
+    c.cyan + 'Size' + c.reset + ' ' + c.brightWhite + sizeDisp + c.reset + '  ' + c.dim + '\u2502' + c.reset + '  ' +
+    c.cyan + 'Tests' + c.reset + ' ' + testColor + '\u25CF' + tests.testFiles + c.reset + ' ' + c.dim + '(~' + tests.testCases + ' cases)' + c.reset + '  ' + c.dim + '\u2502' + c.reset + '  ' +
     integStr
   );
 
-  return lines.join('\\n');
+  return lines.join('\n');
 }
 
 // JSON output
@@ -798,41 +755,4 @@ if (process.argv.includes('--json')) {
   console.log(JSON.stringify(generateJSON()));
 } else {
   console.log(generateStatusline());
-}
-`;
-}
-
-/**
- * Generate statusline hook for shell integration
- */
-export function generateStatuslineHook(options: InitOptions): string {
-  if (!options.statusline.enabled) {
-    return '#!/bin/bash\n# Statusline disabled\n';
-  }
-
-  return `#!/bin/bash
-# OpenCode Orchestrator V3 Statusline Hook
-# Source this in your .bashrc/.zshrc for terminal statusline
-
-# Function to get statusline
-opencode_statusline() {
-  local statusline_script="\${OPENCODE_DIR:-.opencode}/helpers/statusline.cjs"
-  if [ -f "$statusline_script" ]; then
-    node "$statusline_script" 2>/dev/null || echo ""
-  fi
-}
-
-# Bash: Add to PS1
-# export PS1='$(opencode_statusline) \\n\\$ '
-
-# Zsh: Add to RPROMPT
-# export RPROMPT='$(opencode_statusline)'
-
-# OpenCode: Add to opencode.json
-# "statusLine": {
-#   "type": "command",
-#   "command": "node .opencode/helpers/statusline.cjs 2>/dev/null"
-#   "when": "test -f .opencode/helpers/statusline.cjs"
-# }
-`;
 }

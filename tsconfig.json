@@ -14,7 +14,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
@@ -33,6 +32,24 @@
     "dist",
     "**/*.test.ts",
     "**/*.bench.ts",
-    "v3/__tests__/**/*.ts"
+    "v3/__tests__/**/*.ts",
+    "v3/@claude-flow/*/examples/**/*.ts",
+    "v3/@claude-flow/plugins/examples/**/*.ts",
+    "v3/index.ts",
+    "v3/@claude-flow/*/vitest.config.ts",
+    "v3/@claude-flow/security/__tests__/**/*.ts",
+    "v3/@claude-flow/providers/src/__tests__/**/*.ts",
+    "v3/@claude-flow/performance/src/examples/**/*.ts",
+    "v3/@claude-flow/testing/src/regression/**/*.ts",
+    "v3/@claude-flow/performance/src/attention-benchmarks.ts",
+    "v3/@claude-flow/performance/src/attention-integration.ts",
+    "v3/mcp/**/*.ts",
+    "v3/plugins/**/*.ts",
+    "v3/@claude-flow/memory/src/sqljs-backend.ts",
+    "v3/@claude-flow/shared/src/events/event-store.ts",
+    "v3/@claude-flow/testing/src/regression/**/*.ts",
+    "v3/vitest.config.ts",
+    "v3/swarm.config.ts",
+    "v3/src/task-execution/**/*.ts"
   ]
 }

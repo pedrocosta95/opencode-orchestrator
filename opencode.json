@@ -1,84 +1,41 @@
 {
-  "$schema": "https://opencode.dev/schema.json",
-  "version": "1.0.0",
-  "name": "opencode-orchestrator",
-  "description": "OpenCode Orchestrator - Multi-agent coordination system",
+  "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "servers": {
-      "claude-flow": {
-        "command": "npx",
-        "args": ["claude-flow@v3alpha", "mcp", "start"],
-        "description": "Claude Flow MCP server for memory, neural, and intelligence features"
-      },
-      "ruv-swarm": {
-        "command": "npx",
-        "args": ["ruv-swarm", "mcp", "start"],
-        "description": "Ruv Swarm for hierarchical and mesh topology swarm coordination"
-      },
-      "flow-nexus": {
-        "command": "npx",
-        "args": ["flow-nexus@latest", "mcp", "start"],
-        "description": "Flow Nexus platform integration"
-      }
+    "claude-flow": {
+      "type": "local",
+      "command": ["npx", "-y", "claude-flow@v3alpha", "mcp", "start"],
+      "enabled": true
+    },
+    "ruv-swarm": {
+      "type": "local",
+      "command": ["npx", "-y", "ruv-swarm", "mcp", "start"],
+      "enabled": true
+    },
+    "flow-nexus": {
+      "type": "local",
+      "command": ["npx", "-y", "flow-nexus@latest", "mcp", "start"],
+      "enabled": true
     }
   },
-  "skills": {
-    "directories": [
-      ".opencode/skills",
-      ".claude/skills",
-      ".agents/skills"
-    ]
+  "agent": {
+    "orchestrator": {
+      "description": "AI coding orchestrator that delegates tasks to specialist agents",
+      "model": "opencode-go/glm-5",
+      "mode": "primary"
+    }
   },
-  "agents": {
-    "directory": ".opencode/agents",
-    "definitions": [
-      "coordinator.yaml",
-      "researcher.yaml",
-      "architect.yaml",
-      "coder.yaml",
-      "reviewer.yaml",
-      "tester.yaml",
-      "security-architect.yaml",
-      "performance-engineer.yaml"
-    ]
-  },
-  "permissions": {
-    "allow": [
-      "read",
-      "write",
-      "edit",
-      "glob",
-      "grep",
-      "ast_grep_search",
-      "ast_grep_replace",
-      "bash",
-      "lsp_goto_definition",
-      "lsp_find_references",
-      "lsp_rename",
-      "lsp_diagnostics",
-      "read",
-      "question",
-      "skill"
-    ],
-    "requireApproval": [
-      "bash:rm -rf",
-      "bash:git push",
-      "bash:git force",
-      "write:.env",
-      "write:credentials"
-    ]
-  },
-  "defaults": {
-    "model": "sonnet",
-    "maxTokens": 100000,
-    "temperature": 0.7
-  },
-  "paths": {
-    "workdir": ".",
-    "src": "src",
-    "tests": "tests",
-    "docs": "docs",
-    "config": "config",
-    "scripts": "scripts"
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow",
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "list": "allow",
+    "skill": "allow",
+    "todowrite": "allow",
+    "todoread": "allow",
+    "websearch": "allow",
+    "question": "allow"
   }
 }
