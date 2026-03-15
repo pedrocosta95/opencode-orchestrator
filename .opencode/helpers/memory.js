@@ -7,7 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const MEMORY_DIR = path.join(process.cwd(), '.claude-flow', 'data');
+const MEMORY_DIR = path.join(process.cwd(), '.opencode', 'data');
 const MEMORY_FILE = path.join(MEMORY_DIR, 'memory.json');
 
 function loadMemory() {

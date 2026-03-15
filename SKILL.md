@@ -1,4 +1,4 @@
-# Claude Code Configuration - RuFlo V3
+# Claude Code Configuration - OpenCode Orchestrator
 
 ## Behavioral Rules (Always Enforced)
 

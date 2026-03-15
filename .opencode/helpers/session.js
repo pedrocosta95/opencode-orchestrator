@@ -7,7 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SESSION_DIR = path.join(process.cwd(), '.claude-flow', 'sessions');
+const SESSION_DIR = path.join(process.cwd(), '.opencode', 'sessions');
 const SESSION_FILE = path.join(SESSION_DIR, 'current.json');
 
 const commands = {

@@ -10,11 +10,11 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const DATA_DIR = path.join(process.cwd(), '.claude-flow', 'data');
+const DATA_DIR = path.join(process.cwd(), '.opencode', 'data');
 const STORE_PATH = path.join(DATA_DIR, 'auto-memory-store.json');
 const RANKED_PATH = path.join(DATA_DIR, 'ranked-context.json');
 const PENDING_PATH = path.join(DATA_DIR, 'pending-insights.jsonl');
-const SESSION_DIR = path.join(process.cwd(), '.claude-flow', 'sessions');
+const SESSION_DIR = path.join(process.cwd(), '.opencode', 'sessions');
 const SESSION_FILE = path.join(SESSION_DIR, 'current.json');
 
 function ensureDir(dir) {
@@ -57,8 +57,8 @@ function tokenize(text) {
 function bootstrapFromMemoryFiles() {
   var entries = [];
   var candidates = [
-    path.join(os.homedir(), ".claude", "projects"),
-    path.join(process.cwd(), ".claude-flow", "memory"),
+    path.join(os.homedir(), ".opencode", "projects"),
+    path.join(process.cwd(), ".opencode", "memory"),
     path.join(process.cwd(), ".claude", "memory"),
   ];
   for (var i = 0; i < candidates.length; i++) {

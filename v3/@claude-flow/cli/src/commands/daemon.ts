@@ -432,7 +432,7 @@ const statusCommand: Command = {
           `Workers Enabled: ${status.config.workers.filter(w => w.enabled).length}`,
           `Max Concurrent: ${status.config.maxConcurrent}`,
         ].filter(Boolean).join('\n'),
-        'RuFlo Daemon'
+        'OpenCode Daemon'
       );
 
       output.writeln();
@@ -512,7 +512,7 @@ const statusCommand: Command = {
           '',
           'Run "claude-flow daemon start" to start the daemon',
         ].join('\n'),
-        'RuFlo Daemon'
+        'OpenCode Daemon'
       );
 
       return { success: true };
@@ -647,7 +647,7 @@ export const daemonCommand: Command = {
   ],
   action: async (): Promise<CommandResult> => {
     output.writeln();
-    output.writeln(output.bold('RuFlo Daemon - Background Task Management'));
+    output.writeln(output.bold('OpenCode Daemon - Background Task Management'));
     output.writeln();
     output.writeln('Node.js-based background worker system that auto-runs like shell daemons.');
     output.writeln('Manages 12 specialized workers for continuous optimization and monitoring.');

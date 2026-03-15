@@ -1,6 +1,6 @@
 {
   "name": "@opencode-orchestrator/cli",
-  "version": "3.5.15",
+  "version": "3.6.1",
   "type": "module",
   "description": "OpenCode Orchestrator CLI - Enterprise AI agent orchestration with 60+ specialized agents, swarm coordination, MCP server, self-learning hooks, and vector memory",
   "main": "dist/src/index.js",
