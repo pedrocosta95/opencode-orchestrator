@@ -1,6 +1,6 @@
 /**
  * Settings.json Generator
- * Creates .claude/settings.json with V3-optimized hook configurations
+ * Creates opencode.json with V3-optimized hook configurations
  */
 
 import type { InitOptions, HooksConfig, PlatformInfo } from './types.js';
@@ -36,30 +36,30 @@ export function generateSettings(options: InitOptions): object {
     ],
   };
 
-  // Add claude-flow attribution for git commits and PRs
+  // Add opencode-orchestrator attribution for git commits and PRs
   settings.attribution = {
-    commit: 'Co-Authored-By: claude-flow <ruv@ruv.net>',
-    pr: '🤖 Generated with [claude-flow](https://github.com/ruvnet/claude-flow)',
+    commit: 'Co-Authored-By: opencode-orchestrator <noreply@cloudpftc.com>',
+    pr: '🤖 Generated with [opencode-orchestrator](https://github.com/pedrocosta95/opencode-orchestrator)',
   };
 
-  // Note: Claude Code expects 'model' to be a string, not an object
-  // Model preferences are stored in claudeFlow settings instead
+  // Note: OpenCode expects 'model' to be a string, not an object
+  // Model preferences are stored in opencode settings instead
   // settings.model = 'claude-sonnet-4-5-20250929'; // Uncomment if you want to set a default model
 
   // Add Agent Teams configuration (experimental feature)
   settings.env = {
-    // Enable Claude Code Agent Teams for multi-agent coordination
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: '1',
-    // Claude Flow specific environment
-    CLAUDE_FLOW_V3_ENABLED: 'true',
-    CLAUDE_FLOW_HOOKS_ENABLED: 'true',
+    // Enable OpenCode Agent Teams for multi-agent coordination
+    OPENCODE_EXPERIMENTAL_AGENT_TEAMS: '1',
+    // OpenCode Orchestrator specific environment
+    OPENCODE_V3_ENABLED: 'true',
+    OPENCODE_HOOKS_ENABLED: 'true',
   };
 
   // Detect platform for platform-aware configuration
   const platform = detectPlatform();
 
   // Add V3-specific settings
-  settings.claudeFlow = {
+  settings.opencode = {
     version: '3.0.0',
     enabled: true,
     platform: {
@@ -187,27 +187,27 @@ function hookCmdEsm(script: string, subcommand: string): string {
 
 /** Shorthand for CJS hook-handler commands */
 function hookHandlerCmd(subcommand: string): string {
-  return hookCmd('"$CLAUDE_PROJECT_DIR/.claude/helpers/hook-handler.cjs"', subcommand);
+  return hookCmd('"$OPENCODE_PROJECT_DIR/.opencode/helpers/hook-handler.cjs"', subcommand);
 }
 
 /** Shorthand for ESM auto-memory-hook commands */
 function autoMemoryCmd(subcommand: string): string {
-  return hookCmdEsm('"$CLAUDE_PROJECT_DIR/.claude/helpers/auto-memory-hook.mjs"', subcommand);
+  return hookCmdEsm('"$OPENCODE_PROJECT_DIR/.opencode/helpers/auto-memory-hook.mjs"', subcommand);
 }
 
 /**
- * Generate statusLine configuration for Claude Code
+ * Generate statusLine configuration for OpenCode
  * Uses local helper script for cross-platform compatibility (no npx cold-start)
  */
 function generateStatusLineConfig(_options: InitOptions): object {
-  // Claude Code pipes JSON session data to the script via stdin.
+  // OpenCode pipes JSON session data to the script via stdin.
   // Valid fields: type, command, padding (optional).
   // The script runs after each assistant message (debounced 300ms).
-  // NOTE: statusline must NOT use `cmd /c` — Claude Code manages its stdin
+  // NOTE: statusline must NOT use `cmd /c` — OpenCode manages its stdin
   // directly for statusline commands, and `cmd /c` blocks stdin forwarding.
   return {
     type: 'command',
-    command: `node "$CLAUDE_PROJECT_DIR/.claude/helpers/statusline.cjs"`,
+    command: `node "$OPENCODE_PROJECT_DIR/.opencode/helpers/statusline.cjs"`,
   };
 }
 

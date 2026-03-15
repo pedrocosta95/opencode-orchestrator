@@ -108,7 +108,9 @@ function safeStat(filePath) {
 let _settingsCache = undefined;
 function getSettings() {
   if (_settingsCache !== undefined) return _settingsCache;
-  _settingsCache = readJSON(path.join(CWD, '.claude', 'settings.json'))
+  _settingsCache = readJSON(path.join(CWD, 'opencode.json'))
+                || readJSON(path.join(CWD, '.opencode', 'settings.json'))
+                || readJSON(path.join(CWD, '.claude', 'settings.json'))
                 || readJSON(path.join(CWD, '.claude', 'settings.local.json'))
                 || null;
   return _settingsCache;
@@ -206,6 +208,7 @@ function getModelName() {
 function getLearningStats() {
   const memoryPaths = [
     path.join(CWD, '.swarm', 'memory.db'),
+    path.join(CWD, '.opencode', 'memory.db'),
     path.join(CWD, '.claude-flow', 'memory.db'),
     path.join(CWD, '.claude', 'memory.db'),
     path.join(CWD, 'data', 'memory.db'),
@@ -241,7 +244,8 @@ function getV3Progress() {
   const learning = getLearningStats();
   const totalDomains = 5;
 
-  const dddData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'ddd-progress.json'));
+  const dddData = readJSON(path.join(CWD, '.opencode', 'metrics', 'ddd-progress.json'))
+                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'ddd-progress.json'));
   let dddProgress = dddData ? (dddData.progress || 0) : 0;
   let domainsCompleted = Math.min(5, Math.floor(dddProgress / 20));
 
@@ -264,7 +268,8 @@ function getV3Progress() {
 // Security status (pure file reads)
 function getSecurityStatus() {
   const totalCves = 3;
-  const auditData = readJSON(path.join(CWD, '.claude-flow', 'security', 'audit-status.json'));
+  const auditData = readJSON(path.join(CWD, '.opencode', 'security', 'audit-status.json'))
+                || readJSON(path.join(CWD, '.claude-flow', 'security', 'audit-status.json'));
   if (auditData) {
     return {
       status: auditData.status || 'PENDING',
@@ -290,7 +295,8 @@ function getSecurityStatus() {
 
 // Swarm status (pure file reads, NO ps aux)
 function getSwarmStatus() {
-  const activityData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
+  const activityData = readJSON(path.join(CWD, '.opencode', 'metrics', 'swarm-activity.json'))
+                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
   if (activityData && activityData.swarm) {
     return {
       activeAgents: activityData.swarm.agent_count || 0,
@@ -299,7 +305,8 @@ function getSwarmStatus() {
     };
   }
 
-  const progressData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'v3-progress.json'));
+  const progressData = readJSON(path.join(CWD, '.opencode', 'metrics', 'v3-progress.json'))
+                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'v3-progress.json'));
   if (progressData && progressData.swarm) {
     return {
       activeAgents: progressData.swarm.activeAgents || progressData.swarm.agent_count || 0,
@@ -318,7 +325,8 @@ function getSystemMetrics() {
   const agentdb = getAgentDBStats();
 
   // Intelligence from learning.json
-  const learningData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'learning.json'));
+  const learningData = readJSON(path.join(CWD, '.opencode', 'metrics', 'learning.json'))
+                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'learning.json'));
   let intelligencePct = 0;
   let contextPct = 0;
 
@@ -351,7 +359,8 @@ function getSystemMetrics() {
 
   // Sub-agents from file metrics (no ps aux)
   let subAgents = 0;
-  const activityData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
+  const activityData = readJSON(path.join(CWD, '.opencode', 'metrics', 'swarm-activity.json'))
+                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'swarm-activity.json'));
   if (activityData && activityData.processes && activityData.processes.estimated_agents) {
     subAgents = activityData.processes.estimated_agents;
   }
@@ -361,7 +370,8 @@ function getSystemMetrics() {
 
 // ADR status (count files only — don't read contents)
 function getADRStatus() {
-  const complianceData = readJSON(path.join(CWD, '.claude-flow', 'metrics', 'adr-compliance.json'));
+  const complianceData = readJSON(path.join(CWD, '.opencode', 'metrics', 'adr-compliance.json'))
+                || readJSON(path.join(CWD, '.claude-flow', 'metrics', 'adr-compliance.json'));
   if (complianceData) {
     const checks = complianceData.checks || {};
     const total = Object.keys(checks).length;
@@ -373,6 +383,7 @@ function getADRStatus() {
   const adrPaths = [
     path.join(CWD, 'v3', 'implementation', 'adrs'),
     path.join(CWD, 'docs', 'adrs'),
+    path.join(CWD, '.opencode', 'adrs'),
     path.join(CWD, '.claude-flow', 'adrs'),
   ];
 
@@ -406,7 +417,7 @@ function getHooksStatus() {
   }
 
   try {
-    const hooksDir = path.join(CWD, '.claude', 'hooks');
+    const hooksDir = path.join(CWD, '.opencode', 'hooks');
     if (fs.existsSync(hooksDir)) {
       const hookFiles = fs.readdirSync(hooksDir).filter(f => f.endsWith('.js') || f.endsWith('.sh')).length;
       enabled = Math.max(enabled, hookFiles);
@@ -425,6 +436,7 @@ function getAgentDBStats() {
 
   const dbFiles = [
     path.join(CWD, '.swarm', 'memory.db'),
+    path.join(CWD, '.opencode', 'memory.db'),
     path.join(CWD, '.claude-flow', 'memory.db'),
     path.join(CWD, '.claude', 'memory.db'),
     path.join(CWD, 'data', 'memory.db'),
@@ -442,6 +454,7 @@ function getAgentDBStats() {
 
   if (vectorCount === 0) {
     const dbDirs = [
+      path.join(CWD, '.opencode', 'agentdb'),
       path.join(CWD, '.claude-flow', 'agentdb'),
       path.join(CWD, '.swarm', 'agentdb'),
       path.join(CWD, '.agentdb'),
@@ -463,6 +476,7 @@ function getAgentDBStats() {
   }
 
   const hnswPaths = [
+    path.join(CWD, '.opencode', 'hnsw.index'),
     path.join(CWD, '.swarm', 'hnsw.index'),
     path.join(CWD, '.claude-flow', 'hnsw.index'),
   ];
@@ -524,7 +538,9 @@ function getIntegrationStatus() {
   }
 
   if (mcpServers.total === 0) {
-    const mcpConfig = readJSON(path.join(CWD, '.mcp.json'))
+    const mcpConfig = readJSON(path.join(CWD, 'opencode.json'))
+                   || readJSON(path.join(CWD, '.mcp.json'))
+                   || readJSON(path.join(os.homedir(), '.opencode', 'mcp.json'))
                    || readJSON(path.join(os.homedir(), '.claude', 'mcp.json'));
     if (mcpConfig && mcpConfig.mcpServers) {
       const s = Object.keys(mcpConfig.mcpServers);
@@ -533,7 +549,7 @@ function getIntegrationStatus() {
     }
   }
 
-  const hasDatabase = ['.swarm/memory.db', '.claude-flow/memory.db', 'data/memory.db']
+  const hasDatabase = ['.opencode/memory.db', '.swarm/memory.db', '.claude-flow/memory.db', 'data/memory.db']
     .some(p => fs.existsSync(path.join(CWD, p)));
   const hasApi = !!(process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY);
 
@@ -542,7 +558,7 @@ function getIntegrationStatus() {
 
 // Session stats (pure file reads)
 function getSessionStats() {
-  var sessionPaths = ['.claude-flow/session.json', '.claude/session.json'];
+  var sessionPaths = ['.opencode/session.json', '.claude-flow/session.json', '.claude/session.json'];
   for (var i = 0; i < sessionPaths.length; i++) {
     const data = readJSON(path.join(CWD, sessionPaths[i]));
     if (data && data.startTime) {
@@ -582,7 +598,7 @@ function generateStatusline() {
   const lines = [];
 
   // Header
-  let header = c.bold + c.brightPurple + '\\u258A RuFlo V3 ' + c.reset;
+  let header = c.bold + c.brightPurple + '\\u258A OpenCode V3 ' + c.reset;
   header += (swarm.coordinationActive ? c.brightCyan : c.dim) + '\\u25CF ' + c.brightCyan + git.name + c.reset;
   if (git.gitBranch) {
     header += '  ' + c.dim + '\\u2502' + c.reset + '  ' + c.brightBlue + '\\u23C7 ' + git.gitBranch + c.reset;
@@ -795,28 +811,28 @@ export function generateStatuslineHook(options: InitOptions): string {
   }
 
   return `#!/bin/bash
-# RuFlo V3 Statusline Hook
+# OpenCode Orchestrator V3 Statusline Hook
 # Source this in your .bashrc/.zshrc for terminal statusline
 
 # Function to get statusline
-claude_flow_statusline() {
-  local statusline_script="\${CLAUDE_FLOW_DIR:-.claude}/helpers/statusline.cjs"
+opencode_statusline() {
+  local statusline_script="\${OPENCODE_DIR:-.opencode}/helpers/statusline.cjs"
   if [ -f "$statusline_script" ]; then
     node "$statusline_script" 2>/dev/null || echo ""
   fi
 }
 
 # Bash: Add to PS1
-# export PS1='$(claude_flow_statusline) \\n\\$ '
+# export PS1='$(opencode_statusline) \\n\\$ '
 
 # Zsh: Add to RPROMPT
-# export RPROMPT='$(claude_flow_statusline)'
+# export RPROMPT='$(opencode_statusline)'
 
-# Claude Code: Add to .claude/settings.json
+# OpenCode: Add to opencode.json
 # "statusLine": {
 #   "type": "command",
-#   "command": "node .claude/helpers/statusline.cjs 2>/dev/null"
-#   "when": "test -f .claude/helpers/statusline.cjs"
+#   "command": "node .opencode/helpers/statusline.cjs 2>/dev/null"
+#   "when": "test -f .opencode/helpers/statusline.cjs"
 # }
 `;
 }

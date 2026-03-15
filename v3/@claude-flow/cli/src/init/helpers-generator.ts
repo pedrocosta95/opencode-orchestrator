@@ -1,6 +1,6 @@
 /**
  * Helpers Generator
- * Creates utility scripts in .claude/helpers/
+ * Creates utility scripts in .opencode/helpers/
  */
 
 import type { InitOptions } from './types.js';
@@ -75,7 +75,7 @@ export function generateSessionManager(): string {
 const fs = require('fs');
 const path = require('path');
 
-const SESSION_DIR = path.join(process.cwd(), '.claude-flow', 'sessions');
+const SESSION_DIR = path.join(process.cwd(), '.opencode', 'sessions');
 const SESSION_FILE = path.join(SESSION_DIR, 'current.json');
 
 const commands = {
@@ -282,7 +282,7 @@ export function generateMemoryHelper(): string {
 const fs = require('fs');
 const path = require('path');
 
-const MEMORY_DIR = path.join(process.cwd(), '.claude-flow', 'data');
+const MEMORY_DIR = path.join(process.cwd(), '.opencode', 'data');
 const MEMORY_FILE = path.join(MEMORY_DIR, 'memory.json');
 
 function loadMemory() {
@@ -613,11 +613,11 @@ export function generateIntelligenceStub(): string {
     "const path = require('path');",
     "const os = require('os');",
     '',
-    "const DATA_DIR = path.join(process.cwd(), '.claude-flow', 'data');",
+    "const DATA_DIR = path.join(process.cwd(), '.opencode', 'data');",
     "const STORE_PATH = path.join(DATA_DIR, 'auto-memory-store.json');",
     "const RANKED_PATH = path.join(DATA_DIR, 'ranked-context.json');",
     "const PENDING_PATH = path.join(DATA_DIR, 'pending-insights.jsonl');",
-    "const SESSION_DIR = path.join(process.cwd(), '.claude-flow', 'sessions');",
+    "const SESSION_DIR = path.join(process.cwd(), '.opencode', 'sessions');",
     "const SESSION_FILE = path.join(SESSION_DIR, 'current.json');",
     '',
     'function ensureDir(dir) {',
@@ -660,8 +660,8 @@ export function generateIntelligenceStub(): string {
     'function bootstrapFromMemoryFiles() {',
     '  var entries = [];',
     '  var candidates = [',
-    '    path.join(os.homedir(), ".claude", "projects"),',
-    '    path.join(process.cwd(), ".claude-flow", "memory"),',
+    '    path.join(os.homedir(), ".opencode", "projects"),',
+    '    path.join(process.cwd(), ".opencode", "memory"),',
     '    path.join(process.cwd(), ".claude", "memory"),',
     '  ];',
     '  for (var i = 0; i < candidates.length; i++) {',
@@ -826,7 +826,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PROJECT_ROOT = join(__dirname, '../..');
-const DATA_DIR = join(PROJECT_ROOT, '.claude-flow', 'data');
+const DATA_DIR = join(PROJECT_ROOT, '.opencode', 'data');
 const STORE_PATH = join(DATA_DIR, 'auto-memory-store.json');
 
 const DIM = '\\x1b[2m';
@@ -929,8 +929,8 @@ param(
 )
 
 $ErrorActionPreference = 'SilentlyContinue'
-$ClaudeFlowDir = Join-Path $PWD '.claude-flow'
-$PidDir = Join-Path $ClaudeFlowDir 'pids'
+$OpenCodeDir = Join-Path $PWD '.opencode'
+$PidDir = Join-Path $OpenCodeDir 'pids'
 
 # Ensure directories exist
 if (-not (Test-Path $PidDir)) {
@@ -962,7 +962,7 @@ function Start-SwarmMonitor {
     Write-Host "Starting swarm monitor..." -ForegroundColor Cyan
     $process = Start-Process -FilePath 'node' -ArgumentList @(
         '-e',
-        'setInterval(() => { require("fs").writeFileSync(".claude-flow/metrics/swarm-activity.json", JSON.stringify({swarm:{active:true,agent_count:0},timestamp:Date.now()})) }, 5000)'
+        'setInterval(() => { require("fs").writeFileSync(".opencode/metrics/swarm-activity.json", JSON.stringify({swarm:{active:true,agent_count:0},timestamp:Date.now()})) }, 5000)'
     ) -PassThru -WindowStyle Hidden
 
     $process.Id | Out-File $pidFile
@@ -985,8 +985,8 @@ function Stop-SwarmMonitor {
 
 function Show-Status {
     Write-Host ""
-    Write-Host "RuFlo V3 Daemon Status" -ForegroundColor Cyan
-    Write-Host "=============================" -ForegroundColor Cyan
+    Write-Host "OpenCode Orchestrator V3 Daemon Status" -ForegroundColor Cyan
+    Write-Host "=========================================" -ForegroundColor Cyan
 
     $swarmPid = Join-Path $PidDir 'swarm-monitor.pid'
     $swarmStatus = Get-DaemonStatus -Name 'swarm-monitor' -PidFile $swarmPid
@@ -1026,7 +1026,7 @@ switch ($Action) {
  */
 export function generateWindowsBatchWrapper(): string {
   return `@echo off
-REM RuFlo V3 - Windows Batch Wrapper
+REM OpenCode Orchestrator V3 - Windows Batch Wrapper
 REM Routes to PowerShell daemon manager
 
 PowerShell -ExecutionPolicy Bypass -File "%~dp0daemon-manager.ps1" %*
@@ -1039,7 +1039,7 @@ PowerShell -ExecutionPolicy Bypass -File "%~dp0daemon-manager.ps1" %*
 export function generateCrossPlatformSessionManager(): string {
   return `#!/usr/bin/env node
 /**
- * Claude Flow Cross-Platform Session Manager
+ * OpenCode Orchestrator Cross-Platform Session Manager
  * Works on Windows, macOS, and Linux
  */
 
@@ -1053,18 +1053,18 @@ const homeDir = os.homedir();
 
 // Get data directory based on platform
 function getDataDir() {
-  const localDir = path.join(process.cwd(), '.claude-flow', 'sessions');
+  const localDir = path.join(process.cwd(), '.opencode', 'sessions');
   if (fs.existsSync(path.dirname(localDir))) {
     return localDir;
   }
 
   switch (platform) {
     case 'win32':
-      return path.join(process.env.APPDATA || homeDir, 'claude-flow', 'sessions');
+      return path.join(process.env.APPDATA || homeDir, 'opencode', 'sessions');
     case 'darwin':
-      return path.join(homeDir, 'Library', 'Application Support', 'claude-flow', 'sessions');
+      return path.join(homeDir, 'Library', 'Application Support', 'opencode', 'sessions');
     default:
-      return path.join(homeDir, '.claude-flow', 'sessions');
+      return path.join(homeDir, '.opencode', 'sessions');
   }
 }
 

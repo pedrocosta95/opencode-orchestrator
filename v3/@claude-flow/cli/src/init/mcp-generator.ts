@@ -1,6 +1,6 @@
 /**
  * MCP Configuration Generator
- * Creates .mcp.json for Claude Code and OpenCode MCP server integration
+ * Creates opencode.json for OpenCode MCP server integration
  * Handles cross-platform compatibility (Windows requires cmd /c wrapper)
  */
 
@@ -52,17 +52,17 @@ export function generateMCPConfig(options: InitOptions): object {
     npm_config_update_notifier: 'false',
   };
 
-  // Claude Flow MCP server (core)
+  // OpenCode Orchestrator MCP server (core)
   if (config.claudeFlow) {
-    mcpServers['claude-flow'] = createMCPServerEntry(
-      ['@claude-flow/cli@latest', 'mcp', 'start'],
+    mcpServers['opencode-orchestrator'] = createMCPServerEntry(
+      ['@cloudpftc/opencode-orchestrator@latest', 'mcp', 'start'],
       {
         ...npmEnv,
-        CLAUDE_FLOW_MODE: 'v3',
-        CLAUDE_FLOW_HOOKS_ENABLED: 'true',
-        CLAUDE_FLOW_TOPOLOGY: options.runtime.topology,
-        CLAUDE_FLOW_MAX_AGENTS: String(options.runtime.maxAgents),
-        CLAUDE_FLOW_MEMORY_BACKEND: options.runtime.memoryBackend,
+        OPENCODE_MODE: 'v3',
+        OPENCODE_HOOKS_ENABLED: 'true',
+        OPENCODE_TOPOLOGY: options.runtime.topology,
+        OPENCODE_MAX_AGENTS: String(options.runtime.maxAgents),
+        OPENCODE_MEMORY_BACKEND: options.runtime.memoryBackend,
       },
       { autoStart: config.autoStart }
     );
@@ -90,7 +90,7 @@ export function generateMCPConfig(options: InitOptions): object {
 }
 
 /**
- * Generate .mcp.json as formatted string
+ * Generate opencode.json as formatted string
  */
 export function generateMCPJson(options: InitOptions): string {
   const config = generateMCPConfig(options);
@@ -106,23 +106,23 @@ export function generateMCPCommands(options: InitOptions): string[] {
 
   if (isWindows()) {
     if (config.claudeFlow) {
-      commands.push('claude mcp add claude-flow -- cmd /c npx -y @claude-flow/cli@latest mcp start');
+      commands.push('opencode mcp add opencode-orchestrator -- cmd /c npx -y @cloudpftc/opencode-orchestrator@latest mcp start');
     }
     if (config.ruvSwarm) {
-      commands.push('claude mcp add ruv-swarm -- cmd /c npx -y ruv-swarm mcp start');
+      commands.push('opencode mcp add ruv-swarm -- cmd /c npx -y ruv-swarm mcp start');
     }
     if (config.flowNexus) {
-      commands.push('claude mcp add flow-nexus -- cmd /c npx -y flow-nexus@latest mcp start');
+      commands.push('opencode mcp add flow-nexus -- cmd /c npx -y flow-nexus@latest mcp start');
     }
   } else {
     if (config.claudeFlow) {
-      commands.push("claude mcp add claude-flow -- npx -y @claude-flow/cli@latest mcp start");
+      commands.push("opencode mcp add opencode-orchestrator -- npx -y @cloudpftc/opencode-orchestrator@latest mcp start");
     }
     if (config.ruvSwarm) {
-      commands.push("claude mcp add ruv-swarm -- npx -y ruv-swarm mcp start");
+      commands.push("opencode mcp add ruv-swarm -- npx -y ruv-swarm mcp start");
     }
     if (config.flowNexus) {
-      commands.push("claude mcp add flow-nexus -- npx -y flow-nexus@latest mcp start");
+      commands.push("opencode mcp add flow-nexus -- npx -y flow-nexus@latest mcp start");
     }
   }
 
