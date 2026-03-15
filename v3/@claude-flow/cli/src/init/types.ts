@@ -184,8 +184,12 @@ export interface RuntimeConfig {
   enableMemoryGraph?: boolean;
   /** Enable AgentMemoryScope (ADR-049) - 3-scope agent memory */
   enableAgentScopes?: boolean;
-  /** CLAUDE.md template variant */
+  /** SKILL.md template variant */
   opencodeMdTemplate?: SkillMdTemplate;
+  /** Enable ruv-swarm MCP server */
+  swarm?: boolean;
+  /** Enable flow-nexus MCP server */
+  flowNexus?: boolean;
 }
 
 /** Template variants for generated CLAUDE.md files */
